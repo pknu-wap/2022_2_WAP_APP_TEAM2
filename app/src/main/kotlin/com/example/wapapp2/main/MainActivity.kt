@@ -19,6 +19,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        // branch 테스트입니다.
+        //1234
+
     }
 
     override fun onResume() {
