@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.wapapp2.R
-import com.example.wapapp2.databinding.FragmentNewCalcBinding
+import com.example.wapapp2.databinding.FragmentCalcMainBinding
 
 
-class NewCalcFragment : Fragment() {
-    private lateinit var binding: FragmentNewCalcBinding
+class CalcMainFragment : Fragment() {
+    private lateinit var binding: FragmentCalcMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,12 +19,15 @@ class NewCalcFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentNewCalcBinding.inflate(inflater)
+        binding = FragmentCalcMainBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.topAppBar.setNavigationOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 }

@@ -1,27 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/groupRV"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="-25dp"
-        android:paddingBottom="25dp"
         android:layout_gravity="center_horizontal"
-
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
 
-    <ImageView
-        android:id="@+id/group_btn_add"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:clickable="true"
-        android:src="@drawable/ic_add"/>
 
 
 </LinearLayout>

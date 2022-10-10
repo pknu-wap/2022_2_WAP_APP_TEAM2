@@ -1,4 +1,4 @@
-package com.example.wapapp2
+package com.example.wapapp2.view.calendar
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -11,7 +11,7 @@ import com.example.wapapp2.databinding.CalenderItemBinding
 import org.joda.time.DateTime
 
 class CalenderFragment : Fragment() {
-    private lateinit var dstDate : DateTime
+    private lateinit var dstDate: DateTime
     private lateinit var binding: CalenderFragmentBinding
 
 
@@ -21,17 +21,17 @@ class CalenderFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
 
-        fun updateCal(){
-            binding.calenderDate.setText(dstDate.toString("yyyy년 MM월") )
+        fun updateCal() {
+            binding.calenderDate.setText(dstDate.toString("yyyy년 MM월"))
             binding.calenderRV.adapter = CalenderAdapter(dstDate.year, dstDate.monthOfYear)
         }
 
-        dstDate = DateTime()
+        dstDate = org.joda.time.DateTime()
         binding = CalenderFragmentBinding.inflate(layoutInflater)
 
         updateCal()
@@ -49,24 +49,24 @@ class CalenderFragment : Fragment() {
     }
 
 
-    private inner class CalenderAdapter(year : Int, month : Int) : RecyclerView.Adapter<CalenderAdapter.ViewHolder>(){
-        private val row = 7;    private val col = 5
-        private var dayStart : Int
-        private var maxDay : Int
+    private inner class CalenderAdapter(year: Int, month: Int) : RecyclerView.Adapter<CalenderAdapter.ViewHolder>() {
+        private val row = 7;
+        private val col = 5
+        private var dayStart: Int
+        private var maxDay: Int
 
         private lateinit var item_binding: CalenderItemBinding
 
 
-
-        init{
-            val dstDate = DateTime().withDate(year,month,1)
-            dayStart = -( dstDate.dayOfWeek - 1 )
+        init {
+            val dstDate = DateTime().withDate(year, month, 1)
+            dayStart = -(dstDate.dayOfWeek - 1)
             maxDay = dstDate.toLocalDate().dayOfMonth().withMaximumValue().dayOfMonth
 
         }
 
-        inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
-            fun bind(pos: Int){
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            fun bind(pos: Int) {
                 val dayCount = dayStart + pos
                 if (dayCount in 1..maxDay)
                     item_binding.calenderDay.setText(dayCount.toString())
@@ -90,7 +90,6 @@ class CalenderFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(position)
         }
-
 
 
     }
