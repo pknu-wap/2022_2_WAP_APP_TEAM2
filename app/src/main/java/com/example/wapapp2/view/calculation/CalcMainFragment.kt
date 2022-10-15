@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
+import com.example.wapapp2.view.chat.ChatFragment
 
 
 class CalcMainFragment : Fragment() {
@@ -29,5 +30,15 @@ class CalcMainFragment : Fragment() {
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
+
+        val recentTopFragment = RecentCalcTopFragment()
+        val chatFragment = ChatFragment()
+
+        val fragmentManager = childFragmentManager
+        fragmentManager.beginTransaction().replace(binding.calculationSimpleInfo.id,
+                recentTopFragment, RecentCalcTopFragment::class.simpleName)
+                .replace(binding.chat.id, chatFragment, ChatFragment::class.simpleName).commitAllowingStateLoss()
+
+
     }
 }
