@@ -1,4 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="msg_header_space_height">8dp</dimen>
+    <dimen name="chat_msg_item_time_margin">8dp</dimen>
 </resources>

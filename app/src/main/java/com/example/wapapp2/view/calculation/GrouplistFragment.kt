@@ -14,6 +14,7 @@ import com.example.wapapp2.R
 import com.example.wapapp2.databinding.GroupFragmentBinding
 import com.example.wapapp2.databinding.GroupItemBinding
 import com.example.wapapp2.databinding.ListAddViewBinding
+import com.example.wapapp2.dummy.CalcRoomDummyData
 import com.example.wapapp2.view.main.MainHostFragment
 
 
@@ -26,6 +27,12 @@ class GrouplistFragment : Fragment() {
         override fun onClickedItem(position: Int) {
             val fragment = CalcMainFragment()
             val fragmentManager = parentFragment!!.parentFragmentManager
+
+            val bundle = Bundle()
+            val calcRoomDummyData = CalcRoomDummyData.getRoom()
+            bundle.putString("roomId", calcRoomDummyData.roomId)
+
+            fragment.arguments = bundle
 
             fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as

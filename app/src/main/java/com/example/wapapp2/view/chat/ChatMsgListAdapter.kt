@@ -1,82 +1,101 @@
 package com.example.wapapp2.view.chat
 
+import android.content.Context
 import android.graphics.Color
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.ChatMsgItemBinding
+import com.example.wapapp2.model.ChatData
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.ISODateTimeFormat
 
-class ChatMsgListAdapter {
+class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adapter<ChatMsgListAdapter.ViewHolder>() {
+    private val layoutInflater: LayoutInflater
+    private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
+    private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
+    val chatList = ArrayList<ChatData>()
 
-    private inner class ViewHolder(val binding: ChatMsgItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    init {
+        layoutInflater = LayoutInflater.from(context)
+    }
+
+    inner class ViewHolder(val binding: ChatMsgItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        var time = DateTime()
 
         fun bind() {
+            binding.root.layoutParams = RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
             val position = adapterPosition
+            val msgParams = binding.msg.layoutParams as ConstraintLayout.LayoutParams
+            val userNameParams = binding.userName.layoutParams as ConstraintLayout.LayoutParams
+            val timeParams = binding.time.layoutParams as ConstraintLayout.LayoutParams
 
-        }
+            binding.msg.text = chatList[position].msg
 
-        private fun configMessage() {
-            configText()
-            configUsername()
-            configSpacing()
-        }
+            if (chatList[position].userId == myId) {
+                //내 메시지
+                binding.msg.setTextColor(Color.WHITE)
+                binding.msg.setBackgroundResource(R.drawable.chat_msg_bubble_right)
 
-        private fun configText() {
-            val text = binding.msg
-
-            val params = text.layoutParams as ConstraintLayout.LayoutParams
-            if (messageListItem.isMine) {
-                params.horizontalBias = 1f
-                text.setTextColor(Color.WHITE)
-                text.setPadding(dpToPixel(10f), dpToPixel(5f), dpToPixel(15f), dpToPixel(5f))
-                if (isBottom()) {
-                    text.setBackgroundResource(R.drawable.chat_msg_item_bubble_right_tail)
-                } else {
-                    text.setBackgroundResource(R.drawable.chat_msg_bubble_right)
-                }
+                userNameParams.endToEnd = R.id.parent
+                msgParams.endToEnd = R.id.parent
+                timeParams.endToStart = R.id.msg
             } else {
-                params.horizontalBias = 0f
-                text.setTextColor(Color.BLACK)
-                text.setPadding(dpToPixel(15f), dpToPixel(5f), dpToPixel(10f), dpToPixel(5f))
-                if (isBottom()) {
-                    text.setBackgroundResource(R.drawable.chat_msg_item_bubble_left_tail)
-                } else {
-                    text.setBackgroundResource(R.drawable.chat_msg_bubble_left)
-                }
+                //상대방 메시지
+                binding.msg.setTextColor(Color.BLACK)
+                binding.msg.setBackgroundResource(R.drawable.chat_msg_bubble_left)
+
+                userNameParams.startToStart = R.id.parent
+                msgParams.startToStart = R.id.parent
+                timeParams.startToEnd = R.id.msg
             }
 
+            binding.msg.layoutParams = msgParams
+            binding.userName.layoutParams = userNameParams
+            binding.time.layoutParams = timeParams
+
+            setUserName(position)
+
+            if (equalsTopUserId(chatList[position].userId, position)) {
+                binding.spaceHeader.layoutParams.height = 6
+            }
+
+            time = dateTimeParser.parseDateTime(chatList[position].time)
+            binding.time.text = timeFormat.print(time)
         }
 
-        private fun configUsername() {
-            if (channelState.members.size == 2 || messageListItem.isMine || !isTop()) {
+
+        private fun setUserName(position: Int) {
+            if (chatList[position].userId == myId || equalsTopUserId(chatList[position].userId, position)) {
                 binding.userName.visibility = View.GONE
                 return
             }
 
-            binding.userName.text = messageListItem.message.user.name
-
-            val params = binding.userName.layoutParams as ConstraintLayout.LayoutParams
-            if (messageListItem.isMine) {
-                params.horizontalBias = 1f
-                params.rightMargin = 40
-            } else {
-                params.horizontalBias = 0f
-                params.leftMargin = 40
-            }
+            binding.userName.visibility = View.VISIBLE
+            binding.userName.text = chatList[position].userName
         }
 
-        private fun configSpacing() {
-            if (!isTop()) {
-                binding.spaceHeader.layoutParams.height = 5
-            }
-        }
 
-        private fun configDate() {
-            binding.userName.visibility = View.GONE
-            binding.msg.text = DateFormat
-                    .getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
-                    .format(messageListItem.date)
+        private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
+            return if (currentPosition - 1 < 0) false else chatList[currentPosition - 1].userId == userId
         }
     }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(ChatMsgItemBinding.inflate(layoutInflater, parent, false))
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind()
+    }
+
+    override fun getItemCount(): Int = chatList.size
 }

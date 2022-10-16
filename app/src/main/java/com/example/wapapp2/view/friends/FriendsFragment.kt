@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentFriendsBinding
-import com.example.wapapp2.main.ProfileAdapter
+import com.example.wapapp2.view.login.ProfileAdapter
 import com.example.wapapp2.view.login.Profiles
 
 class FriendsFragment : Fragment() {

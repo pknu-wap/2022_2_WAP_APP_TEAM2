@@ -1,4 +1,4 @@
-package com.example.wapapp2.main
+package com.example.wapapp2.view.login
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
-import com.example.wapapp2.view.login.Profiles
 
 class ProfileAdapter(val profileList: ArrayList<Profiles>) : RecyclerView.Adapter<ProfileAdapter.CustomViewHolder>()
 {
