@@ -27,7 +27,7 @@ class CalenderFragment : Fragment() {
         // Inflate the layout for this fragment
 
         fun updateCal() {
-            binding.calenderDate.setText(dstDate.toString("yyyy년 MM월"))
+            binding.calenderDate.text = dstDate.toString("yyyy년 MM월")
             binding.calenderRV.adapter = CalenderAdapter(dstDate.year, dstDate.monthOfYear)
         }
 
@@ -57,7 +57,6 @@ class CalenderFragment : Fragment() {
 
         private lateinit var item_binding: CalenderItemBinding
 
-
         init {
             val dstDate = DateTime().withDate(year, month, 1)
             dayStart = -(dstDate.dayOfWeek - 1)
@@ -69,9 +68,9 @@ class CalenderFragment : Fragment() {
             fun bind(pos: Int) {
                 val dayCount = dayStart + pos
                 if (dayCount in 1..maxDay)
-                    item_binding.calenderDay.setText(dayCount.toString())
+                    item_binding.calenderDay.text = dayCount.toString()
                 else
-                    item_binding.calenderDay.setText("")
+                    item_binding.calenderDay.text = ""
             }
         }
 
