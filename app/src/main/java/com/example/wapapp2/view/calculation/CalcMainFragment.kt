@@ -53,7 +53,7 @@ class CalcMainFragment : Fragment() {
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                
+
             }
         })
 
@@ -67,6 +67,15 @@ class CalcMainFragment : Fragment() {
                 binding.calculationSimpleInfo.recentCalculationView.visibility = if (expanded) View.VISIBLE else View.GONE
             }
         })
+
+        binding.topAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.menu ->
+                    binding.root.openDrawer(binding.sideNavigation)
+                else -> {}
+            }
+            true
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
