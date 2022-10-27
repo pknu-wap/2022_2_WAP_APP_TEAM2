@@ -44,7 +44,7 @@ class GrouplistFragment : Fragment() {
 
     }
 
-    
+
     /** Add Group **/
     private val addOnClickedItemListener = View.OnClickListener {
         val fragment = NewCalcFragment()
@@ -56,6 +56,8 @@ class GrouplistFragment : Fragment() {
                 .add(R.id.fragment_container_view, fragment, NewCalcFragment::class.java.name)
                 .addToBackStack(NewCalcFragment::class.java.name).commitAllowingStateLoss()
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,9 +116,7 @@ class GrouplistFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return
-                if (position == itemCount - 1) (holder as AddVH).bind()
-                else (holder as GroupVH).bind(items[position])
+            return if (position == itemCount - 1) (holder as AddVH).bind() else (holder as GroupVH).bind(items[position])
         }
 
         override fun getItemCount(): Int {
