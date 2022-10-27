@@ -23,6 +23,7 @@ class GrouplistFragment : Fragment() {
 
     private lateinit var adapter: GroupAdapter
 
+    /** Enter Group **/
     private val onClickedItemListener = object : OnClickedItemListener {
         override fun onClickedItem(position: Int) {
             val fragment = CalcMainFragment()
@@ -40,8 +41,11 @@ class GrouplistFragment : Fragment() {
                     .add(R.id.fragment_container_view, fragment, CalcMainFragment::class.java.name)
                     .addToBackStack(CalcMainFragment::class.java.name).commitAllowingStateLoss()
         }
+
     }
 
+    
+    /** Add Group **/
     private val addOnClickedItemListener = View.OnClickListener {
         val fragment = NewCalcFragment()
         val fragmentManager = requireParentFragment().parentFragmentManager
@@ -102,17 +106,17 @@ class GrouplistFragment : Fragment() {
         }
 
         inner class AddVH(val binding: ListAddViewBinding) : RecyclerView.ViewHolder(binding.root) {
-
             fun bind() {
                 binding.groupBtnAdd.setOnClickListener {
                     addOnClickedItemListener.onClick(binding.root)
                 }
             }
-
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return if (position == itemCount - 1) (holder as AddVH).bind() else (holder as GroupVH).bind(items[position])
+            return
+                if (position == itemCount - 1) (holder as AddVH).bind()
+                else (holder as GroupVH).bind(items[position])
         }
 
         override fun getItemCount(): Int {
