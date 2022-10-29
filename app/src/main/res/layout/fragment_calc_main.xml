@@ -69,7 +69,9 @@
                 android:orientation="vertical"
                 >
 
+                <!--
                 <include android:id="@+id/side_nav_menu" />
+                -->
 
             </LinearLayout>
 

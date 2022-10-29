@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentNewCalcBinding
+import com.example.wapapp2.view.friends.FriendsFragment
+import com.example.wapapp2.view.main.MainHostFragment
 
 
 class NewCalcFragment : Fragment() {
@@ -29,5 +31,8 @@ class NewCalcFragment : Fragment() {
         binding.topAppBar.setNavigationOnClickListener{
             parentFragmentManager.popBackStack()
         }
+
+        childFragmentManager.beginTransaction().add(binding.fragmentContainerView.id, FriendsFragment(), FriendsFragment::class.java.name)
+            .commitAllowingStateLoss()
     }
 }

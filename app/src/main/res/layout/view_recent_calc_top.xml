@@ -16,9 +16,19 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="최근 정산"
+            android:text="나의 정산액"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/summary"
+            android:text="12,000원"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintRight_toLeftOf="@id/expand_btn"
+            app:layout_constraintBottom_toBottomOf="@id/title"
+            android:layout_marginRight="20dp"
             />
 
         <ImageButton
@@ -36,46 +46,31 @@
             android:id="@+id/recent_calculation_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             app:layout_constraintTop_toBottomOf="@id/title"
             >
 
-            <TextView
-                android:id="@+id/totalMoneyLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="전체금액 : "
-                app:layout_constraintLeft_toLeftOf="parent"
+
+
+            <ImageView
+                android:id="@+id/sep_line"
                 app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/black"
                 />
 
-            <TextView
-                android:id="@+id/totalMoney"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5,000원"
-                app:layout_constraintBaseline_toBaselineOf="@id/totalMoneyLabel"
-                app:layout_constraintLeft_toRightOf="@id/totalMoneyLabel"
-                />
 
-            <TextView
-                android:id="@+id/myMoneyLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="내가 내야할 금액 : "
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recent_calc_item"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/totalMoneyLabel"
+                app:layout_constraintTop_toBottomOf="@id/sep_line"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 />
 
-            <TextView
-                android:id="@+id/myMoney"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2,000원"
-                app:layout_constraintBaseline_toBaselineOf="@id/myMoneyLabel"
-                app:layout_constraintLeft_toRightOf="@id/myMoneyLabel"
-                />
 
             <TextView
                 android:id="@+id/description"
@@ -85,7 +80,7 @@
                 android:text="송금부탁!!"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/myMoneyLabel"
+                app:layout_constraintTop_toBottomOf="@id/recent_calc_item"
                 />
 
             <TextView
@@ -94,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:text="2022년 10월 16일 일요일 오후 4:10"
                 android:textSize="13sp"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/description"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
