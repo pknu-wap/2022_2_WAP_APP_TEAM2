@@ -10,6 +10,7 @@ import com.example.wapapp2.view.calendar.CalenderFragment
 import com.example.wapapp2.view.calculation.GrouplistFragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentMainHostBinding
+import com.example.wapapp2.view.friends.FriendsFragment
 
 
 class MainHostFragment : Fragment() {
@@ -54,11 +55,16 @@ class MainHostFragment : Fragment() {
                         true
                     }
 
+                    R.id.friends -> {
+                        newFragment = FriendsFragment()
+                        true
+                    }
+
                     else -> false
                 }
 
                 transaction.add(binding.fragmentContainerView.id, newFragment!!,
-                        tag).addToBackStack(tag).setPrimaryNavigationFragment(newFragment)
+                        tag).addToBackStack(tag)
 
             } else {
                 transaction.show(newFragment)

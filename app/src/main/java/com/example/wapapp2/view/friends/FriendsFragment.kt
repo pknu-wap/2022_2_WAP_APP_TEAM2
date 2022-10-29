@@ -23,8 +23,8 @@ class FriendsFragment : Fragment() {
 
         val profileList = arrayListOf(
                 Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com"),
-                Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com"),
-                Profiles(R.drawable.girl, "김성윤", "ksu8063@naver.com")
+                Profiles(R.drawable.man, "박준성", "ksu8063@naver.com"),
+                Profiles(R.drawable.girl, "김진우", "nbmlon99@naver.com")
         )
 
         viewBinding.rvProfile.setHasFixedSize(true)

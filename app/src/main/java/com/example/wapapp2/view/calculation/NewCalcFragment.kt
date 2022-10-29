@@ -19,6 +19,8 @@ import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.view.friends.FriendsListFragment
 import com.example.wapapp2.viewmodel.NewCalculationViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.wapapp2.view.friends.FriendsFragment
+import com.example.wapapp2.view.main.MainHostFragment
 
 
 open class NewCalcFragment : Fragment() {
@@ -117,6 +119,8 @@ open class NewCalcFragment : Fragment() {
         }
 
         binding.divideN.isSelected = true
+
+
     }
 
     private fun addCalculationItem() {
