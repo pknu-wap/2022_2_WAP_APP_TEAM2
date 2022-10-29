@@ -3,6 +3,7 @@ package com.example.wapapp2.dummy
 import com.example.wapapp2.model.CalcRoomData
 import com.example.wapapp2.model.CalcRoomMemberData
 import com.example.wapapp2.model.ChatData
+import com.example.wapapp2.model.FriendDTO
 import org.joda.time.DateTime
 
 class CalcRoomDummyData {
@@ -36,6 +37,12 @@ class CalcRoomDummyData {
             testList.add(ChatData(peopleList[1].userName, peopleList[1].userId, dateTime.toString(), "@@"))
 
             return testList
+        }
+
+        fun getFriendsList(): ArrayList<FriendDTO> {
+            val list = ArrayList<FriendDTO>()
+
+            return list
         }
     }
 
