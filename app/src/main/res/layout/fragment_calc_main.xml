@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     tools:openDrawer="right"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
         >
 
         <com.google.android.material.appbar.AppBarLayout
@@ -69,14 +67,12 @@
                 android:orientation="vertical"
                 >
 
-                <!--
-                <include android:id="@+id/side_nav_menu" />
-                -->
-
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+
     </com.google.android.material.navigation.NavigationView>
+
 </androidx.drawerlayout.widget.DrawerLayout>
 
 
