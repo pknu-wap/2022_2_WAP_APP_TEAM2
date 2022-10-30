@@ -21,7 +21,7 @@ class CalcMainFragment : Fragment() {
     private lateinit var bundle: Bundle
     private var summary = 0
 
-    fun updateSummary(){
+    fun updateSummary() {
         binding.calculationSimpleInfo.summary.text = summary.toString() + "원"
     }
 
@@ -43,10 +43,10 @@ class CalcMainFragment : Fragment() {
         binding = FragmentCalcMainBinding.inflate(inflater)
 
         val dummyReceipt = ArrayList<ReceiptDTO>()
-        dummyReceipt.add(ReceiptDTO("돼지고기",36000,12000,3))
-        dummyReceipt.add(ReceiptDTO("된장찌개",6000,6000,1))
+        dummyReceipt.add(ReceiptDTO("돼지고기", 36000, 12000, 3, ReceiptDTO.CalculationType.CUSTOM))
+        dummyReceipt.add(ReceiptDTO("된장찌개", 6000, 6000, 1, ReceiptDTO.CalculationType.DIVIDE_N))
 
-        binding.calculationSimpleInfo.recentCalcItem.adapter = ReceiptItemAdapter( context ,dummyReceipt)
+        binding.calculationSimpleInfo.recentCalcItem.adapter = ReceiptItemAdapter(context, dummyReceipt)
         return binding.root
     }
 
@@ -85,7 +85,7 @@ class CalcMainFragment : Fragment() {
 
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.menu ->{
+                R.id.menu -> {
                     binding.root.openDrawer(binding.sideNavigation)
                 }
 
@@ -95,13 +95,17 @@ class CalcMainFragment : Fragment() {
         }
     }
 
-    private inner class ReceiptItemAdapter(private val context : Context? ,private val items : ArrayList<ReceiptDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptDTO>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        inner class ReceiptVH(val binding : ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root){
+        inner class ReceiptVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(item : ReceiptDTO){
-                try{item.myMoney = item.totalMoney / item.personCount}catch (e : ArithmeticException){ item.myMoney =0}
+            fun bind(item: ReceiptDTO) {
+                try {
+                    item.myMoney = item.totalMoney / item.personCount
+                } catch (e: ArithmeticException) {
+                    item.myMoney = 0
+                }
                 binding.receiptMenu.text = item.menu
                 binding.receiptTotalMoney.text = item.totalMoney.toString()
                 binding.receiptMyMoney.text = item.myMoney.toString()
@@ -111,8 +115,8 @@ class CalcMainFragment : Fragment() {
                 summary += item.myMoney
 
 
-                binding.recentCalcCkbox.setOnCheckedChangeListener{ _, isChecked ->
-                    if(isChecked){
+                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
                         summary -= item.myMoney
                         item.personCount++; item.myMoney = item.totalMoney / item.personCount
                         summary += item.myMoney
@@ -122,11 +126,14 @@ class CalcMainFragment : Fragment() {
                         binding.receiptPersonCount.text = item.personCount.toString() + "/3"
                         updateSummary()
 
-                    }
-                    else{
+                    } else {
                         item.personCount--;
                         summary -= item.myMoney
-                        try{item.myMoney = item.totalMoney / item.personCount}catch (e : ArithmeticException){ item.myMoney =0}
+                        try {
+                            item.myMoney = item.totalMoney / item.personCount
+                        } catch (e: ArithmeticException) {
+                            item.myMoney = 0
+                        }
                         summary += item.myMoney
 
                         binding.receiptMyMoney.text = item.myMoney.toString()

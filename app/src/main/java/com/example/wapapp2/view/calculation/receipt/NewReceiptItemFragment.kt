@@ -10,15 +10,14 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.NewReceiptItemViewFragmentBinding
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
-import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class NewReceiptItemFragment : Fragment() {
+class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter {
     private lateinit var binding: NewReceiptItemViewFragmentBinding
     private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
     private var receiptId: String? = null
@@ -45,6 +44,37 @@ class NewReceiptItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.totalMoneyEditText.addTextChangedListener {
+            //총 금액 값이 0이상인 경우
+            if (!it.isNullOrEmpty()) {
+                if (newReceiptViewModel.getProductCount(receiptId!!) > 0) {
+
+                    //영수증 항목이 존재하는 경우에 상단 총 금액 값과 영수증 항목 총 금액이 다를 경우
+                    //상단 총 금액 항목의 값을 영수증 총 금액 항목으로 설정한다.
+                    if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.totalMoney != it.toString().toInt()) {
+                        binding.totalMoneyEditText.text = newReceiptViewModel.getReceiptDTO(receiptId!!)?.totalMoney.toString().toEditable()
+                    }
+                } else {
+                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.totalMoney = it.toString().toInt()
+                }
+            } else {
+                //총 금액 값이 없는 경우
+                if (newReceiptViewModel.getProductCount(receiptId!!) > 0) {
+                    val realTotalPrice = newReceiptViewModel.calcTotalPrice(receiptId!!)
+
+                    //영수증 항목이 존재하는 경우에
+                    //상단 총 금액 항목의 값을 영수증 총 금액 항목으로 설정한다.
+                    binding.totalMoneyEditText.text = realTotalPrice.toEditable()
+                } else {
+                    //영수증항목이 없을 때 0으로 설정
+                    binding.totalMoneyEditText.text = "0".toEditable()
+                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.totalMoney = 0
+                }
+            }
+
+        }
+
+
         binding.addProductBtn.setOnClickListener {
             addProduct()
         }
@@ -58,18 +88,19 @@ class NewReceiptItemFragment : Fragment() {
         }
 
         binding.toggles.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            when (checkedId) {
-                binding.divideN.id -> {
+            if (isChecked) {
+                when (checkedId) {
+                    binding.divideN.id -> {
+                        newReceiptViewModel.getReceiptDTO(receiptId!!)?.calculationType = ReceiptDTO.CalculationType.DIVIDE_N
+                    }
+                    binding.manualInput.id -> {
+                        newReceiptViewModel.getReceiptDTO(receiptId!!)?.calculationType = ReceiptDTO.CalculationType.CUSTOM
+                    }
+                    else -> {
 
-                }
-                binding.manualInput.id -> {
-
-                }
-                else -> {
-
+                    }
                 }
             }
-
         }
 
         binding.addReceiptImgBtn.setOnClickListener {
@@ -90,8 +121,12 @@ class NewReceiptItemFragment : Fragment() {
             dialog.show()
         }
 
-        binding.divideN.isSelected = true
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.toggles.check(binding.divideN.id)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -101,8 +136,8 @@ class NewReceiptItemFragment : Fragment() {
 
     private fun addProduct() {
         val itemBinding = ProductItemLayoutInNewCalcBinding.inflate(layoutInflater)
-        val dto = newReceiptViewModel.addProduct(receiptId!!)
-        itemBinding.root.tag = dto
+        val productDTO = newReceiptViewModel.addProduct(receiptId!!)
+        itemBinding.root.tag = productDTO
 
         val addedPosition = binding.productsList.childCount - 1
 
@@ -117,19 +152,28 @@ class NewReceiptItemFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 if (!s.isNullOrEmpty()) {
-                    dto.price = s.toString().toInt()
-                    calcTotalPrice()
+                    productDTO.price = s.toString().toInt()
                 } else {
                     itemBinding.productPriceEditText.text = "0".toEditable()
+                    productDTO.price = 0
                 }
-
+                calcTotalPrice()
             }
         })
+
+        itemBinding.calculationItemNameEditText.addTextChangedListener {
+            if (!it.isNullOrEmpty()) {
+                productDTO.itemName = it.toString()
+            } else {
+                itemBinding.calculationItemNameEditText.text = "".toEditable()
+                productDTO.itemName = ""
+            }
+        }
 
         itemBinding.removeBtn.setOnClickListener {
 
             try {
-                val position = newReceiptViewModel.removeProduct(receiptId!!, dto)
+                val position = newReceiptViewModel.removeProduct(receiptId!!, productDTO)
                 binding.productsList.removeViewAt(position)
                 calcTotalPrice()
             } catch (e: Exception) {
@@ -146,5 +190,9 @@ class NewReceiptItemFragment : Fragment() {
     }
 
     private fun String.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
+
+    override fun getTotalMoney(): String {
+        return binding.totalMoneyEditText.text?.toString() ?: "0"
+    }
 
 }
