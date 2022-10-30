@@ -32,4 +32,19 @@
     <string name="exit">닫기</string>
     <string name="shoot_camera">사진 촬영</string>
     <string name="pick_image">사진 선택</string>
+    <string name="new_calc_room">정산방 추가</string>
+    <string name="invite_friends_list">초대 친구 목록</string>
+    <string name="input_search_friend_name">친구 이름 입력</string>
+    <string name="hint_input_room_name">방 제목 입력</string>
+    <string name="edit_img">사진 교체</string>
+    <string name="add_img">사진 추가</string>
+    <string name="remove_img">사진 삭제</string>
+    <string name="receipt_img">영수증 사진</string>
+    <string name="removed_receipt">영수증이 삭제 되었습니다</string>
+    <string name="unable_to_remove_receipt">영수증 삭제 불가</string>
+    <string name="receipt_count">영수증 개수</string>
+    <string name="add">추가</string>
+    <string name="final_confirmation">최종 확인</string>
+    <string name="calculation_type_divide_n">1/N</string>
+    <string name="calculation_type_custom">직접 입력</string>
 </resources>
