@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.databinding.ViewRecentCalcItemBinding
-import com.example.wapapp2.model.CalcReceiptData
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.chat.ChatFragment
 
 
@@ -42,9 +42,9 @@ class CalcMainFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         binding = FragmentCalcMainBinding.inflate(inflater)
 
-        val dummyReceipt = ArrayList<CalcReceiptData>()
-        dummyReceipt.add(CalcReceiptData("돼지고기",36000,12000,3))
-        dummyReceipt.add(CalcReceiptData("된장찌개",6000,6000,1))
+        val dummyReceipt = ArrayList<ReceiptDTO>()
+        dummyReceipt.add(ReceiptDTO("돼지고기",36000,12000,3))
+        dummyReceipt.add(ReceiptDTO("된장찌개",6000,6000,1))
 
         binding.calculationSimpleInfo.recentCalcItem.adapter = ReceiptItemAdapter( context ,dummyReceipt)
         return binding.root
@@ -95,12 +95,12 @@ class CalcMainFragment : Fragment() {
         }
     }
 
-    private inner class ReceiptItemAdapter(private val context : Context? ,private val items : ArrayList<CalcReceiptData>)
+    private inner class ReceiptItemAdapter(private val context : Context? ,private val items : ArrayList<ReceiptDTO>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
         inner class ReceiptVH(val binding : ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root){
 
-            fun bind(item : CalcReceiptData){
+            fun bind(item : ReceiptDTO){
                 try{item.myMoney = item.totalMoney / item.personCount}catch (e : ArithmeticException){ item.myMoney =0}
                 binding.receiptMenu.text = item.menu
                 binding.receiptTotalMoney.text = item.totalMoney.toString()

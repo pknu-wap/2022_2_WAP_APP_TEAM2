@@ -96,4 +96,7 @@ dependencies {
     //for Calender
     implementation 'net.danlew:android.joda:2.9.9.3'
 
+    // list, viewpager indicator
+    implementation 'me.relex:circleindicator:2.1.6'
+
 }
