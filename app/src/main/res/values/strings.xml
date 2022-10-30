@@ -44,4 +44,7 @@
     <string name="unable_to_remove_receipt">영수증 삭제 불가</string>
     <string name="receipt_count">영수증 개수</string>
     <string name="add">추가</string>
+    <string name="final_confirmation">최종 확인</string>
+    <string name="calculation_type_divide_n">1/N</string>
+    <string name="calculation_type_custom">직접 입력</string>
 </resources>

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 
 class NewReceiptViewModel(application: Application) : AndroidViewModel(application) {
     private val receiptMap = HashMap<String, ReceiptDTO>()
@@ -20,7 +21,7 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO("", 0, 0, 0)
+        receiptMap[receiptId] = ReceiptDTO("", 0, 0, 0, ReceiptDTO.CalculationType.DIVIDE_N)
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
@@ -40,6 +41,13 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun getReceipts(): MutableCollection<ReceiptDTO> = receiptMap.values
+
+    fun getReceiptSet(): MutableSet<String> = receiptMap.keys
+
+    fun getReceiptDTO(receiptId: String): ReceiptDTO? = receiptMap[receiptId]
+
+    fun getProductCount(receiptId: String): Int = receiptMap[receiptId]?.getProducts()?.size ?: 0
 
     fun getReceiptCount(): Int = receiptMap.size
 
@@ -53,6 +61,15 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
         return price.toString()
     }
 
+    fun calcTotalPrice(): String {
+        var price = 0
+        for (product in receiptMap.values) {
+            price += product.totalMoney
+        }
+
+        return price.toString()
+    }
+
     fun checkTotalMoneyWithProductsPrice(receiptId: String, totalPrice: Int): Boolean {
         var price = 0
         for (product in receiptMap[receiptId]!!.getProducts()) {
@@ -62,5 +79,4 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
         return totalPrice == price
     }
 
-    data class ReceiptProductHolder(val receiptId: String, val receiptProductDTO: ReceiptProductDTO)
 }

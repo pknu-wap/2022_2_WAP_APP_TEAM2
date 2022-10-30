@@ -2,7 +2,7 @@ package com.example.wapapp2.model
 
 import java.lang.Exception
 
-data class ReceiptDTO(val menu: String, var totalMoney: Int, var myMoney: Int, var personCount: Int) {
+data class ReceiptDTO(val menu: String, var totalMoney: Int, var myMoney: Int, var personCount: Int, var calculationType: CalculationType) {
     private val productList = ArrayList<ReceiptProductDTO>()
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
@@ -21,4 +21,7 @@ data class ReceiptDTO(val menu: String, var totalMoney: Int, var myMoney: Int, v
         throw Exception("no data")
     }
 
+    enum class CalculationType {
+        DIVIDE_N, CUSTOM
+    }
 }

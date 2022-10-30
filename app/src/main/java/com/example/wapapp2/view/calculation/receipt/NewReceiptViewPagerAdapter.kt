@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class NewReceiptViewPagerAdapter(parentFragment: Fragment, private val list: ArrayList<Holder> = ArrayList<Holder>()) : FragmentStateAdapter(parentFragment) {
+class NewReceiptViewPagerAdapter(parentFragment: Fragment, private val list: ArrayList<Holder> = ArrayList<Holder>()) :
+        FragmentStateAdapter(parentFragment) {
 
     private var receiptId = 0
     private var pageIds = list.map { it.hashCode().toLong() }
@@ -47,6 +48,15 @@ class NewReceiptViewPagerAdapter(parentFragment: Fragment, private val list: Arr
 
     override fun containsItem(itemId: Long): Boolean {
         return pageIds.contains(itemId)
+    }
+
+    fun getTotalMoney(receiptId: String): String {
+        for (holder in list) {
+            if (holder.receiptId == receiptId) {
+                return holder.fragment.getTotalMoney()
+            }
+        }
+        return ""
     }
 
     data class Holder(val receiptId: String, val fragment: NewReceiptItemFragment)
