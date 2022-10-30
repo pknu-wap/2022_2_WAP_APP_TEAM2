@@ -71,11 +71,11 @@ class CalcMainFragment : Fragment() {
         val dummyReceipts = ArrayList<ReceiptDTO>()
 
         val dummyReceipt1 = ReceiptDTO("1","점심계산")
-        dummyReceipt1.addProduct(ReceiptProductDTO("돼지고기",36000,3))
-        dummyReceipt1.addProduct(ReceiptProductDTO("된장찌개",6000,1))
+        dummyReceipt1.addProduct(ReceiptProductDTO("","돼지고기",36000,3))
+        dummyReceipt1.addProduct(ReceiptProductDTO("","된장찌개",6000,1))
         val dummyReceipt2 = ReceiptDTO("2","저녁계산")
-        dummyReceipt2.addProduct(ReceiptProductDTO("숙소",100000,3))
-        dummyReceipt2.addProduct(ReceiptProductDTO("치킨",25000,2))
+        dummyReceipt2.addProduct(ReceiptProductDTO("","숙소",100000,3))
+        dummyReceipt2.addProduct(ReceiptProductDTO("","치킨",25000,2))
 
         dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
 

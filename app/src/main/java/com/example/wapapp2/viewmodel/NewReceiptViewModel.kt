@@ -25,7 +25,7 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("",  0, 0)
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 0)
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }
