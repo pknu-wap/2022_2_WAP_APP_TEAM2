@@ -135,7 +135,7 @@ class CalcMainFragment : Fragment() {
 
         inner class ReceiptVM(val binding : ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root){
             fun bind(receipt : ReceiptDTO){
-                binding.description.text = receipt.title
+                binding.description.text = "[ " + receipt.title + " ] - 김진우"
                 binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
                 binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
             }

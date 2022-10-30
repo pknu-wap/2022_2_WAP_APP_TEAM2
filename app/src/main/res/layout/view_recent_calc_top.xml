@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="나의 정산액"
+            android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:text="12,000원"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/title"
             app:layout_constraintRight_toLeftOf="@id/expand_btn" />
 
@@ -66,12 +68,15 @@
                 android:layout_above="@id/btn_frame"
                 />
 
+
+
             <!-- Button Frame -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/btn_frame"
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                >
                 <Button
                     android:id="@+id/btn_calc_done"
                     android:layout_width="wrap_content"
