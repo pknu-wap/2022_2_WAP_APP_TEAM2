@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/topAppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+            app:title="@string/new_calc_room"
+            />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/room_name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:elevation="4dp"
+        android:hint="@string/hint_input_room_name"
+        app:endIconMode="clear_text"
+        app:expandedHintEnabled="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topAppBarLayout"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/room_name_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/invite_friends_list_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/invite_friends_list"
+        android:textSize="17sp"
+        app:layout_constraintTop_toBottomOf="@id/room_name_layout"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/invite_friends_list"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/invite_friends_list_label"
+        tools:itemCount="6"
+        tools:listitem="@layout/checked_friend_itemview"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchview_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:elevation="4dp"
+        android:hint="@string/input_search_friend_name"
+        app:endIconMode="clear_text"
+        app:expandedHintEnabled="true"
+        app:layout_constraintTop_toBottomOf="@id/invite_friends_list"
+        app:startIconDrawable="@drawable/ic_baseline_search_24"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_friends_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/save_btn"
+        app:layout_constraintTop_toBottomOf="@id/searchview_layout"
+        tools:itemCount="2"
+        tools:listitem="@layout/search_friend_item_view"
+        />
+
+    <Button
+        android:id="@+id/save_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/check"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
