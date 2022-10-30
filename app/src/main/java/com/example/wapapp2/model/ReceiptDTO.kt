@@ -13,18 +13,11 @@ data class ReceiptDTO(val id: String, var title: String) {
     public var myMoney = 0
     public val date: String = DateTime.now().toString()
 
-    init {
-
-    }
-
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)
         totalMoney += receiptProductDTO.price
     }
-
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
-
-
     fun removeProduct(receiptProductDTO: ReceiptProductDTO): Int {
         for ((index, value) in productList.withIndex()) {
             if (value == receiptProductDTO) {
