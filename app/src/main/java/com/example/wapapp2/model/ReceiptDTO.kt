@@ -7,15 +7,14 @@ import java.lang.Exception
 /** 영수증
  * @param title : description of receipt
  */
-data class ReceiptDTO(val title: String) {
+data class ReceiptDTO(val id: String, var title: String) {
     private val productList = ArrayList<ReceiptProductDTO>()
-    private var totalMoney = 0
-    private var myMoney = 0
-    lateinit var date : String
-
+    public var totalMoney = 0
+    public var myMoney = 0
+    public val date: String = DateTime.now().toString()
 
     init {
-        date = DateTime.now().toString()
+
     }
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
@@ -38,7 +37,4 @@ data class ReceiptDTO(val title: String) {
         throw Exception("no data")
     }
 
-    enum class CalculationType {
-        DIVIDE_N, CUSTOM
-    }
 }

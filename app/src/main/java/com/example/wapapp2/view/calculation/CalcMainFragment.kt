@@ -16,7 +16,6 @@ import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.databinding.ViewReceiptItemBinding
 import com.example.wapapp2.databinding.ViewRecentCalcItemBinding
-import com.example.wapapp2.model.CalcReceiptData
 import com.example.wapapp2.model.CalcReceiptMenuData
 import com.example.wapapp2.view.chat.ChatFragment
 
@@ -66,19 +65,19 @@ class CalcMainFragment : Fragment() {
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
-        val dummyReceiptMenu  = ArrayList<CalcReceiptMenuData>()
-        dummyReceiptMenu.add(CalcReceiptMenuData("돼지고기",36000,12000,3))
-        dummyReceiptMenu.add(CalcReceiptMenuData("된장찌개",6000,6000,1))
+        val dummyReceiptMenu = ArrayList<CalcReceiptMenuData>()
+        dummyReceiptMenu.add(CalcReceiptMenuData("돼지고기", 36000, 12000, 3))
+        dummyReceiptMenu.add(CalcReceiptMenuData("된장찌개", 6000, 6000, 1))
 
-        val dummyReceiptMenu2  = ArrayList<CalcReceiptMenuData>()
-        dummyReceiptMenu2.add(CalcReceiptMenuData("돼지고기",36000,12000,3))
-        dummyReceiptMenu2.add(CalcReceiptMenuData("된장찌개",6000,6000,1))
+        val dummyReceiptMenu2 = ArrayList<CalcReceiptMenuData>()
+        dummyReceiptMenu2.add(CalcReceiptMenuData("돼지고기", 36000, 12000, 3))
+        dummyReceiptMenu2.add(CalcReceiptMenuData("된장찌개", 6000, 6000, 1))
 
         val dummyReceipt = ArrayList<CalcReceiptData>()
-        dummyReceipt.add(CalcReceiptData("description Frist",dummyReceiptMenu, "2021-01-25", 0))
-        dummyReceipt.add(CalcReceiptData("description Second", dummyReceiptMenu2 , "2022-02-01", 0))
+        dummyReceipt.add(CalcReceiptData("description Frist", dummyReceiptMenu, "2021-01-25", 0))
+        dummyReceipt.add(CalcReceiptData("description Second", dummyReceiptMenu2, "2022-02-01", 0))
 
-        binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipt )
+        binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipt)
 
         val chatFragment = ChatFragment()
         chatFragment.arguments = bundle
@@ -104,7 +103,7 @@ class CalcMainFragment : Fragment() {
                     R.drawable.ic_baseline_expand_more_24)
                 binding.calculationSimpleInfo.foldableView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
-                    if (expanded) RelativeLayout.LayoutParams.MATCH_PARENT  else RelativeLayout.LayoutParams.WRAP_CONTENT
+                        if (expanded) RelativeLayout.LayoutParams.MATCH_PARENT else RelativeLayout.LayoutParams.WRAP_CONTENT
             }
         })
 
@@ -113,7 +112,7 @@ class CalcMainFragment : Fragment() {
 
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.menu ->{
+                R.id.menu -> {
                     binding.root.openDrawer(binding.sideNavigation)
                 }
 
@@ -124,16 +123,16 @@ class CalcMainFragment : Fragment() {
     }
 
 
-    fun updateSummary(){
+    fun updateSummary() {
         binding.calculationSimpleInfo.summary.text = summary.toString() + "원"
     }
 
-    private inner class ReceiptAdapter(private val context: Context?, private val receipts : ArrayList<CalcReceiptData>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<CalcReceiptData>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        inner class ReceiptVM(val binding : ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root){
-            fun bind(receipt : CalcReceiptData){
+        inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
+            fun bind(receipt: CalcReceiptData) {
                 binding.description.text = receipt.description
                 binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.menus)
                 binding.dateTime.text = receipt.date
@@ -154,14 +153,18 @@ class CalcMainFragment : Fragment() {
 
     }
 
-    private inner class ReceiptItemAdapter(private val context : Context? ,private val items : ArrayList<CalcReceiptMenuData>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<CalcReceiptMenuData>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        inner class ReceiptMenuVH(val binding : ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root){
+        inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(item : CalcReceiptMenuData){
-                try{item.myMoney = item.totalMoney / item.personCount}catch (e : ArithmeticException){ item.myMoney =0}
+            fun bind(item: CalcReceiptMenuData) {
+                try {
+                    item.myMoney = item.totalMoney / item.personCount
+                } catch (e: ArithmeticException) {
+                    item.myMoney = 0
+                }
                 binding.receiptMenu.text = item.menu
                 binding.receiptTotalMoney.text = item.totalMoney.toString()
                 binding.receiptMyMoney.text = item.myMoney.toString()
@@ -173,8 +176,8 @@ class CalcMainFragment : Fragment() {
                 updateSummary()
 
 
-                binding.recentCalcCkbox.setOnCheckedChangeListener{ _, isChecked ->
-                    if(isChecked){
+                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
                         summary -= 0
                         item.personCount++; item.myMoney = item.totalMoney / item.personCount
                         summary += item.myMoney
@@ -184,11 +187,14 @@ class CalcMainFragment : Fragment() {
                         binding.receiptPersonCount.text = item.personCount.toString() + "/3"
                         updateSummary()
 
-                    }
-                    else{
+                    } else {
                         item.personCount--;
                         summary -= item.myMoney
-                        try{item.myMoney = item.totalMoney / item.personCount}catch (e : ArithmeticException){ item.myMoney =0}
+                        try {
+                            item.myMoney = item.totalMoney / item.personCount
+                        } catch (e: ArithmeticException) {
+                            item.myMoney = 0
+                        }
                         summary += 0
 
                         binding.receiptMyMoney.text = item.myMoney.toString()
