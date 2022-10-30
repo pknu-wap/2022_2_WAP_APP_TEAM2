@@ -16,6 +16,10 @@ import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 
 class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter {
     private lateinit var binding: NewReceiptItemViewFragmentBinding
@@ -132,6 +136,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
+
     }
 
     private fun addProduct() {
