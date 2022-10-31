@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.main
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -25,9 +26,14 @@ class RootTransactionFragment : Fragment() {
 
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(onBackPressedCallback)
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

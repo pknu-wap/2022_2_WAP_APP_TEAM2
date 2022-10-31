@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    >
+
+    <TextView
+        android:id="@+id/selected_bank_label"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bank_name"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="12dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toBottomOf="@id/selected_bank"
+        app:layout_constraintLeft_toRightOf="@id/selected_bank_label"
+        app:layout_constraintTop_toTopOf="@id/selected_bank"
+        />
+
+    <TextView
+        android:id="@+id/selected_bank"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="신한은행"
+        app:layout_constraintBaseline_toBaselineOf="@id/selected_bank_label"
+        app:layout_constraintLeft_toRightOf="@id/icon"
+        />
+
+    <TextView
+        android:id="@+id/bank_account_number_label"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/bank_account_number"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selected_bank_label"
+        />
+
+    <TextView
+        android:id="@+id/bank_account_number"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="계좌번호"
+        app:layout_constraintBaseline_toBaselineOf="@id/bank_account_number_label"
+        app:layout_constraintLeft_toRightOf="@id/bank_account_number_label"
+        />
+
+    <TextView
+        android:id="@+id/bank_account_holder_label"
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/bank_account_holder"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bank_account_number_label"
+        />
+
+    <TextView
+        android:id="@+id/bank_account_holder"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="예금주 명"
+        app:layout_constraintBaseline_toBaselineOf="@id/bank_account_holder_label"
+        app:layout_constraintLeft_toRightOf="@id/bank_account_holder_label"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

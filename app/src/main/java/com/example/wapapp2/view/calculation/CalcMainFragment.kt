@@ -55,11 +55,11 @@ class CalcMainFragment : Fragment() {
         //toggle로 바꿀 예정
         binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
             val dummyData = ArrayList<FixedPayDTO>()
-            dummyData.add(FixedPayDTO("김성윤",+6000))
-            dummyData.add(FixedPayDTO("박준성",-24000))
+            dummyData.add(FixedPayDTO("김성윤", +6000))
+            dummyData.add(FixedPayDTO("박준성", -24000))
 
             (binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
-            binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter( context, dummyData)
+            binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter(context, dummyData)
 
 
             binding.calculationSimpleInfo.btnCalcAdd.text = "정산 수정"
@@ -67,7 +67,7 @@ class CalcMainFragment : Fragment() {
                 TODO("정산수정버튼 구현 필요")
 
             })
-            
+
             binding.calculationSimpleInfo.btnCalcDone.text = "정산 완료"
             binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
                 TODO("정산완료버튼 구현 필요")
@@ -88,16 +88,16 @@ class CalcMainFragment : Fragment() {
 
         val dummyReceipts = ArrayList<ReceiptDTO>()
 
-        val dummyReceipt1 = ReceiptDTO("1","점심계산")
-        dummyReceipt1.addProduct(ReceiptProductDTO("","돼지고기",36000,3))
-        dummyReceipt1.addProduct(ReceiptProductDTO("","된장찌개",6000,1))
-        val dummyReceipt2 = ReceiptDTO("2","저녁계산")
-        dummyReceipt2.addProduct(ReceiptProductDTO("","숙소",100000,3))
-        dummyReceipt2.addProduct(ReceiptProductDTO("","치킨",25000,2))
+        val dummyReceipt1 = ReceiptDTO("1", "점심계산")
+        dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 36000, 3))
+        dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 6000, 1))
+        val dummyReceipt2 = ReceiptDTO("2", "저녁계산")
+        dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, 3))
+        dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 25000, 2))
 
         dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
 
-        binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipts )
+        binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipts)
 
         val chatFragment = ChatFragment()
         chatFragment.arguments = bundle
@@ -123,7 +123,7 @@ class CalcMainFragment : Fragment() {
                     R.drawable.ic_baseline_expand_more_24)
                 binding.calculationSimpleInfo.foldableView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
-                    if (expanded) RelativeLayout.LayoutParams.MATCH_PARENT  else RelativeLayout.LayoutParams.WRAP_CONTENT
+                        if (expanded) RelativeLayout.LayoutParams.MATCH_PARENT else RelativeLayout.LayoutParams.WRAP_CONTENT
             }
         })
 
@@ -132,7 +132,7 @@ class CalcMainFragment : Fragment() {
 
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.menu ->{
+                R.id.menu -> {
                     binding.root.openDrawer(binding.sideNavigation)
                 }
 
@@ -141,8 +141,9 @@ class CalcMainFragment : Fragment() {
             true
         }
     }
+
     /** setListener For Input Box **/
-    private fun setInputListener(){
+    private fun setInputListener() {
         binding.clearBtn.setOnClickListener {
             binding.inputText.text = null
         }
@@ -157,12 +158,12 @@ class CalcMainFragment : Fragment() {
     }
 
     /** summary 화면에 표시 **/
-    private fun updateSummary(){
+    private fun updateSummary() {
         binding.calculationSimpleInfo.summary.text = summary.toString() + "원"
     }
 
-    private fun updateFixedPay(){
-        if(paymoney >= 0) {
+    private fun updateFixedPay() {
+        if (paymoney >= 0) {
             binding.calculationSimpleInfo.summary.text = "+" + paymoney.toString()
             binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payPlus))
         } else {
@@ -174,12 +175,12 @@ class CalcMainFragment : Fragment() {
 
 
     /** 영수증 Adapter **/
-    private inner class ReceiptAdapter(private val context: Context?, private val receipts : ArrayList<ReceiptDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<ReceiptDTO>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        inner class ReceiptVM(val binding : ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root){
-            fun bind(receipt : ReceiptDTO){
+        inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
+            fun bind(receipt: ReceiptDTO) {
                 binding.description.text = "[ " + receipt.title + " ] - 김진우"
                 binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
                 binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
@@ -201,14 +202,14 @@ class CalcMainFragment : Fragment() {
     }
 
     /** 영수증 세부 항목 Adapter **/
-    private inner class ReceiptItemAdapter(private val context : Context? ,private val items : ArrayList<ReceiptProductDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        inner class ReceiptMenuVH(val binding : ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root){
+        inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
 
-            fun bind(item : ReceiptProductDTO){
+            fun bind(item: ReceiptProductDTO) {
                 var myMoney = calcMyMoney(item)
                 binding.receiptMenu.text = item.itemName
                 binding.receiptTotalMoney.text = item.price.toString()
@@ -221,8 +222,8 @@ class CalcMainFragment : Fragment() {
                 updateSummary()
 
 
-                binding.recentCalcCkbox.setOnCheckedChangeListener{ _, isChecked ->
-                    if(isChecked){
+                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
                         item.personCount++;
                         myMoney = calcMyMoney(item)
                         summary += myMoney
@@ -231,8 +232,7 @@ class CalcMainFragment : Fragment() {
                         binding.receiptPersonCount.text = item.personCount.toString() + "/3"
                         updateSummary()
 
-                    }
-                    else{
+                    } else {
                         myMoney = calcMyMoney(item)
                         summary -= myMoney
                         item.personCount--;
@@ -244,8 +244,13 @@ class CalcMainFragment : Fragment() {
 
                 }
             }
-            fun calcMyMoney(item : ReceiptProductDTO) :Int{
-                return try{item.price / item.personCount}catch(e : ArithmeticException){ 0 }
+
+            fun calcMyMoney(item: ReceiptProductDTO): Int {
+                return try {
+                    item.price / item.personCount
+                } catch (e: ArithmeticException) {
+                    0
+                }
             }
 
         }
@@ -266,17 +271,17 @@ class CalcMainFragment : Fragment() {
 
 
     /** 확정 정산 금액 **/
-    private inner class FixedPayAdapter(val context: Context?, val items : ArrayList<FixedPayDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class FixedPayAdapter(val context: Context?, val items: ArrayList<FixedPayDTO>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        inner class FixedPayVH(val binding: ViewDutchItemBinding ) : RecyclerView.ViewHolder(binding.root){
-            fun bind(item : FixedPayDTO){
+        inner class FixedPayVH(val binding: ViewDutchItemBinding) : RecyclerView.ViewHolder(binding.root) {
+            fun bind(item: FixedPayDTO) {
                 binding.name.text = item.id
                 binding.pay.text = item.pay.toString()
-                if( item.pay >= 0 ) {
+                if (item.pay >= 0) {
                     binding.pay.text = "+" + binding.pay.text
                     binding.pay.setTextColor(getColor(requireContext(), R.color.payPlus))
-                }else binding.pay.setTextColor(getColor(requireContext(), R.color.payMinus))
+                } else binding.pay.setTextColor(getColor(requireContext(), R.color.payMinus))
 
 
                 paymoney += item.pay
@@ -298,15 +303,16 @@ class CalcMainFragment : Fragment() {
 
     }
 
-    private inner class friendsAdapter(val context: Context?, val items : ArrayList<Profiles>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+    private inner class friendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         inner class friendsVH(val binding: ChatFriendsItemBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(item : Profiles){
+            fun bind(item: Profiles) {
                 binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
                 binding.friendName.text = item.name
             }
         }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return friendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
         }
@@ -326,18 +332,18 @@ class CalcMainFragment : Fragment() {
         outState.putAll(bundle)
     }
 
-    private fun setSideMenu(){
-        binding.receiptsList.setOnClickListener(View.OnClickListener {  })
-        binding.exitRoom.setOnClickListener(View.OnClickListener {  })
+    private fun setSideMenu() {
+        binding.receiptsList.setOnClickListener(View.OnClickListener { })
+        binding.exitRoom.setOnClickListener(View.OnClickListener { })
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
 
         val dummyFriends = ArrayList<Profiles>()
-        dummyFriends.add(Profiles(R.drawable.girl,"김진우 (나)","nbmlon99@naver.com"))
-        dummyFriends.add(Profiles(R.drawable.man,"박준성","jesp0305@naver.com"))
-        dummyFriends.add(Profiles(R.drawable.man,"김성윤","ksu8063@naver.com"))
+        dummyFriends.add(Profiles(R.drawable.girl, "김진우 (나)", "nbmlon99@naver.com"))
+        dummyFriends.add(Profiles(R.drawable.man, "박준성", "jesp0305@naver.com"))
+        dummyFriends.add(Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com"))
 
-        binding.friends.adapter = friendsAdapter(context, dummyFriends )
+        binding.friends.adapter = friendsAdapter(context, dummyFriends)
     }
 
 }

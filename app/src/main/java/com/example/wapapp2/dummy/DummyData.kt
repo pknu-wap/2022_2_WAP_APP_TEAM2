@@ -1,10 +1,7 @@
 package com.example.wapapp2.dummy
 
 import com.example.wapapp2.R
-import com.example.wapapp2.model.CalcRoomData
-import com.example.wapapp2.model.CalcRoomMemberData
-import com.example.wapapp2.model.ChatData
-import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.model.*
 import com.example.wapapp2.view.login.Profiles
 import org.joda.time.DateTime
 
@@ -52,6 +49,16 @@ class DummyData {
             list.add(FriendDTO(uid++.toString(), "김진우", "nbmlon99@naver.com"))
             list.add(FriendDTO(uid++.toString(), "남진하", "zinha@naver.com"))
             list.add(FriendDTO(uid.toString(), "옥수환", "oksu@naver.com"))
+
+            return list
+        }
+
+        fun getMyBankAccountList(): ArrayList<BankAccountDTO> {
+            val list = ArrayList<BankAccountDTO>()
+
+            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", "박준성"))
+            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", "박준성"))
+            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", "박준성"))
 
             return list
         }
