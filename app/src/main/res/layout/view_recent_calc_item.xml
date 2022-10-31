@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBox
+        android:id="@+id/recent_calc_ckbox"
+        android:minWidth="5dp"
+        android:minHeight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/recent_calc_ckbox"
+        android:weightSum="7"
+        >
+        <TextView
+            android:id="@+id/receipt_menu"
+            android:text="돼지고기"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+        />
+
+        <TextView
+            android:id="@+id/receipt_total_money"
+            android:text="36,000"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            />
+        <TextView
+            android:id="@+id/receipt_my_money"
+            android:text="12,000"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            />
+
+        <TextView
+            android:id="@+id/receipt_person_count"
+            android:text="3/3"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            />
+    </LinearLayout>
+
+</RelativeLayout>
