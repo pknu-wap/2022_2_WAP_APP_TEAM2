@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <ImageView
         android:id="@+id/sep_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:foreground="@color/black"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginVertical="12dp"
+        android:background="@color/black"
         />
 
     <TextView
@@ -19,10 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="송금부탁!!"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sep_line" />
+        android:text="[ Title ]"
+        android:textStyle="italic"
+        android:textSize="14sp"
+        android:layout_below="@id/sep_line"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recent_calc_item"
@@ -30,8 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description" />
+        android:layout_below="@id/description"
+        />
 
 
     <TextView
@@ -41,8 +42,9 @@
         android:text="2022년 10월 16일 일요일 오후 4:10"
         android:textSize="10sp"
         android:layout_marginRight="10dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recent_calc_item" />
+        android:layout_below="@id/recent_calc_item"
+        android:layout_alignParentRight="true"
+        />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

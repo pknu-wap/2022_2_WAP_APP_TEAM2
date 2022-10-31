@@ -105,6 +105,7 @@
 
     </RelativeLayout>
 
+    <!-- side menu -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/side_navigation"
         android:layout_width="wrap_content"
@@ -123,7 +124,90 @@
                 android:orientation="vertical"
                 >
 
-                
+                <TextView
+                    android:id="@+id/room_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textSize="20sp"
+                    android:textAlignment="textEnd"
+                    android:text="채팅방 제목"
+                    android:textStyle="bold"
+                    />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33000000"
+                    />
+                <TextView
+                    android:id="@+id/receipts_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+
+                    android:textSize="20sp"
+
+                    android:text="영수증 목록"
+                    />
+
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33000000"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="그룹 참여자"
+
+                    android:layout_margin="10dp"
+                    android:textSize="20sp"
+                    />
+
+                <include
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/add_friend"
+                    android:layout_marginVertical="10dp"
+                    layout="@layout/chat_friends_item"
+                    />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/friends"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/chat_friends_item"
+                    tools:itemCount="6"
+                    android:layout_marginBottom="10dp"
+                    />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33000000"
+                    />
+                <TextView
+                    android:id="@+id/exit_room"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="방 나가기"
+                    android:textAlignment="textEnd"
+                    android:textStyle="bold"
+
+                    android:layout_margin="10dp"
+                    android:textSize="20sp"
+                    android:textColor="#FF5533"
+                />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#33000000"
+                    />
+
+
 
             </LinearLayout>
 
