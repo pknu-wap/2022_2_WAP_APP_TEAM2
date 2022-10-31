@@ -1,10 +1,8 @@
 package com.example.wapapp2.dummy
 
 import com.example.wapapp2.R
-import com.example.wapapp2.model.CalcRoomData
-import com.example.wapapp2.model.CalcRoomMemberData
-import com.example.wapapp2.model.ChatData
-import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.model.*
+import com.example.wapapp2.view.calculation.GrouplistFragment
 import com.example.wapapp2.view.login.Profiles
 import org.joda.time.DateTime
 
@@ -54,6 +52,22 @@ class DummyData {
             list.add(FriendDTO(uid.toString(), "옥수환", "oksu@naver.com"))
 
             return list
+        }
+
+        fun getProfiles() : ArrayList<Profiles>{
+            val dummyFriends = ArrayList<Profiles>()
+            dummyFriends.add(Profiles(R.drawable.girl,"김진우 (나)","nbmlon99@naver.com"))
+            dummyFriends.add(Profiles(R.drawable.man,"박준성","jesp0305@naver.com"))
+            dummyFriends.add(Profiles(R.drawable.man,"김성윤","ksu8063@naver.com"))
+            return dummyFriends
+        }
+
+
+        fun getGroupList() : ArrayList<GroupItemDTO> {
+            return arrayListOf<GroupItemDTO>(
+                GroupItemDTO(DateTime.now().minusDays(20).toString(), arrayListOf("김진우", "김성윤", "박준성"), false),
+                GroupItemDTO(DateTime.now().minusDays(7).toString(), arrayListOf("짱구","훈이","유리","철수","훈이"), true)
+            )
         }
     }
 
