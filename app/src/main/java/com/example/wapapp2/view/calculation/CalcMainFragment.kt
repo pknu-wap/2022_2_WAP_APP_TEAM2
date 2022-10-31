@@ -1,7 +1,6 @@
 package com.example.wapapp2.view.calculation
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +10,15 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
-import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
-import com.example.wapapp2.model.*
+import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.FixedPayDTO
+import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.login.Profiles
 import org.joda.time.DateTime
@@ -54,10 +54,7 @@ class CalcMainFragment : Fragment() {
 
         //toggle로 바꿀 예정
         binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
-            val dummyData = ArrayList<FixedPayDTO>()
-            dummyData.add(FixedPayDTO("김성윤",+6000))
-            dummyData.add(FixedPayDTO("박준성",-24000))
-
+            val dummyData = DummyData.getFixedDTOs()
             (binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
             binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter( context, dummyData)
 
@@ -128,8 +125,9 @@ class CalcMainFragment : Fragment() {
         })
 
         //default를 false로 수정할 필요.
-        binding.calculationSimpleInfo.expandBtn.callOnClick()
-
+        binding.calculationSimpleInfo.expandBtn.post(Runnable {
+            binding.calculationSimpleInfo.expandBtn.callOnClick()
+        })
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu ->{
@@ -332,11 +330,7 @@ class CalcMainFragment : Fragment() {
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
 
-        val dummyFriends = ArrayList<Profiles>()
-        dummyFriends.add(Profiles(R.drawable.girl,"김진우 (나)","nbmlon99@naver.com"))
-        dummyFriends.add(Profiles(R.drawable.man,"박준성","jesp0305@naver.com"))
-        dummyFriends.add(Profiles(R.drawable.man,"김성윤","ksu8063@naver.com"))
-
+        val dummyFriends = DummyData.getProfiles()
         binding.friends.adapter = friendsAdapter(context, dummyFriends )
     }
 
