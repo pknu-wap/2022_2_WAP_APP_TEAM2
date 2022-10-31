@@ -9,7 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
 
-    <color name="bg_itembox">@color/purple_200</color>
+    <color name="bg_itembox">#33999999</color>
     <color name="group_dutch_state">@color/teal_700</color>
 
     <color name="dutch_done">#007777</color>
