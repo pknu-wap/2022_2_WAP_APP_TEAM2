@@ -85,9 +85,7 @@ class CalcMainFragment : Fragment() {
         setSideMenu()
 
 
-<<<<<<< HEAD
-        val dummyReceipts = DummyData.getReceipts()
-=======
+<<<<<<<<< Temporary merge branch 1
         val dummyReceipts = ArrayList<ReceiptDTO>()
 
         val dummyReceipt1 = ReceiptDTO("1", "점심계산")
@@ -98,7 +96,9 @@ class CalcMainFragment : Fragment() {
         dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 25000, 2))
 
         dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
->>>>>>> 6255fc822252fdbec2c88498779a56cbf7eaee51
+=========
+        val dummyReceipts = DummyData.getReceipts()
+>>>>>>>>> Temporary merge branch 2
 
         binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipts)
 
