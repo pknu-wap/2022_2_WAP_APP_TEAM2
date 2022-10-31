@@ -69,6 +69,13 @@ class DummyData {
                 GroupItemDTO(DateTime.now().minusDays(7).toString(), arrayListOf("짱구","훈이","유리","철수","훈이"), true)
             )
         }
+
+        fun getFixedDTOs() : ArrayList<FixedPayDTO> {
+            val dummyData = ArrayList<FixedPayDTO>()
+            dummyData.add(FixedPayDTO("김성윤",+6000))
+            dummyData.add(FixedPayDTO("박준성",-24000))
+            return dummyData
+        }
     }
 
 }

@@ -54,10 +54,7 @@ class CalcMainFragment : Fragment() {
 
         //toggle로 바꿀 예정
         binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
-            val dummyData = ArrayList<FixedPayDTO>()
-            dummyData.add(FixedPayDTO("김성윤",+6000))
-            dummyData.add(FixedPayDTO("박준성",-24000))
-
+            val dummyData = DummyData.getFixedDTOs()
             (binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
             binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter( context, dummyData)
 
@@ -128,8 +125,9 @@ class CalcMainFragment : Fragment() {
         })
 
         //default를 false로 수정할 필요.
-        binding.calculationSimpleInfo.expandBtn.callOnClick()
-
+        binding.calculationSimpleInfo.expandBtn.post(Runnable {
+            binding.calculationSimpleInfo.expandBtn.callOnClick()
+        })
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu ->{
