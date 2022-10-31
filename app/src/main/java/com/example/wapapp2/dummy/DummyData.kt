@@ -48,8 +48,8 @@ class DummyData {
             list.add(FriendDTO(uid++.toString(), "김성윤", "ksu8063@naver.com"))
             list.add(FriendDTO(uid++.toString(), "박준성", "jesp0305@naver.com"))
             list.add(FriendDTO(uid++.toString(), "김진우", "nbmlon99@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "남진하", "zinha@naver.com"))
-            list.add(FriendDTO(uid.toString(), "옥수환", "oksu@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "짱구", "ZZang9@naver.com"))
+            list.add(FriendDTO(uid.toString(), "훈이", "huni@naver.com"))
 
             return list
         }
@@ -75,6 +75,20 @@ class DummyData {
             dummyData.add(FixedPayDTO("김성윤",+6000))
             dummyData.add(FixedPayDTO("박준성",-24000))
             return dummyData
+        }
+
+        fun getReceipts() : ArrayList<ReceiptDTO> {
+            val dummyReceipts = ArrayList<ReceiptDTO>()
+
+            val dummyReceipt1 = ReceiptDTO("1","점심계산")
+            dummyReceipt1.addProduct(ReceiptProductDTO("","돼지고기",36000,3))
+            dummyReceipt1.addProduct(ReceiptProductDTO("","된장찌개",6000,1))
+            val dummyReceipt2 = ReceiptDTO("2","저녁계산")
+            dummyReceipt2.addProduct(ReceiptProductDTO("","숙소",100000,3))
+            dummyReceipt2.addProduct(ReceiptProductDTO("","치킨",25000,2))
+
+            dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
+            return dummyReceipts
         }
     }
 
