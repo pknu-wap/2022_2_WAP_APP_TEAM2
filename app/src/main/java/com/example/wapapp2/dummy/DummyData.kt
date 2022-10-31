@@ -53,6 +53,7 @@ class DummyData {
             return list
         }
 
+
         fun getMyBankAccountList(): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 
@@ -61,6 +62,29 @@ class DummyData {
             list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", "박준성"))
 
             return list
+
+        fun getProfiles() : ArrayList<Profiles>{
+            val dummyFriends = ArrayList<Profiles>()
+            dummyFriends.add(Profiles(R.drawable.girl,"김진우 (나)","nbmlon99@naver.com"))
+            dummyFriends.add(Profiles(R.drawable.man,"박준성","jesp0305@naver.com"))
+            dummyFriends.add(Profiles(R.drawable.man,"김성윤","ksu8063@naver.com"))
+            return dummyFriends
+        }
+
+
+        fun getGroupList() : ArrayList<GroupItemDTO> {
+            return arrayListOf<GroupItemDTO>(
+                GroupItemDTO(DateTime.now().minusDays(20).toString(), arrayListOf("김진우", "김성윤", "박준성"), false),
+                GroupItemDTO(DateTime.now().minusDays(7).toString(), arrayListOf("짱구","훈이","유리","철수","훈이"), true)
+            )
+        }
+
+        fun getFixedDTOs() : ArrayList<FixedPayDTO> {
+            val dummyData = ArrayList<FixedPayDTO>()
+            dummyData.add(FixedPayDTO("김성윤",+6000))
+            dummyData.add(FixedPayDTO("박준성",-24000))
+            return dummyData
+
         }
     }
 

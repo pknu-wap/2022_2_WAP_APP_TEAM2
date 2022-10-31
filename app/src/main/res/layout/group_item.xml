@@ -2,36 +2,44 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_itembox"
-    android:orientation="vertical"
-    android:padding="20dp"
+    android:padding="10dp"
     >
 
-    <TextView
-        android:id="@+id/group_item_date"
+    <RelativeLayout
+        android:background="@drawable/bg_itembox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="2022-09-23"
-        />
+        android:padding="20dp"
+        >
 
-    <TextView
-        android:id="@+id/group_item_names"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/group_item_date"
-        android:text="OOO, OOO, OOO 외 3명"
-        android:textSize="25sp"
-        />
+        <TextView
+            android:id="@+id/group_item_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2022-09-23"
+            />
 
-    <TextView
-        android:id="@+id/group_item_state"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/group_item_names"
-        android:text="정산 진행중.."
-        android:textAlignment="textEnd"
-        android:textColor="@color/group_dutch_state"
-        />
+        <TextView
+            android:id="@+id/group_item_names"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/group_item_date"
+            android:text="OOO, OOO, OOO 외 3명"
+            android:textSize="25sp"
+            />
+
+        <TextView
+            android:id="@+id/group_item_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/group_item_names"
+            android:text="정산 진행중.."
+            android:textAlignment="textEnd"
+            android:textColor="@color/group_dutch_state"
+            />
+
+
+    </RelativeLayout>
 
 
 </RelativeLayout>
