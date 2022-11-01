@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.databinding.FragmentChatBinding
-import com.example.wapapp2.dummy.CalcRoomDummyData
+import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 
 class ChatFragment : Fragment() {
@@ -42,19 +42,8 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        chatAdapter.chatList.addAll(CalcRoomDummyData.getChatList())
+        chatAdapter.chatList.addAll(DummyData.getChatList())
 
-        binding.clearBtn.setOnClickListener {
-            binding.inputText.text = null
-        }
-
-        binding.sendBtn.setOnClickListener {
-            if (binding.inputText.text.isNotEmpty()) {
-                // 전송
-            } else {
-                Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
