@@ -87,7 +87,6 @@ class CalcMainFragment : Fragment() {
 
         val dummyReceipts = DummyData.getReceipts()
 
-
         binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipts)
 
         val chatFragment = ChatFragment()
