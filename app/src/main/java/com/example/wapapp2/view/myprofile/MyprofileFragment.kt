@@ -18,14 +18,26 @@ class MyprofileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         viewBinding = FragmentMyprofileBinding.inflate(inflater)
-        val mactivity = activity as MainActivity
+        val mainactivity = activity as MainActivity
 
         viewBinding.btnConform.setOnClickListener { //확인버튼
-            mactivity.gotoMain()
+
+            activity?.supportFragmentManager
+                ?.beginTransaction()
+                ?.remove(this)
+                ?.commit()
+
+            mainactivity.gotoFriends()
         }
 
         viewBinding.btnCancel.setOnClickListener { //취소버튼
-            mactivity.gotoMain()
+
+            activity?.supportFragmentManager
+                ?.beginTransaction()
+                ?.remove(this)
+                ?.commit()
+
+            mainactivity.gotoFriends()
         }
 
         return viewBinding.root

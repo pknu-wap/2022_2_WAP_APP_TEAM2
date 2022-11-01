@@ -32,10 +32,13 @@ class MainActivity : AppCompatActivity() {
             .commitAllowingStateLoss()
     }
 
-    fun gotoMain() {
+    fun gotoFriends() {
         val rootTransactionFragment = RootTransactionFragment()
-        supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, rootTransactionFragment,
-            RootTransactionFragment::class.java.name).commitAllowingStateLoss()
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)
+            .commitAllowingStateLoss()
     }
 
     override fun onStart() {
