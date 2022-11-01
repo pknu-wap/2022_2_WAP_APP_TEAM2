@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="bank_name_list">
+        <item>@string/kb_bank</item>
+        <item>@string/nh_bank</item>
+        <item>@string/ibk_bank</item>
+        <item>@string/mg_bank</item>
+        <item>@string/bnk_busan_bank</item>
+        <item>@string/bnk_gyeongnam_bank</item>
+        <item>@string/gwangju_bank</item>
+        <item>@string/jeonbuk_bank</item>
+        <item>@string/shinhyeob_bank</item>
+        <item>@string/sc_bank</item>
+        <item>@string/kdb_bank</item>
+        <item>@string/dgb_bank</item>
+        <item>@string/jeju_bank</item>
+        <item>@string/hana_bank</item>
+        <item>@string/korea_post_bank</item>
+        <item>@string/sh_bank</item>
+        <item>@string/korea_city_bank</item>
+        <item>@string/woori_bank</item>
+        <item>@string/shinhan_bank</item>
+        <item>@string/k_bank</item>
+        <item>@string/kakao_bank</item>
+        <item>@string/sanrim_bank</item>
+        <item>@string/toss_bank</item>
+    </string-array>
+
+    <integer-array name="bank_icon_list">
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/ic_launcher_foreground</item>
+    </integer-array>
+
+    <string name="kb_bank">KB국민은행</string>
+    <string name="nh_bank">NH농협은행</string>
+    <string name="ibk_bank">IBK기업은행</string>
+    <string name="mg_bank">MG새마을금고</string>
+    <string name="bnk_busan_bank">BNK부산은행</string>
+    <string name="bnk_gyeongnam_bank">BNK경남은행</string>
+    <string name="gwangju_bank">광주은행</string>
+    <string name="jeonbuk_bank">전북은행</string>
+    <string name="shinhyeob_bank">신협</string>
+    <string name="sc_bank">SC제일은행</string>
+    <string name="kdb_bank">KDB산업은행</string>
+    <string name="dgb_bank">DGB대구은행</string>
+    <string name="jeju_bank">제주은행</string>
+    <string name="hana_bank">하나은행</string>
+    <string name="korea_post_bank">우정사업본부</string>
+    <string name="sh_bank">SH수협은행</string>
+    <string name="korea_city_bank">한국씨티은행</string>
+    <string name="woori_bank">우리은행</string>
+    <string name="shinhan_bank">신한은행</string>
+    <string name="k_bank">케이뱅크</string>
+    <string name="kakao_bank">카카오뱅크</string>
+    <string name="sanrim_bank">산림조합</string>
+    <string name="toss_bank">토스뱅크</string>
+</resources>

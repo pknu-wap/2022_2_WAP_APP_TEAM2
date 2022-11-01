@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    >
+
+
+    <ImageView
+        android:id="@+id/profile_img"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="2dp"
+        android:src="@drawable/man"
+        android:layout_alignParentLeft="true"
+        />
+
+    <TextView
+        android:id="@+id/friend_name"
+        android:layout_toRightOf="@id/profile_img"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="name"
+        android:gravity="center_vertical"
+        android:paddingLeft="10dp"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        />
+
+
+</RelativeLayout>

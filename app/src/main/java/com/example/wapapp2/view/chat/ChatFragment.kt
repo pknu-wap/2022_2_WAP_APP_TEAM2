@@ -44,14 +44,6 @@ class ChatFragment : Fragment() {
 
         chatAdapter.chatList.addAll(DummyData.getChatList())
 
-        binding.sendBtn.setOnClickListener {
-            if (binding.inputText.text?.isNotEmpty() == true) {
-                // 전송
-                Toast.makeText(context, binding.inputText.text.toString(), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
