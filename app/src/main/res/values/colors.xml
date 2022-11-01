@@ -18,4 +18,6 @@
     <color name="payPlus">#2244FF</color>
     <color name="payMinus">#FF6688</color>
 
+    <color name="gray">#9A9A9A</color>
+
 </resources>

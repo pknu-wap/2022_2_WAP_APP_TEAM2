@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingHorizontal="12dp"
+    >
+
+    <TextView
+        android:id="@+id/member_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="김진우"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        />
+
+
+    <TextView
+        android:id="@+id/msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/member_name"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="chatchat"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        />
+</LinearLayout>

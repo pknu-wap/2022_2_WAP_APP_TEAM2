@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    >
+
+    <ImageView
+        android:id="@+id/receipt_image"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        />
+
+    <TextView
+        android:id="@+id/msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/receipt_image"
+        android:text="@string/added_new_receipt"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/date_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/msg"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/receipt_image"
+        android:text="2022.11.02 화 오후 3시 20분"
+        android:textSize="14sp"
+        />
+
+
+    <TextView
+        android:id="@+id/payer_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date_time"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/receipt_image"
+        android:text="@string/payer"
+        android:textSize="14sp"
+        />
+
+    <TextView
+        android:id="@+id/payer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/payer_label"
+        android:layout_marginLeft="6dp"
+        android:layout_toRightOf="@id/payer_label"
+        android:text="김성윤"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        />
+
+    <TextView
+        android:id="@+id/total_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/payer_label"
+        android:layout_marginLeft="12dp"
+        android:layout_toRightOf="@id/payer"
+        android:text="25,000원"
+        android:textColor="@color/design_default_color_primary"
+        android:textSize="15sp"
+        />
+</RelativeLayout>
