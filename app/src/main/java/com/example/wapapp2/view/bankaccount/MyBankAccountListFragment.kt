@@ -64,7 +64,7 @@ class MyBankAccountListFragment : Fragment() {
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        adapter.setList(DummyData.getMyBankAccountList())
+        adapter.setList(DummyData.getMyBankAccountList("박준성"))
         binding.bankList.adapter = adapter
         return binding.root
     }
