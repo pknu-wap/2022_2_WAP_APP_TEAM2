@@ -2,34 +2,41 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/checklist_receipts"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     app:contentPadding="16dp"
     >
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         >
+
+
+        <!-- Upper Frame -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="나의 정산액"
+            android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/summary"
-            android:text="12,000원"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintRight_toLeftOf="@id/expand_btn"
-            app:layout_constraintBottom_toBottomOf="@id/title"
             android:layout_marginRight="20dp"
-            />
+            android:text="12,000원"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/title"
+            app:layout_constraintRight_toLeftOf="@id/expand_btn" />
 
         <ImageButton
             android:id="@+id/expand_btn"
@@ -39,60 +46,82 @@
             android:src="@drawable/ic_baseline_expand_less_24"
             app:layout_constraintBottom_toBottomOf="@id/title"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/title"
-            />
+            app:layout_constraintTop_toTopOf="@id/title" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/recent_calculation_view"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        <!-- Lower Frame -->
+        <RelativeLayout
+            android:id="@+id/foldable_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/title"
+            android:layout_height="match_parent"
             >
 
 
-
-            <ImageView
-                android:id="@+id/sep_line"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:background="@color/black"
-                />
-
-
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recent_calc_item"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/sep_line"
-                android:layout_marginTop="12dp"
+                android:id="@+id/view_receipts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:layout_above="@id/btn_frame"
+                />
+
+
+
+            <!-- Button Frame -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/btn_frame"
+                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                />
+                >
+                <Button
+                    android:id="@+id/btn_calc_done"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="40dp"
+                    android:backgroundTint="#9C5ECC"
+                    android:paddingHorizontal="30dp"
+                    android:text="정산 완료"
+                    android:textColor="#FFFFFF"
+
+                    android:textSize="15sp"
+                    app:layout_constraintLeft_toLeftOf="@id/guideline1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    />
+
+                <Button
+                    android:id="@+id/btn_calc_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginRight="15dp"
+                    android:backgroundTint="#9C5ECC"
+                    android:paddingHorizontal="30dp"
+                    android:text="정산 추가"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    app:layout_constraintRight_toRightOf="@id/guideline1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
 
 
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="송금부탁!!"
-                android:textSize="16sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recent_calc_item"
-                />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/date_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2022년 10월 16일 일요일 오후 4:10"
-                android:textSize="13sp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/description"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+
+
 </com.google.android.material.card.MaterialCardView>

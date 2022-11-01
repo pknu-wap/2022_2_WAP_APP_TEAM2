@@ -71,6 +71,11 @@ class CalenderFragment : Fragment() {
                     item_binding.calenderDay.text = dayCount.toString()
                 else
                     item_binding.calenderDay.text = ""
+
+                if (dayCount in mutableListOf(22, 17 , 27))
+                    item_binding.markingDone.visibility = View.VISIBLE
+                if (dayCount in mutableListOf( 4 , 10))
+                    item_binding.markingYet.visibility = View.VISIBLE
             }
         }
 

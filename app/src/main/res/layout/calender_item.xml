@@ -4,14 +4,41 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
-
     <TextView
         android:id="@+id/calender_day"
         android:textSize="10sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="45dp"
+        android:layout_marginBottom="5dp"
         />
 
+    <TextView
+        android:id="@+id/marking_done"
+        android:text="완료 description"
+        android:layout_marginRight="10dp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:textSize="8sp"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dutch_done"
+        android:layout_marginBottom="40dp"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/marking_yet"
+        android:text="미완료 description"
+        android:layout_marginRight="10dp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:textSize="8sp"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dutch_yet"
+        android:layout_marginBottom="40dp"
+        android:visibility="gone"
+        />
 
 </LinearLayout>

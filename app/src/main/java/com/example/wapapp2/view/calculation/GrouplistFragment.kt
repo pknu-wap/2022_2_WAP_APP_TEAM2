@@ -1,21 +1,24 @@
 package com.example.wapapp2.view.calculation
 
-import android.content.ClipData
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.GroupFragmentBinding
 import com.example.wapapp2.databinding.GroupItemBinding
 import com.example.wapapp2.databinding.ListAddViewBinding
-import com.example.wapapp2.dummy.CalcRoomDummyData
+import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.GroupItemDTO
+import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.joda.time.DateTime
 
 
 class GrouplistFragment : Fragment() {
@@ -30,8 +33,8 @@ class GrouplistFragment : Fragment() {
             val fragmentManager = parentFragment!!.parentFragmentManager
 
             val bundle = Bundle()
-            val calcRoomDummyData = CalcRoomDummyData.getRoom()
-            bundle.putString("roomId", calcRoomDummyData.roomId)
+            val dummyData = DummyData.getRoom()
+            bundle.putString("roomId", dummyData.roomId)
 
             fragment.arguments = bundle
 
@@ -39,7 +42,7 @@ class GrouplistFragment : Fragment() {
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
                             Fragment)
                     .add(R.id.fragment_container_view, fragment, CalcMainFragment::class.java.name)
-                    .addToBackStack(CalcMainFragment::class.java.name).commitAllowingStateLoss()
+                    .addToBackStack(CalcMainFragment::class.java.name).commit()
         }
 
     }
@@ -47,16 +50,30 @@ class GrouplistFragment : Fragment() {
 
     /** Add Group **/
     private val addOnClickedItemListener = View.OnClickListener {
-        val fragment = NewCalcFragment()
-        val fragmentManager = requireParentFragment().parentFragmentManager
-
-        fragmentManager.beginTransaction()
-                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
-                        Fragment)
-                .add(R.id.fragment_container_view, fragment, NewCalcFragment::class.java.name)
-                .addToBackStack(NewCalcFragment::class.java.name).commitAllowingStateLoss()
+        MaterialAlertDialogBuilder(requireActivity())
+                .setTitle(R.string.add)
+                .setNeutralButton(R.string.new_calculation) { dialog, which ->
+                    //정산 추가
+                    val fragment = NewReceiptFragment()
+                    val fragmentManager = requireParentFragment().parentFragmentManager
+                    dialog.dismiss()
+                    fragmentManager.beginTransaction()
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                                    Fragment)
+                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment::class.java.name)
+                            .addToBackStack(NewReceiptFragment::class.java.name).commit()
+                }.setPositiveButton(R.string.new_calc_room) { dialog, which ->
+                    //정산방 추가
+                    val fragment = NewCalcRoomFragment()
+                    val fragmentManager = requireParentFragment().parentFragmentManager
+                    dialog.dismiss()
+                    fragmentManager.beginTransaction()
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                                    Fragment)
+                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment::class.java.name)
+                            .addToBackStack(NewCalcRoomFragment::class.java.name).commit()
+                }.create().show()
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,10 +85,7 @@ class GrouplistFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding = GroupFragmentBinding.inflate(layoutInflater)
-        val groupItem = arrayListOf<GroupItem>(
-                GroupItem("2022-09-23", "OOO, OOO, OOO 외 1명", "정산완료"),
-                GroupItem("2022-09-27", "OOO, OOO, OOO 외 3명", "정산진행중..")
-        )
+        val groupItem = DummyData.getGroupList()
         adapter = GroupAdapter(context, groupItem)
         binding.groupRV.adapter = adapter
         return binding.root
@@ -90,15 +104,30 @@ class GrouplistFragment : Fragment() {
 
     private inner class GroupItem(val date: String, val names: String, val state: String)
 
-    private inner class GroupAdapter(private val context: Context?, private val items: ArrayList<GroupItem>)
+    private inner class GroupAdapter(private val context: Context?, private val items: ArrayList<GroupItemDTO>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         inner class GroupVH(val binding: GroupItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(groupItem: GroupItem) {
-                binding.groupItemDate.text = groupItem.date
-                binding.groupItemNames.text = groupItem.names
+            fun bind(groupItem: GroupItemDTO) {
+                var nameString = ""
+                var count = 1;
+                for (name in groupItem.members) {
+                    if (count >3){
+                        nameString += " 외 " + (groupItem.members.size-3) + "명"
+                        break
+                    }
+                    else {
+                        nameString += name
+                        if (count != groupItem.members.size && count != 3)
+                            nameString += ", "
+                    }
+                    count ++
+                }
+
+                binding.groupItemNames.text = nameString
                 binding.groupItemState.text = groupItem.state
+                binding.groupItemDate.text = DateTime.parse(groupItem.date).toString("yyyy-MM-dd")
 
                 binding.root.setOnClickListener {
                     onClickedItemListener.onClickedItem(adapterPosition)
