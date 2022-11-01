@@ -1,5 +1,7 @@
 package com.example.wapapp2.view.calculation
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.model.FixedPayDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
@@ -56,8 +59,7 @@ class CalcMainFragment : Fragment() {
         binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
 
             val dummyData = DummyData.getFixedDTOs()
-
-            (binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
+            //(binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
             binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter(context, dummyData)
 
 
@@ -265,18 +267,19 @@ class CalcMainFragment : Fragment() {
     private inner class FixedPayAdapter(val context: Context?, val items: ArrayList<FixedPayDTO>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+
         inner class FixedPayVH(val binding: ViewDutchItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(item: FixedPayDTO) {
-                binding.name.text = item.id
+                binding.name.text = item.name
                 binding.pay.text = item.pay.toString()
                 if (item.pay >= 0) {
                     binding.pay.text = "+" + binding.pay.text
                     binding.pay.setTextColor(getColor(requireContext(), R.color.payPlus))
                 } else binding.pay.setTextColor(getColor(requireContext(), R.color.payMinus))
-
-
                 paymoney += item.pay
                 updateFixedPay()
+
+                binding.accounts.adapter = AccountsAdapter(context, item.accounts)
             }
         }
 
@@ -290,6 +293,39 @@ class CalcMainFragment : Fragment() {
 
         override fun getItemCount(): Int {
             return items.size
+        }
+
+
+
+        inner class AccountsAdapter(val context: Context?, val items : ArrayList<BankAccountDTO>)
+            : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+            inner class AccountsVH(val binding : BankItemViewBinding) :RecyclerView.ViewHolder(binding.root){
+                fun bind(account : BankAccountDTO){
+                    binding.name.setTextSize(14.0F)
+                    binding.name.text = account.bankDTO.bankName +"  "+ account.accountNumber +"  "+ account.accountHolder
+
+                    binding.root.setOnClickListener(View.OnClickListener {
+                        val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clipData = ClipData.newPlainText("accountNumber", account.accountNumber)
+                        clipboardManager.setPrimaryClip(clipData)
+                        Toast.makeText(requireContext() , account.accountNumber +" 복사가 완료되었습니다!",Toast.LENGTH_SHORT).show()
+                    })
+
+                }
+            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                return AccountsVH(BankItemViewBinding.inflate(LayoutInflater.from(context)))
+            }
+
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                (holder as AccountsVH).bind(items[position])
+            }
+
+            override fun getItemCount(): Int {
+                return items.size
+            }
+
         }
 
     }
@@ -330,6 +366,7 @@ class CalcMainFragment : Fragment() {
         binding.addFriend.friendName.text = "친구 초대"
 
         val dummyFriends = DummyData.getProfiles()
+        binding.friends.adapter = friendsAdapter(context, dummyFriends)
     }
 
 }
