@@ -1,7 +1,6 @@
 package com.example.wapapp2.view.calculation
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,9 @@ import com.example.wapapp2.databinding.GroupFragmentBinding
 import com.example.wapapp2.databinding.GroupItemBinding
 import com.example.wapapp2.databinding.ListAddViewBinding
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.dummy.TestLogics
 import com.example.wapapp2.model.GroupItemDTO
+import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -98,6 +99,14 @@ class GrouplistFragment : Fragment() {
         //binding.groupRV.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        // 알림 테스트
+        TestLogics.notifyChatNotification(requireContext())
+        TestLogics.notifyCalcNotification(requireContext())
+    }
+
     private enum class ItemViewType {
         ADD, GROUP_ITEM
     }
@@ -113,16 +122,15 @@ class GrouplistFragment : Fragment() {
                 var nameString = ""
                 var count = 1;
                 for (name in groupItem.members) {
-                    if (count >3){
-                        nameString += " 외 " + (groupItem.members.size-3) + "명"
+                    if (count > 3) {
+                        nameString += " 외 " + (groupItem.members.size - 3) + "명"
                         break
-                    }
-                    else {
+                    } else {
                         nameString += name
                         if (count != groupItem.members.size && count != 3)
                             nameString += ", "
                     }
-                    count ++
+                    count++
                 }
 
                 binding.groupItemNames.text = nameString
