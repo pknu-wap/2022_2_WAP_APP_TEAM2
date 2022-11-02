@@ -66,7 +66,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
 
         if (ignoreIdSet.isNotEmpty()) {
             val removeIdxs = ArrayList<Int>()
-            for (idx in friendsList.size - 1..0) {
+            for (idx in friendsList.size - 1 downTo 0) {
                 if (ignoreIdSet.contains(friendsList[idx].uid)) {
                     removeIdxs.add(idx)
                 }
@@ -87,6 +87,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
 
 
     fun ignoreIds(set: HashSet<String>) {
+        ignoreIdSet.clear()
         ignoreIdSet.addAll(set)
     }
 

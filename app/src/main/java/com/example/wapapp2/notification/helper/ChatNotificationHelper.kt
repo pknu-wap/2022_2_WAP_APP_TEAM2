@@ -1,8 +1,10 @@
 package com.example.wapapp2.notification.helper
 
 import android.content.Context
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.wapapp2.R
+import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.model.notifications.NotificationObj
 
 class ChatNotificationHelper private constructor(context: Context)
@@ -26,5 +28,16 @@ class ChatNotificationHelper private constructor(context: Context)
         return notificationObj
     }
 
+    fun notifyNotification(context: Context, roomName: String, chatDTO: ChatDTO) {
+        val notificationObj = createNotification(context)
+        val remoteViews = RemoteViews(context.packageName, R.layout.chat_notification_remoteviews)
+        remoteViews.setTextViewText(R.id.member_name, chatDTO.userName)
+        remoteViews.setTextViewText(R.id.msg, chatDTO.msg)
+        remoteViews.setImageViewResource(R.id.icon, chatDTO.icon)
+
+        notificationObj.notificationBuilder.setContentTitle(roomName)
+        notificationObj.notificationBuilder.setCustomContentView(remoteViews)
+        notifyNotification(notificationObj)
+    }
 
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:orientation="vertical"
+    >
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:tabGravity="center"
+        app:tabIndicator="@drawable/tabindicator"
+        app:tabIndicatorHeight="2dp"
+        app:tabMode="scrollable"
+        />
+
+    <com.nshmura.recyclertablayout.RecyclerTabLayout
+        android:id="@+id/recycler_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        rtl_tabIndicatorColor="?attr/colorAccent"
+        rtl_tabIndicatorHeight="2dp"
+        rtl_tabBackground="?attr/selectableItemBackground"
+        rtl_tabTextAppearance="@android:style/TextAppearance.Small"
+        rtl_tabSelectedTextColor="?android:textColorPrimary"
+        rtl_tabMinWidth="72dp"
+        rtl_tabMaxWidth="264dp"
+        rtl_tabPaddingStart="12dp"
+        rtl_tabPaddingTop="0dp"
+        rtl_tabPaddingEnd="12dp"
+        rtl_tabPaddingBottom="0dp"
+        rtl_tabPadding="0dp"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingLeft="36dp"
+        android:paddingTop="42dp"
+        android:paddingRight="36dp"
+        android:paddingBottom="42dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        >
+
+        <Button
+            android:id="@+id/go_to_today_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/go_to_today"
+            android:textColor="@color/white"
+            />
+
+        <Button
+            android:id="@+id/go_to_first_selected_day_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/go_to_first_selected_day"
+            android:textColor="@color/white"
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>
