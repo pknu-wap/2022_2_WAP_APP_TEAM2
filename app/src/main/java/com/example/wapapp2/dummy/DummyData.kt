@@ -53,13 +53,12 @@ class DummyData {
             return list
         }
 
-
-        fun getMyBankAccountList(): ArrayList<BankAccountDTO> {
+        fun getMyBankAccountList(name : String): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 
-            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", "박준성"))
-            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", "박준성"))
-            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", "박준성"))
+            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name))
+            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", name))
+            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", name))
 
             return list
         }
@@ -82,8 +81,8 @@ class DummyData {
 
         fun getFixedDTOs(): ArrayList<FixedPayDTO> {
             val dummyData = ArrayList<FixedPayDTO>()
-            dummyData.add(FixedPayDTO("김성윤", +6000))
-            dummyData.add(FixedPayDTO("박준성", -24000))
+            dummyData.add(FixedPayDTO("","김성윤",+6000, getMyBankAccountList("김성윤")))
+            dummyData.add(FixedPayDTO("","박준성", -24000, getMyBankAccountList("박준성")))
             return dummyData
 
         }

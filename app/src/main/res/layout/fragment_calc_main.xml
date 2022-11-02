@@ -107,6 +107,7 @@
 
     </RelativeLayout>
 
+
     <!-- side menu -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/side_navigation"

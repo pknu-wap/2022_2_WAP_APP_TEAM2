@@ -1,36 +1,39 @@
 package com.example.wapapp2.view.calculation
 
+import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.util.Log
+import android.view.*
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.dummy.DummyData
-import com.example.wapapp2.model.FixedPayDTO
-import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.*
+import com.example.wapapp2.repository.AppCheckRepository
 import com.example.wapapp2.view.chat.ChatFragment
-import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
-import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import org.joda.time.DateTime
 
 
 class CalcMainFragment : Fragment() {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
-    private val calcRoomViewModel: CalcRoomViewModel by viewModels()
+    private val bank_repo = AppCheckRepository.getINSTANCE()
+    private lateinit var banks_able : ArrayList<ApplicationInfo>
 
     private var summary = 0
     private var paymoney = 0
@@ -44,6 +47,9 @@ class CalcMainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         childFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
+
+        bank_repo.getBankPackageList(requireContext())
+        banks_able = bank_repo.BankPakageLiveData.value!!
 
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
@@ -60,8 +66,7 @@ class CalcMainFragment : Fragment() {
         binding.calculationSimpleInfo.btnCalcDone.setOnClickListener(View.OnClickListener {
 
             val dummyData = DummyData.getFixedDTOs()
-
-            (binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
+            //(binding.calculationSimpleInfo.viewReceipts.layoutParams as ViewGroup.MarginLayoutParams).topMargin = 100
             binding.calculationSimpleInfo.viewReceipts.adapter = FixedPayAdapter(context, dummyData)
 
 
@@ -83,9 +88,8 @@ class CalcMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.setNavigationOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            parentFragmentManager.popBackStack()
         }
-
         setSideMenu()
 
 
@@ -263,24 +267,33 @@ class CalcMainFragment : Fragment() {
         }
 
     }
+    private enum class ItemViewType {
+        BANKS, ALARM
+    }
 
 
     /** 확정 정산 금액 **/
     private inner class FixedPayAdapter(val context: Context?, val items: ArrayList<FixedPayDTO>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+
         inner class FixedPayVH(val binding: ViewDutchItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(item: FixedPayDTO) {
-                binding.name.text = item.id
+                binding.name.text = item.name
                 binding.pay.text = item.pay.toString()
                 if (item.pay >= 0) {
                     binding.pay.text = "+" + binding.pay.text
                     binding.pay.setTextColor(getColor(requireContext(), R.color.payPlus))
-                } else binding.pay.setTextColor(getColor(requireContext(), R.color.payMinus))
+                    binding.accounts.adapter = AccountsAdapter(context, null)
 
+                } else {
+                    binding.pay.setTextColor(getColor(requireContext(), R.color.payMinus))
+                    binding.accounts.adapter = AccountsAdapter(context, item.accounts)
 
+                }
                 paymoney += item.pay
                 updateFixedPay()
+
             }
         }
 
@@ -294,6 +307,86 @@ class CalcMainFragment : Fragment() {
 
         override fun getItemCount(): Int {
             return items.size
+        }
+
+
+
+
+        inner class AccountsAdapter(val context: Context?, val items : ArrayList<BankAccountDTO>?)
+            : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+            inner class AccountsVH(val binding : BankItemViewBinding) :RecyclerView.ViewHolder(binding.root){
+                fun bind_account(account : BankAccountDTO){
+                    binding.name.setTextSize(14.0F)
+                    binding.name.text = account.bankDTO.bankName +"  "+ account.accountNumber +"  "+ account.accountHolder
+
+                    binding.root.setOnClickListener(View.OnClickListener {
+                        val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        val clipData = ClipData.newPlainText("accountNumber", account.accountNumber)
+                        clipboardManager.setPrimaryClip(clipData)
+                        Toast.makeText(requireContext() , account.accountNumber +" 복사가 완료되었습니다!",Toast.LENGTH_SHORT)
+
+                        val dialog_view = View.inflate(requireContext(),R.layout.account_dialog,null)
+                        val dialog_rv = dialog_view.findViewById<RecyclerView>(R.id.bank_list)
+                        dialog_view.findViewById<RecyclerView>(R.id.bank_list).adapter = banks_adapter()
+
+
+                        val dlg =  Dialog(requireContext())
+                        dlg.setContentView(dialog_view)
+                        dlg.setTitle(account.accountNumber +" 복사가 완료되었습니다!")
+                        dlg.show()
+
+                    })
+                }
+
+                fun bind_alert(){
+                    binding.name.setTextSize(14.0F)
+                    binding.name.text = "정산 재촉하기"
+                    binding.icon.visibility = View.INVISIBLE
+                    binding.root.setOnClickListener(View.OnClickListener {
+                        Toast.makeText(requireContext(), "정산 재촉하기 구현 필요",Toast.LENGTH_SHORT).show()
+                    })
+                }
+
+
+
+                inner class banks_adapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+                    inner class bankVH(val binding : ApplistItemBinding) : RecyclerView.ViewHolder(binding.root){
+                        fun bind(pac : ApplicationInfo){
+                            binding.appName.text = bank_repo.getAppName(requireContext(), pac)
+                            binding.appIcon.setImageDrawable(bank_repo.getBankAppIcon(requireContext(), pac))
+                        }
+                    }
+
+                    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                        return bankVH(ApplistItemBinding.inflate(LayoutInflater.from(requireContext())))
+                    }
+
+                    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                        (holder as bankVH).bind(banks_able[position])
+                    }
+
+                    override fun getItemCount(): Int {
+                        return banks_able.size
+                    }
+
+
+
+                }
+            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+                return AccountsVH(BankItemViewBinding.inflate(LayoutInflater.from(context)))
+            }
+
+            override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+                if (items != null ) (holder as AccountsVH).bind_account(items[position])
+                else (holder as AccountsVH).bind_alert()
+            }
+
+            override fun getItemCount(): Int {
+                return if (items != null ) items.size else 1
+            }
+
         }
 
     }
@@ -332,29 +425,18 @@ class CalcMainFragment : Fragment() {
         binding.exitRoom.setOnClickListener(View.OnClickListener { })
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
-        binding.addFriend.friendName.isClickable = true
 
-        binding.addFriend.friendName.setOnClickListener {
-            val inviteFragment = InviteFriendsFragment()
-            inviteFragment.arguments = Bundle().apply {
-                //현재 정산방 친구 목록 ID set생성
-                val currentFriendsListInRoom = ArrayList<String>()
-                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
-
-                for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.uid)
-                }
-
-                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
-            }
-            val tag = "inviteFriends"
-            val fragmentManager = requireParentFragment().parentFragmentManager
-            fragmentManager.beginTransaction().hide(this@CalcMainFragment)
-                    .add(R.id.fragment_container_view, inviteFragment, tag)
-                    .addToBackStack(tag).commit()
-
-        }
         val dummyFriends = DummyData.getProfiles()
+        binding.friends.adapter = friendsAdapter(context, dummyFriends)
     }
+
+    private fun openApp(packageName : String){
+        val intent: Intent? = requireContext().packageManager.getLaunchIntentForPackage(packageName)
+        intent?.let{
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(it)
+        }
+    }
+
 
 }
