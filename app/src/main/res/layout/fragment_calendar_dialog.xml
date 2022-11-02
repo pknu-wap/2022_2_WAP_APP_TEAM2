@@ -8,32 +8,6 @@
     android:orientation="vertical"
     >
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        app:tabGravity="center"
-        app:tabIndicator="@drawable/tabindicator"
-        app:tabIndicatorHeight="2dp"
-        app:tabMode="scrollable"
-        />
-
-    <com.nshmura.recyclertablayout.RecyclerTabLayout
-        android:id="@+id/recycler_tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        rtl_tabIndicatorColor="?attr/colorAccent"
-        rtl_tabIndicatorHeight="2dp"
-        rtl_tabBackground="?attr/selectableItemBackground"
-        rtl_tabTextAppearance="@android:style/TextAppearance.Small"
-        rtl_tabSelectedTextColor="?android:textColorPrimary"
-        rtl_tabMinWidth="72dp"
-        rtl_tabMaxWidth="264dp"
-        rtl_tabPaddingStart="12dp"
-        rtl_tabPaddingTop="0dp"
-        rtl_tabPaddingEnd="12dp"
-        rtl_tabPaddingBottom="0dp"
-        rtl_tabPadding="0dp"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

@@ -73,9 +73,6 @@ class CalendarDialogFragment : DialogFragment() {
             setCurrentItem(FIRST_VIEW_PAGER_POSITION, false)
         }
 
-        val tabLayoutMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager
-        ) { tab, position -> }
-        //tabLayoutMediator.attach()
 
         binding.goToTodayBtn.setOnClickListener {
             goToToday()
@@ -100,8 +97,6 @@ class CalendarDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 
 
