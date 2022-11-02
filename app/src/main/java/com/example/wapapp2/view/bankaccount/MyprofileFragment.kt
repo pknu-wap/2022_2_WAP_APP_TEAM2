@@ -15,9 +15,9 @@ import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
-class MyBankAccountListFragment : Fragment() {
+class MyprofileFragment : Fragment() {
     private val viewModel: MyBankAccountsViewModel by viewModels()
-    private lateinit var binding: FragmentMyBankAccountListBinding
+    private lateinit var binding: FragmentMyprofileBinding
     private val adapter = MyAccountListAdapter()
 
     private val onClickedPopupMenuListener = object : OnClickedPopupMenuListener {
@@ -45,9 +45,9 @@ class MyBankAccountListFragment : Fragment() {
             fragment.arguments = Bundle().also {
                 it.putSerializable("bankAccountDTO", bankAccountDTO)
             }
-            parentFragmentManager.beginTransaction().hide(this@MyBankAccountListFragment)
-                    .add(R.id.fragment_container_view, fragment, "EditMyBankAccountFragment")
-                    .addToBackStack("EditMyBankAccountFragment").commit()
+            parentFragmentManager.beginTransaction().hide(this@MyprofileFragment)
+                    .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
+                    .addToBackStack("MyprofileFragment").commit()
         }
     }
 
@@ -59,12 +59,12 @@ class MyBankAccountListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentMyBankAccountListBinding.inflate(inflater)
+        binding = FragmentMyprofileBinding.inflate(inflater)
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        adapter.setList(DummyData.getMyBankAccountList())
+        adapter.setList(DummyData.getMyBankAccountList("박준성"))
         binding.bankList.adapter = adapter
         return binding.root
     }
@@ -72,9 +72,9 @@ class MyBankAccountListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.addBtn.setOnClickListener {
+        binding.btnAddAcount.setOnClickListener {
             val addFragment = AddMyBankAccountFragment()
-            parentFragmentManager.beginTransaction().hide(this@MyBankAccountListFragment)
+            parentFragmentManager.beginTransaction().hide(this@MyprofileFragment)
                     .add(R.id.fragment_container_view, addFragment, "AddMyBankAccountFragment")
                     .addToBackStack("AddMyBankAccountFragment").commit()
         }
