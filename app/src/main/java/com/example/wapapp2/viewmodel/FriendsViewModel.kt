@@ -5,14 +5,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.wapapp2.model.FriendDTO
-import com.example.wapapp2.repository.FriendRepository
+import com.example.wapapp2.repository.FriendsRepository
 
-class NewCalcRoomViewModel(application: Application) : AndroidViewModel(application) {
-    private val friendRepository: FriendRepository = FriendRepository.getINSTANCE()
+class FriendsViewModel(application: Application) : AndroidViewModel(application) {
+    private val friendsRepository: FriendsRepository = FriendsRepository.getINSTANCE()
 
     val friendsListLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
     val friendCheckedLiveData: MutableLiveData<FriendCheckDTO> = MutableLiveData<FriendCheckDTO>()
-    val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendRepository.searchResultFriendsLiveData
+    val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendsRepository.searchResultFriendsLiveData
+    val currentRoomFriendsSet = HashSet<String>()
 
     fun checkedFriend(friendDTO: FriendDTO, isChecked: Boolean) {
         val list = friendsListLiveData.value!!
@@ -41,7 +42,7 @@ class NewCalcRoomViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun getFriends(word: String) {
-        friendRepository.getFriendsList(word)
+        friendsRepository.getFriendsList(word)
     }
 
     data class FriendCheckDTO(val isChecked: Boolean, val friendDTO: FriendDTO)

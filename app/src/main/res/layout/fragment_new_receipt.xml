@@ -80,9 +80,9 @@
     <me.relex.circleindicator.CircleIndicator3
         android:id="@+id/indicator"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="24dp"
         app:ci_drawable="@color/design_default_color_primary"
-        app:ci_drawable_unselected="@color/design_default_color_secondary_variant"
+        app:ci_drawable_unselected="@color/gray"
         app:ci_orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/save_btn"
         />

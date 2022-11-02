@@ -88,6 +88,11 @@
         <item>@drawable/ic_launcher_foreground</item>
     </integer-array>
 
+
+    <string-array name="bank_app_packages">
+
+    </string-array>
+
     <string name="kb_bank">KB국민은행</string>
     <string name="nh_bank">NH농협은행</string>
     <string name="ibk_bank">IBK기업은행</string>
