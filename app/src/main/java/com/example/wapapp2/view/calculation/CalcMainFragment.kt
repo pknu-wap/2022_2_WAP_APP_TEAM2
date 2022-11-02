@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
@@ -28,7 +29,9 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.*
 import com.example.wapapp2.repository.AppCheckRepository
 import com.example.wapapp2.view.chat.ChatFragment
+import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
+import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import org.joda.time.DateTime
 
 
@@ -36,7 +39,9 @@ class CalcMainFragment : Fragment() {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
     private val bank_repo = AppCheckRepository.getINSTANCE()
-    private lateinit var banks_able : ArrayList<ApplicationInfo>
+    private lateinit var banks_able: ArrayList<ApplicationInfo>
+
+    private val calcRoomViewModel: CalcRoomViewModel by viewModels()
 
     private var summary = 0
     private var paymoney = 0
@@ -284,6 +289,7 @@ class CalcMainFragment : Fragment() {
         }
 
     }
+
     private enum class ItemViewType {
         BANKS, ALARM
     }
@@ -327,49 +333,46 @@ class CalcMainFragment : Fragment() {
         }
 
 
+        inner class AccountsAdapter(val context: Context?, val items: ArrayList<BankAccountDTO>?)
+            : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-
-        inner class AccountsAdapter(val context: Context?, val items : ArrayList<BankAccountDTO>?)
-            : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-
-            inner class AccountsVH(val binding : BankItemViewBinding) :RecyclerView.ViewHolder(binding.root){
-                fun bind_account(account : BankAccountDTO){
+            inner class AccountsVH(val binding: BankItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
+                fun bind_account(account: BankAccountDTO) {
                     binding.name.setTextSize(14.0F)
-                    binding.name.text = account.bankDTO.bankName +"  "+ account.accountNumber +"  "+ account.accountHolder
+                    binding.name.text = account.bankDTO.bankName + "  " + account.accountNumber + "  " + account.accountHolder
 
                     binding.root.setOnClickListener(View.OnClickListener {
                         val clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         val clipData = ClipData.newPlainText("accountNumber", account.accountNumber)
                         clipboardManager.setPrimaryClip(clipData)
-                        Toast.makeText(requireContext() , account.accountNumber +" 복사가 완료되었습니다!",Toast.LENGTH_SHORT)
+                        Toast.makeText(requireContext(), account.accountNumber + " 복사가 완료되었습니다!", Toast.LENGTH_SHORT)
 
-                        val dialog_view = View.inflate(requireContext(),R.layout.account_dialog,null)
+                        val dialog_view = View.inflate(requireContext(), R.layout.account_dialog, null)
                         val dialog_rv = dialog_view.findViewById<RecyclerView>(R.id.bank_list)
                         dialog_view.findViewById<RecyclerView>(R.id.bank_list).adapter = banks_adapter()
 
 
-                        val dlg =  Dialog(requireContext())
+                        val dlg = Dialog(requireContext())
                         dlg.setContentView(dialog_view)
-                        dlg.setTitle(account.accountNumber +" 복사가 완료되었습니다!")
+                        dlg.setTitle(account.accountNumber + " 복사가 완료되었습니다!")
                         dlg.show()
 
                     })
                 }
 
-                fun bind_alert(){
+                fun bind_alert() {
                     binding.name.setTextSize(14.0F)
                     binding.name.text = "정산 재촉하기"
                     binding.icon.visibility = View.INVISIBLE
                     binding.root.setOnClickListener(View.OnClickListener {
-                        Toast.makeText(requireContext(), "정산 재촉하기 구현 필요",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "정산 재촉하기 구현 필요", Toast.LENGTH_SHORT).show()
                     })
                 }
 
 
-
-                inner class banks_adapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
-                    inner class bankVH(val binding : ApplistItemBinding) : RecyclerView.ViewHolder(binding.root){
-                        fun bind(pac : ApplicationInfo){
+                inner class banks_adapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                    inner class bankVH(val binding: ApplistItemBinding) : RecyclerView.ViewHolder(binding.root) {
+                        fun bind(pac: ApplicationInfo) {
                             binding.appName.text = bank_repo.getAppName(requireContext(), pac)
                             binding.appIcon.setImageDrawable(bank_repo.getBankAppIcon(requireContext(), pac))
                         }
@@ -388,20 +391,20 @@ class CalcMainFragment : Fragment() {
                     }
 
 
-
                 }
             }
+
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
                 return AccountsVH(BankItemViewBinding.inflate(LayoutInflater.from(context)))
             }
 
             override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-                if (items != null ) (holder as AccountsVH).bind_account(items[position])
+                if (items != null) (holder as AccountsVH).bind_account(items[position])
                 else (holder as AccountsVH).bind_alert()
             }
 
             override fun getItemCount(): Int {
-                return if (items != null ) items.size else 1
+                return if (items != null) items.size else 1
             }
 
         }
@@ -468,13 +471,14 @@ class CalcMainFragment : Fragment() {
                     .addToBackStack(tag).commit()
 
 
-        val dummyFriends = DummyData.getProfiles()
-        binding.friends.adapter = friendsAdapter(context, dummyFriends)
+            val dummyFriends = DummyData.getProfiles()
+            binding.friends.adapter = FriendsAdapter(context, dummyFriends)
+        }
     }
 
-    private fun openApp(packageName : String){
+    private fun openApp(packageName: String) {
         val intent: Intent? = requireContext().packageManager.getLaunchIntentForPackage(packageName)
-        intent?.let{
+        intent?.let {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(it)
 

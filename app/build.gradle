@@ -103,7 +103,4 @@ dependencies {
     // list, viewpager indicator
     implementation 'me.relex:circleindicator:2.1.6'
 
-    //recycler tablayout
-    implementation 'com.ochim:recyclertablayout-androidx:2.0.0'
-
 }

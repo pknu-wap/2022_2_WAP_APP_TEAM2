@@ -73,7 +73,7 @@ class DummyData {
             return list
         }
 
-        fun getMyBankAccountList(name : String): ArrayList<BankAccountDTO> {
+        fun getMyBankAccountList(name: String): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 
             list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name))
@@ -101,8 +101,8 @@ class DummyData {
 
         fun getFixedDTOs(): ArrayList<FixedPayDTO> {
             val dummyData = ArrayList<FixedPayDTO>()
-            dummyData.add(FixedPayDTO("","김성윤",+6000, getMyBankAccountList("김성윤")))
-            dummyData.add(FixedPayDTO("","박준성", -24000, getMyBankAccountList("박준성")))
+            dummyData.add(FixedPayDTO("", "김성윤", +6000, getMyBankAccountList("김성윤")))
+            dummyData.add(FixedPayDTO("", "박준성", -24000, getMyBankAccountList("박준성")))
             return dummyData
 
         }
@@ -120,6 +120,8 @@ class DummyData {
             dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
             return dummyReceipts
         }
+
+        fun getReceipt(): ReceiptDTO = ReceiptDTO("0", "우리 정산 하자!!", "0")
     }
 
 }
