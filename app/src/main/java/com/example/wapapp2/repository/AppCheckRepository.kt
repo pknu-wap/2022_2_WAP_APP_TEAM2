@@ -23,7 +23,7 @@ class AppCheckRepository private constructor(){
     }
 
     /** bank packageList livedata로 저장 **/
-    fun getBankPackageList(context : Context) {
+    fun setBankAppInfoList(context : Context) {
         val bank_infos = ArrayList<ApplicationInfo>()
 
         val packageManager: PackageManager = context.packageManager
