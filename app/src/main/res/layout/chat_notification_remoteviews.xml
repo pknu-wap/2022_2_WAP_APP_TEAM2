@@ -15,7 +15,7 @@
         android:maxLines="1"
         android:text="김진우"
         android:textColor="@color/black"
-        android:textSize="15sp"
+        android:textSize="14sp"
         />
 
 
@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/member_name"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="2dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="chatchat"
