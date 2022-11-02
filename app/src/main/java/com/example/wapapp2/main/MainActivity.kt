@@ -7,6 +7,7 @@ import com.example.wapapp2.databinding.ActivityMainBinding
 import com.example.wapapp2.dummy.TestLogics
 import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.view.main.RootTransactionFragment
+import com.example.wapapp2.view.myprofile.MyprofileFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -21,6 +22,24 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, rootTransactionFragment,
                 RootTransactionFragment::class.java.name).commitAllowingStateLoss()
 
+    }
+
+    fun gotoMyprofile() {
+        val myprofileFragment = MyprofileFragment()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(binding.fragmentContainerView.id, myprofileFragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
+    }
+
+    fun gotoFriends() {
+        val rootTransactionFragment = RootTransactionFragment()
+
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)
+            .commitAllowingStateLoss()
     }
 
     override fun onStart() {
