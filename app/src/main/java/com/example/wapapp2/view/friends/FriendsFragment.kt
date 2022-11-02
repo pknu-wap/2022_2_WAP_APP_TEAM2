@@ -1,9 +1,7 @@
 package com.example.wapapp2.view.friends
 
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,30 +11,21 @@ import androidx.fragment.app.Fragment
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentFriendsBinding
-import com.example.wapapp2.databinding.FragmentMyprofileBinding
-import com.example.wapapp2.main.MainActivity
 import com.example.wapapp2.view.login.ProfileAdapter
 import com.example.wapapp2.view.login.Profiles
-import com.example.wapapp2.view.myprofile.MyprofileFragment
-import org.w3c.dom.Text
-import com.example.wapapp2.view.bankaccount.MyBankAccountListFragment
+import com.example.wapapp2.view.bankaccount.MyprofileFragment
 import com.example.wapapp2.view.main.MainHostFragment
 
 class FriendsFragment : Fragment() {
+
     private lateinit var viewBinding: FragmentFriendsBinding
+
     private val friendOnClickListener = ListOnClickListener<Profiles> { item, position ->
-        val fragment = MyBankAccountListFragment()
-        val fragmentManager = requireParentFragment().parentFragmentManager
-        fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
-                Fragment)
-                .add(R.id.fragment_container_view, fragment, "MyBankAccountListFragment").addToBackStack("MyBankAccountListFragment")
-                .commit()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         viewBinding = FragmentFriendsBinding.inflate(inflater)
 
-        val mactivity = activity as MainActivity
         val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
 
         val profileList = arrayListOf(
@@ -46,7 +35,14 @@ class FriendsFragment : Fragment() {
         )
 
         viewBinding.rvMyprofile.setOnClickListener {
-            mactivity.gotoMyprofile()
+            val fragment = MyprofileFragment()
+            val fragmentManager = requireParentFragment().parentFragmentManager
+            fragmentManager
+                .beginTransaction()
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
+                .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
+                .addToBackStack("MyprofileFragment")
+                .commit()
         }
 
         viewBinding.rvMyprofile.findViewById<ImageView>(R.id.iv_profile).setImageResource(myprofile.gender)
