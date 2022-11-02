@@ -81,11 +81,11 @@
 
         <ImageView
             android:id="@+id/receipt_image"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="16dp"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/receipt_sample"
             app:layout_constraintBottom_toTopOf="@id/barrier1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -121,6 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
+            android:backgroundTint="@color/gray"
             android:text="@string/remove_img"
             app:layout_constraintLeft_toRightOf="@id/edit_receipt_img_btn"
             app:layout_constraintRight_toRightOf="parent"
@@ -158,9 +159,11 @@
             android:id="@+id/products_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
             android:orientation="vertical"
             android:paddingHorizontal="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/products_label"
             >
 

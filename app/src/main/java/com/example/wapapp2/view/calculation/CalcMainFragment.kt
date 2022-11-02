@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
@@ -20,13 +21,16 @@ import com.example.wapapp2.model.FixedPayDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.chat.ChatFragment
+import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
+import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import org.joda.time.DateTime
 
 
 class CalcMainFragment : Fragment() {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
+    private val calcRoomViewModel: CalcRoomViewModel by viewModels()
 
     private var summary = 0
     private var paymoney = 0
@@ -79,7 +83,7 @@ class CalcMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         setSideMenu()
@@ -328,7 +332,28 @@ class CalcMainFragment : Fragment() {
         binding.exitRoom.setOnClickListener(View.OnClickListener { })
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
+        binding.addFriend.friendName.isClickable = true
 
+        binding.addFriend.friendName.setOnClickListener {
+            val inviteFragment = InviteFriendsFragment()
+            inviteFragment.arguments = Bundle().apply {
+                //현재 정산방 친구 목록 ID set생성
+                val currentFriendsListInRoom = ArrayList<String>()
+                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
+
+                for (dto in currentFriendDTOList) {
+                    currentFriendsListInRoom.add(dto.uid)
+                }
+
+                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
+            }
+            val tag = "inviteFriends"
+            val fragmentManager = requireParentFragment().parentFragmentManager
+            fragmentManager.beginTransaction().hide(this@CalcMainFragment)
+                    .add(R.id.fragment_container_view, inviteFragment, tag)
+                    .addToBackStack(tag).commit()
+
+        }
         val dummyFriends = DummyData.getProfiles()
     }
 

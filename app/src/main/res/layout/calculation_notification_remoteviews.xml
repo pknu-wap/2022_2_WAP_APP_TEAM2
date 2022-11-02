@@ -12,6 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="16dp"
+        android:src="@drawable/receipt_sample"
         />
 
     <TextView
@@ -23,7 +24,6 @@
         android:text="@string/added_new_receipt"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:textStyle="bold"
         />
 
     <TextView

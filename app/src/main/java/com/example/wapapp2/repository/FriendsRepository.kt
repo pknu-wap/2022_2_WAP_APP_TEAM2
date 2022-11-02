@@ -1,20 +1,18 @@
 package com.example.wapapp2.repository
 
-import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.FriendDTO
 
-class FriendRepository private constructor() {
+class FriendsRepository private constructor() {
     val searchResultFriendsLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>()
     val dummyFriendsList = DummyData.getFriendsList()
 
     companion object {
-        private lateinit var INSTANCE: FriendRepository
+        private lateinit var INSTANCE: FriendsRepository
 
         fun initialize() {
-            INSTANCE = FriendRepository()
+            INSTANCE = FriendsRepository()
         }
 
         fun getINSTANCE() = INSTANCE
