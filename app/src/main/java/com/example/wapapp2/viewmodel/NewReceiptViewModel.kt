@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 
 class NewReceiptViewModel(application: Application) : AndroidViewModel(application) {
     private val receiptMap = HashMap<String, ReceiptDTO>()
@@ -21,7 +20,7 @@ class NewReceiptViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO(receiptId, "")
+        receiptMap[receiptId] = ReceiptDTO(receiptId, "", "0")
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {

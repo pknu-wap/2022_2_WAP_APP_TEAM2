@@ -7,6 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.view.*
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -33,6 +40,7 @@ class CalcMainFragment : Fragment() {
 
     private var summary = 0
     private var paymoney = 0
+    private var chatInputLayoutHeight = 0
 
     private val fragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
@@ -44,8 +52,13 @@ class CalcMainFragment : Fragment() {
         super.onCreate(savedInstanceState)
         childFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
 
+
+        calcRoomViewModel.currentFriendsList.clear()
+        calcRoomViewModel.currentFriendsList.addAll(DummyData.getFriendsInRoomList())
+
         bank_repo.setBankAppInfoList(requireContext())
         banks_able = bank_repo.BankPakageLiveData.value!!
+
 
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
@@ -53,7 +66,6 @@ class CalcMainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentCalcMainBinding.inflate(inflater)
-        setInputListener()
         binding.calculationSimpleInfo.btnCalcAdd.setOnClickListener(View.OnClickListener {
             TODO("정산추가화면 구현 필요")
         })
@@ -77,6 +89,10 @@ class CalcMainFragment : Fragment() {
                 TODO("정산완료버튼 구현 필요")
             })
         })
+
+
+
+
         return binding.root
     }
 
@@ -88,7 +104,6 @@ class CalcMainFragment : Fragment() {
         }
         setSideMenu()
 
-
         val dummyReceipts = DummyData.getReceipts()
 
         binding.calculationSimpleInfo.viewReceipts.adapter = ReceiptAdapter(context, dummyReceipts)
@@ -96,20 +111,19 @@ class CalcMainFragment : Fragment() {
         val chatFragment = ChatFragment()
         chatFragment.arguments = bundle
 
-        val fragmentManager = childFragmentManager
-        fragmentManager.beginTransaction()
-                .replace(binding.chat.id, chatFragment, ChatFragment::class.simpleName).commitAllowingStateLoss()
+        chatFragment.setViewHeightCallback { height ->
+            // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
+            chatInputLayoutHeight = height + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
+                    resources.displayMetrics).toInt()
+        }
 
-        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-            }
-        })
-
+        childFragmentManager.beginTransaction()
+                .replace(binding.chat.id, chatFragment, ChatFragment::class.simpleName).commit()
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
             var expanded = true
+            val collapsedMarginBottom = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f,
+                    resources.displayMetrics)
 
             override fun onClick(v: View?) {
                 expanded = !expanded
@@ -117,14 +131,35 @@ class CalcMainFragment : Fragment() {
                     R.drawable.ic_baseline_expand_more_24)
                 binding.calculationSimpleInfo.foldableView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
-                        if (expanded) RelativeLayout.LayoutParams.MATCH_PARENT else RelativeLayout.LayoutParams.WRAP_CONTENT
+                        if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
+
+                // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
+                val cardViewLayoutParams = binding.calculationSimpleInfo.root.layoutParams as FrameLayout.LayoutParams
+                cardViewLayoutParams.bottomMargin = if (expanded) chatInputLayoutHeight else collapsedMarginBottom.toInt()
+
+                binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
             }
         })
 
         //default를 false로 수정할 필요.
         binding.calculationSimpleInfo.expandBtn.post(Runnable {
             binding.calculationSimpleInfo.expandBtn.callOnClick()
+            binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    if (binding.calculationSimpleInfo.root.height > 0) {
+                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
+                        val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
+                        chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
+
+                        binding.chat.layoutParams = chatFragmentContainerLayoutParams
+                    }
+                }
+            })
         })
+
+
+
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu -> {
@@ -137,20 +172,6 @@ class CalcMainFragment : Fragment() {
         }
     }
 
-    /** setListener For Input Box **/
-    private fun setInputListener() {
-        binding.clearBtn.setOnClickListener {
-            binding.inputText.text = null
-        }
-
-        binding.sendBtn.setOnClickListener {
-            if (binding.inputText.text.isNotEmpty()) {
-                // 전송
-            } else {
-                Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     /** summary 화면에 표시 **/
     private fun updateSummary() {
@@ -387,10 +408,10 @@ class CalcMainFragment : Fragment() {
 
     }
 
-    private inner class friendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
+    private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        inner class friendsVH(val binding: ChatFriendsItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        inner class FriendsVH(val binding: ChatFriendsItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(item: Profiles) {
                 binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
                 binding.friendName.text = item.name
@@ -398,11 +419,11 @@ class CalcMainFragment : Fragment() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return friendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
+            return FriendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            (holder as friendsVH).bind(items[position])
+            (holder as FriendsVH).bind(items[position])
         }
 
         override fun getItemCount(): Int {
@@ -417,10 +438,35 @@ class CalcMainFragment : Fragment() {
     }
 
     private fun setSideMenu() {
-        binding.receiptsList.setOnClickListener(View.OnClickListener { })
-        binding.exitRoom.setOnClickListener(View.OnClickListener { })
+        binding.receiptsList.setOnClickListener {
+        }
+        binding.exitRoom.setOnClickListener {
+        }
+
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
+
+
+        binding.addFriend.root.setOnClickListener {
+            binding.root.closeDrawers()
+            val inviteFriendsFragment = InviteFriendsFragment()
+            inviteFriendsFragment.arguments = Bundle().apply {
+                //현재 정산방 친구 목록 ID set생성
+                val currentFriendsListInRoom = ArrayList<String>()
+                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
+
+                for (dto in currentFriendDTOList) {
+                    currentFriendsListInRoom.add(dto.uid)
+                }
+
+                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
+            }
+            val tag = "inviteFriends"
+            val fragmentManager = parentFragmentManager
+
+            fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
+                    .addToBackStack(tag).commit()
+
 
         val dummyFriends = DummyData.getProfiles()
         binding.friends.adapter = friendsAdapter(context, dummyFriends)
@@ -431,8 +477,13 @@ class CalcMainFragment : Fragment() {
         intent?.let{
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(it)
+
         }
     }
 
+
+    fun interface ViewHeightCallback {
+        fun height(height: Int)
+    }
 
 }

@@ -6,7 +6,7 @@ import com.example.wapapp2.model.FriendDTO
 
 class FriendsRepository private constructor() {
     val searchResultFriendsLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>()
-    val dummyFriendsList = DummyData.getFriendsList()
+    val dummyFriendsList = DummyData.getMyFriendsList()
 
     companion object {
         private lateinit var INSTANCE: FriendsRepository
