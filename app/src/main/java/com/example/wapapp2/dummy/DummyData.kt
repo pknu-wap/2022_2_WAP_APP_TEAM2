@@ -53,7 +53,6 @@ class DummyData {
             return list
         }
 
-
         fun getMyBankAccountList(name : String): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 

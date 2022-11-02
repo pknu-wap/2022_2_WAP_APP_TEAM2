@@ -22,4 +22,14 @@
     <style name="Theme.WapApp2.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.WapApp2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+
+
+    <!-- Animation for dialog box -->
+    <style name="BottomSlidingDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">#55000000</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>

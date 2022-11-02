@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="bank_package_list">\
+            <!--신용카드-->
+        <item>kr.co.samsungcard.mpocket</item>  <!--삼성 앱카드, 삼성 앱카드 공동인증서-->
+        <item>com.shcard.smartpay</item>  <!--신한 페이판-->
+        <item>com.shinhancard.smartshinhan</item>  <!--신한(ARS/일반결제/Smart결제), 신한 공동인증서-->
+        <item>com.kbcard.cxh.appcard</item>  <!--KBPay-->
+        <item>com.kbstar.liivbank</item>  <!--LiiV(국민은행)-->
+        <item>com.kbstar.reboot</item>  <!--new liib-->
+        <item>kvp.jjy.MispAndroid320</item>  <!--페이북/ISP-->
+        <item>com.hanaskcard.paycla</item>  <!--하나카드 원큐페이-->
+        <item>kr.co.hanamembers.hmscustomer</item>  <!--하나멤버스-->
+        <item>com.lcacApp</item>  <!--롯데 앱카드-->
+        <item>nh.smart.nhallonepay</item>  <!--NH 올원페이, NH 올원페이 공동인증서-->
+        <item>com.wooricard.smartapp</item>  <!--우리 WON 카드-->
+        <item>com.hyundaicard.appcard</item>  <!--현대 앱카드-->
+        <item>kr.co.citibank.citimobile</item>  <!--씨티카드-->
+
+        <!--간편결제-->
+        <item>com.samsung.android.spay</item>  <!--삼성페이(삼성, 농협, KB)-->
+        <item>com.samsung.android.spaylite</item>  <!--삼성페이 미니(삼성, KB)-->
+        <item>com.kakao.talk</item>  <!--카카오페이-->
+        <item>com.nhn.android.search</item>  <!--네이버페이-->
+        <item>com.ssg.serviceapp.android.egiftcertificate</item>  <!--SSGPay(현대)-->
+        <item>com.nhnent.payapp</item>  <!--페이코(삼성, 농협, KB)-->
+        <item>com.lge.lgpay</item>  <!--엘지페이(삼성, KB)-->
+        <item>com.lottemembers.android</item>  <!--LPay-->
+        <item>com.tencent.mm</item> <!-- 위챗페이-->
+        <item>viva.republica.toss</item> <!-- 토스-->
+
+        <!--계좌이체-->
+        <item>com.kftc.bankpay.android</item>  <!--금결원-->
+
+    </string-array>
+
+
+
     <string-array name="bank_name_list">
         <item>@string/kb_bank</item>
         <item>@string/nh_bank</item>
@@ -75,4 +111,6 @@
     <string name="kakao_bank">카카오뱅크</string>
     <string name="sanrim_bank">산림조합</string>
     <string name="toss_bank">토스뱅크</string>
+
+
 </resources>
