@@ -31,19 +31,19 @@ class GrouplistFragment : Fragment() {
     private val onClickedItemListener = object : OnClickedItemListener {
         override fun onClickedItem(position: Int) {
             val fragment = CalcMainFragment()
-            val fragmentManager = parentFragment!!.parentFragmentManager
+            val fragmentManager = requireParentFragment().parentFragmentManager
 
-            val bundle = Bundle()
-            val dummyData = DummyData.getRoom()
-            bundle.putString("roomId", dummyData.roomId)
-
-            fragment.arguments = bundle
+            fragment.arguments = Bundle().apply {
+                val dummyData = DummyData.getRoom()
+                putString("roomId", dummyData.roomId)
+            }
+            val tag = "CalcMain"
 
             fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
                             Fragment)
-                    .add(R.id.fragment_container_view, fragment, CalcMainFragment::class.java.name)
-                    .addToBackStack(CalcMainFragment::class.java.name).commit()
+                    .add(R.id.fragment_container_view, fragment, tag)
+                    .addToBackStack(tag).commit()
         }
 
     }

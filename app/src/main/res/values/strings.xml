@@ -84,4 +84,7 @@
     <string name="receipt_notification_channel_description">영수증 추가 시 알립니다.</string>
     <string name="added_new_receipt">정산에 참여해주세요!</string>
     <string name="payer">결제자</string>
+    <string name="invite_friends">친구 초대</string>
+    <string name="go_to_today">오늘로 이동</string>
+    <string name="go_to_first_selected_day">첫 선택날짜로 이동</string>
 </resources>

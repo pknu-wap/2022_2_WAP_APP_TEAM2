@@ -7,7 +7,7 @@ import java.lang.Exception
 /** 영수증
  * @param title : description of receipt
  */
-data class ReceiptDTO(val id: String, var title: String) {
+data class ReceiptDTO(val id: String, var title: String, val payerId: String) {
     private val productList = ArrayList<ReceiptProductDTO>()
     public var totalMoney = 0
     public var myMoney = 0
