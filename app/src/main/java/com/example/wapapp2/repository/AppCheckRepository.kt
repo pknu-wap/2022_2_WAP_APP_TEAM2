@@ -31,9 +31,7 @@ class AppCheckRepository private constructor(){
         val setBanks = context.resources.getStringArray(R.array.bank_package_list).toHashSet()
 
         for (pac : ApplicationInfo in packages){
-            if (setBanks.contains(pac.packageName)){
                 bank_infos.add(pac)
-            }
         }
 
         BankPakageLiveData.value = bank_infos
