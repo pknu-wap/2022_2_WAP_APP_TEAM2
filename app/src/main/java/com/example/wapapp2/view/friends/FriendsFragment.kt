@@ -13,7 +13,7 @@ import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentFriendsBinding
 import com.example.wapapp2.view.login.ProfileAdapter
 import com.example.wapapp2.view.login.Profiles
-import com.example.wapapp2.view.bankaccount.MyprofileFragment
+import com.example.wapapp2.view.myprofile.MyprofileFragment
 import com.example.wapapp2.view.main.MainHostFragment
 
 class FriendsFragment : Fragment() {
@@ -29,7 +29,6 @@ class FriendsFragment : Fragment() {
         val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
 
         val profileList = arrayListOf(
-                Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com"),
                 Profiles(R.drawable.man, "박준성", "jesp0305@naver.com"),
                 Profiles(R.drawable.girl, "김진우", "nbmlon99@naver.com")
         )

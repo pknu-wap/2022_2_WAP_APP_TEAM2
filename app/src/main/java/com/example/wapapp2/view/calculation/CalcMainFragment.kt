@@ -21,6 +21,7 @@ import com.example.wapapp2.model.FixedPayDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.chat.ChatFragment
+import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
 import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
@@ -334,6 +335,17 @@ class CalcMainFragment : Fragment() {
         binding.addFriend.friendName.text = "친구 초대"
         binding.addFriend.friendName.isClickable = true
 
+        binding.receiptsList.setOnClickListener {
+            val fragment = CheckReceiptFragment()
+            val fragmentManager = parentFragmentManager
+            fragmentManager
+                .beginTransaction()
+                .hide(this@CalcMainFragment)
+                .add(R.id.fragment_container_view, fragment, "CheckReceiptFragment")
+                .addToBackStack("CheckReceiptFragment")
+                .commit()
+        }
+
         binding.addFriend.friendName.setOnClickListener {
             val inviteFragment = InviteFriendsFragment()
             inviteFragment.arguments = Bundle().apply {
@@ -348,7 +360,7 @@ class CalcMainFragment : Fragment() {
                 putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
             }
             val tag = "inviteFriends"
-            val fragmentManager = requireParentFragment().parentFragmentManager
+            val fragmentManager = parentFragmentManager
             fragmentManager.beginTransaction().hide(this@CalcMainFragment)
                     .add(R.id.fragment_container_view, inviteFragment, tag)
                     .addToBackStack(tag).commit()
