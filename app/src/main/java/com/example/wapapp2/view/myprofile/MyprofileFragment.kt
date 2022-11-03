@@ -45,9 +45,12 @@ class MyprofileFragment : Fragment() {
             fragment.arguments = Bundle().also {
                 it.putSerializable("bankAccountDTO", bankAccountDTO)
             }
-            parentFragmentManager.beginTransaction().hide(this@MyprofileFragment)
-                    .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
-                    .addToBackStack("MyprofileFragment").commit()
+            parentFragmentManager
+                .beginTransaction()
+                .hide(this@MyprofileFragment)
+                .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
+                .addToBackStack("MyprofileFragment")
+                .commit()
         }
     }
 
