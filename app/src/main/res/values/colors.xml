@@ -19,5 +19,6 @@
     <color name="payMinus">#FF6688</color>
 
     <color name="gray">#9A9A9A</color>
+    <color name="transparent">#00FFFFFF</color>
 
 </resources>

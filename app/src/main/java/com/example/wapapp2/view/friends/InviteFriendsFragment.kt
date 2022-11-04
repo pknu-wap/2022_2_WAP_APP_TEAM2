@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.databinding.FragmentInviteFriendsBinding
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
@@ -19,7 +20,7 @@ import kotlin.collections.HashSet
 
 
 class InviteFriendsFragment : Fragment() {
-    private lateinit var binding: FragmentNewCalcRoomBinding
+    private lateinit var binding: FragmentInviteFriendsBinding
 
     private val friendsViewModel: FriendsViewModel by viewModels()
 
@@ -58,13 +59,18 @@ class InviteFriendsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentNewCalcRoomBinding.inflate(inflater)
+        binding = FragmentInviteFriendsBinding.inflate(inflater)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
         binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
 
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putAll(arguments)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

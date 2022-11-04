@@ -30,82 +30,39 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/input_view"
             android:layout_below="@id/topAppBarLayout"
+            android:orientation="vertical"
             >
-            <!-- 진행중인 정산 -->
-            <include
-                android:id="@+id/calculation_simple_info"
-                layout="@layout/view_recent_calc_top"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="#BEFFFFFF"
-                />
+
 
             <!-- 채팅 -->
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/chat"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/calculation_simple_info"
                 />
 
-
-        </RelativeLayout>
-
-
-        <!-- input Box -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/input_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            >
-
-            <ImageButton
-                android:id="@+id/clear_btn"
-                android:layout_width="wrap_content"
+            <!-- 진행중인 정산 -->
+            <include
+                android:id="@+id/calculation_simple_info"
+                layout="@layout/view_recent_calc_top"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
-                android:src="@drawable/ic_baseline_clear_24"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/design_default_color_primary"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="#BEFFFFFF"
                 />
+        </FrameLayout>
 
-            <EditText
-                android:id="@+id/input_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/clear_btn"
-                app:layout_constraintRight_toLeftOf="@id/send_btn"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
-            <ImageButton
-                android:id="@+id/send_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:padding="8dp"
-                android:src="@drawable/ic_baseline_send_24"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/design_default_color_primary"
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </RelativeLayout>
+
 
     <!-- side menu -->
     <com.google.android.material.navigation.NavigationView
@@ -127,47 +84,47 @@
                 android:id="@+id/room_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="16dp"
                 android:text="채팅방 제목"
                 android:textAlignment="textEnd"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginHorizontal="16dp"
                 />
 
             <TextView
                 android:id="@+id/receipts_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="16dp"
                 android:text="영수증 목록"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 />
 
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginHorizontal="16dp"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_margin="16dp"
                 android:text="그룹 참여자"
-                android:textSize="20sp"
+                android:textSize="15sp"
                 />
 
             <include
                 android:id="@+id/add_friend"
                 layout="@layout/chat_friends_item"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
                 />
@@ -186,7 +143,7 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginHorizontal="16dp"
                 />
 
             <Button
@@ -198,8 +155,6 @@
                 android:text="방 나가기"
                 android:textAlignment="textStart"
                 android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 />
 
 

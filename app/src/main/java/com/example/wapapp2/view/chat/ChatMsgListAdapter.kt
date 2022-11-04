@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.ChatMsgItemBinding
-import com.example.wapapp2.model.ChatData
+import com.example.wapapp2.model.ChatDTO
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
@@ -18,7 +18,7 @@ class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adap
     private val layoutInflater: LayoutInflater
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
-    val chatList = ArrayList<ChatData>()
+    val chatList = ArrayList<ChatDTO>()
 
     init {
         layoutInflater = LayoutInflater.from(context)
