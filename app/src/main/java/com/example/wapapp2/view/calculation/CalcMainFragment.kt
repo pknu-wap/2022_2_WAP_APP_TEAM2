@@ -29,6 +29,7 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.*
 import com.example.wapapp2.repository.AppCheckRepository
 import com.example.wapapp2.view.chat.ChatFragment
+import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
 import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
@@ -94,10 +95,6 @@ class CalcMainFragment : Fragment() {
                 TODO("정산완료버튼 구현 필요")
             })
         })
-
-
-
-
         return binding.root
     }
 
@@ -442,6 +439,14 @@ class CalcMainFragment : Fragment() {
 
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
+            val fragment = CheckReceiptFragment()
+            val fragmentManager = parentFragmentManager
+            fragmentManager
+                .beginTransaction()
+                .hide(this@CalcMainFragment)
+                .add(R.id.fragment_container_view, fragment, "CheckReceiptFragment")
+                .addToBackStack("CheckReceiptFragment")
+                .commit()
         }
         binding.exitRoom.setOnClickListener {
         }
