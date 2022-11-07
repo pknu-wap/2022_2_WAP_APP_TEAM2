@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "758781340964",
+    "project_id": "wapapp-21371",
+    "storage_bucket": "wapapp-21371.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758781340964:android:044adf55638617f95d57b1",
+        "android_client_info": {
+          "package_name": "com.example.wapapp2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "758781340964-78tavtj4aa7pftkghjtjn9n5c5qvia8j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wapapp2",
+            "certificate_hash": "89c121df630b4e9773d1294303e1f3dbfcf9963d"
+          }
+        },
+        {
+          "client_id": "758781340964-lpolt02sab22v2vt1cu24n6e2utarauc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAct53Dfr8wRDeyxjH5ujpPzax3dFcBnKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "758781340964-lpolt02sab22v2vt1cu24n6e2utarauc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
