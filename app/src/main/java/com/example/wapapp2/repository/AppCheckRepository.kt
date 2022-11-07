@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.wapapp2.R
 
 
-class AppCheckRepository private constructor(){
+class AppCheckRepository private constructor() {
     val BankPakageLiveData: MutableLiveData<ArrayList<ApplicationInfo>> = MutableLiveData<ArrayList<ApplicationInfo>>()
 
     companion object {
@@ -23,27 +23,29 @@ class AppCheckRepository private constructor(){
     }
 
     /** bank packageList livedata로 저장 **/
-    fun setBankAppInfoList(context : Context) {
+    fun setBankAppInfoList(context: Context): ArrayList<ApplicationInfo> {
         val bank_infos = ArrayList<ApplicationInfo>()
 
         val packageManager: PackageManager = context.packageManager
         val packages: List<ApplicationInfo> = packageManager.getInstalledApplications(0)
-        val setBanks = context.resources.getStringArray(R.array.bank_package_list).toHashSet()
+        val bankAppPackageNameSet = context.resources.getStringArray(R.array.bank_package_list).toHashSet()
 
-        for (pac : ApplicationInfo in packages){
+        for (pac: ApplicationInfo in packages) {
+            if (pac.packageName in bankAppPackageNameSet)
                 bank_infos.add(pac)
         }
 
         BankPakageLiveData.value = bank_infos
+        return bank_infos
     }
 
 
-    fun getBankAppIcon(context: Context, applicationInfo: ApplicationInfo) : Drawable{
+    fun getBankAppIcon(context: Context, applicationInfo: ApplicationInfo): Drawable {
         return context.packageManager.getApplicationIcon(applicationInfo)
     }
 
 
-    fun getAppName(context: Context, applicationInfo: ApplicationInfo) : String{
+    fun getAppName(context: Context, applicationInfo: ApplicationInfo): String {
         val App_name: String = context.packageManager.getApplicationLabel(applicationInfo) as String
         return App_name
     }
