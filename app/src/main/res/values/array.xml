@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="bank_package_list">\
-            <!--신용카드-->
+    <string-array name="bank_package_list">
+        <!--신용카드-->
         <item>kr.co.samsungcard.mpocket</item>  <!--삼성 앱카드, 삼성 앱카드 공동인증서-->
         <item>com.shcard.smartpay</item>  <!--신한 페이판-->
         <item>com.shinhancard.smartshinhan</item>  <!--신한(ARS/일반결제/Smart결제), 신한 공동인증서-->
@@ -33,7 +33,6 @@
         <item>com.kftc.bankpay.android</item>  <!--금결원-->
 
     </string-array>
-
 
 
     <string-array name="bank_name_list">

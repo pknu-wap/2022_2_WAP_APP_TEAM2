@@ -10,7 +10,7 @@ class MyApplication : Application() {
         super.onCreate()
         AppCheckRepository.initialize()
         FriendsRepository.initialize()
-        JodaTimeAndroid.init(this)
+        JodaTimeAndroid.init(applicationContext)
     }
 
 }
