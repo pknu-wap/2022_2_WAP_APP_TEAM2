@@ -144,11 +144,7 @@ open class NewReceiptFragment : Fragment() {
                     val position = adapterPosition
                     val receiptDTO = receiptList[position]
                     viewBinding.productsList.removeAllViews()
-                    val receiptName = "영수증 $position"
-                    viewBinding.receiptName.text = receiptName
-
-                    viewBinding.calculationType.text = if (receiptDTO.calculationType == ReceiptDTO.CalculationType.DIVIDE_N)
-                        context?.getString(R.string.calculation_type_divide_n) else context?.getString(R.string.calculation_type_custom)
+                    viewBinding.receiptName.text = receiptDTO.title
 
                     viewBinding.totalMoney.text = receiptDTO.totalMoney.toString()
                     var productItemBinding: ReceiptProductViewBinding? = null

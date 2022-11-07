@@ -16,6 +16,10 @@ import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.format.ISODateTimeFormat
 
 class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter {
     private lateinit var binding: NewReceiptItemViewFragmentBinding
@@ -44,11 +48,18 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.titleText.addTextChangedListener {
+            if (!it.isNullOrEmpty()) {
+                newReceiptViewModel.getReceiptDTO(receiptId!!)?.title = it.toString()
+            } else {
+                newReceiptViewModel.getReceiptDTO(receiptId!!)?.title = "영수증"
+            }
+        }
+
         binding.totalMoneyEditText.addTextChangedListener {
             //총 금액 값이 0이상인 경우
             if (!it.isNullOrEmpty()) {
                 if (newReceiptViewModel.getProductCount(receiptId!!) > 0) {
-
                     //영수증 항목이 존재하는 경우에 상단 총 금액 값과 영수증 항목 총 금액이 다를 경우
                     //상단 총 금액 항목의 값을 영수증 총 금액 항목으로 설정한다.
                     if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.totalMoney != it.toString().toInt()) {
@@ -87,21 +98,6 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             }
         }
 
-        binding.toggles.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            if (isChecked) {
-                when (checkedId) {
-                    binding.divideN.id -> {
-                        newReceiptViewModel.getReceiptDTO(receiptId!!)?.calculationType = ReceiptDTO.CalculationType.DIVIDE_N
-                    }
-                    binding.manualInput.id -> {
-                        newReceiptViewModel.getReceiptDTO(receiptId!!)?.calculationType = ReceiptDTO.CalculationType.CUSTOM
-                    }
-                    else -> {
-
-                    }
-                }
-            }
-        }
 
         binding.addReceiptImgBtn.setOnClickListener {
             val dialog = MaterialAlertDialogBuilder(requireActivity())
@@ -126,12 +122,12 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
     override fun onStart() {
         super.onStart()
-        binding.toggles.check(binding.divideN.id)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
+
     }
 
     private fun addProduct() {

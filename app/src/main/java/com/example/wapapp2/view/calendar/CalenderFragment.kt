@@ -6,13 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalenderFragmentBinding
 import com.example.wapapp2.databinding.CalenderItemBinding
+import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
 import org.joda.time.DateTime
 
 class CalenderFragment : Fragment() {
     private lateinit var dstDate: DateTime
     private lateinit var binding: CalenderFragmentBinding
+
+    private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, pos ->
+        val dialogFragment = CalendarDialogFragment()
+        dialogFragment.arguments = Bundle().apply {
+            putString("selectedDayISO8601", dayISO8601)
+        }
+
+        dialogFragment.show(childFragmentManager, "calendarDialog")
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,11 +65,12 @@ class CalenderFragment : Fragment() {
         private val col = 5
         private var dayStart: Int
         private var maxDay: Int
+        private val dstDate: DateTime
 
         private lateinit var item_binding: CalenderItemBinding
 
         init {
-            val dstDate = DateTime().withDate(year, month, 1)
+            dstDate = DateTime().withDate(year, month, 1)
             dayStart = -(dstDate.dayOfWeek - 1)
             maxDay = dstDate.toLocalDate().dayOfMonth().withMaximumValue().dayOfMonth
 
@@ -71,6 +83,17 @@ class CalenderFragment : Fragment() {
                     item_binding.calenderDay.text = dayCount.toString()
                 else
                     item_binding.calenderDay.text = ""
+
+                if (dayCount in mutableListOf(22, 17, 27))
+                    item_binding.markingDone.visibility = View.VISIBLE
+                if (dayCount in mutableListOf(4, 10))
+                    item_binding.markingYet.visibility = View.VISIBLE
+
+                item_binding.root.setOnClickListener {
+                    var date = DateTime.parse(dstDate.toString())
+                    date = date.plusDays(dayCount - 1)
+                    dayItemOnClickListener.onClicked(date.toString(), pos)
+                }
             }
         }
 
