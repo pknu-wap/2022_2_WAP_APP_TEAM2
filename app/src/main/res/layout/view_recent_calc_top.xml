@@ -50,81 +50,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Lower Frame -->
         <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
 
-        <!-- Lower Frame -->
-        <RelativeLayout
-            android:id="@+id/foldable_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/view_receipts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:layout_above="@id/btn_frame"
-                />
-
-
-
-            <!-- Button Frame -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/btn_frame"
-                android:layout_alignParentBottom="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                >
-                <Button
-                    android:id="@+id/btn_calc_done"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="40dp"
-                    android:backgroundTint="#9C5ECC"
-                    android:paddingHorizontal="30dp"
-                    android:text="정산 완료"
-                    android:textColor="#FFFFFF"
-
-                    android:textSize="15sp"
-                    app:layout_constraintLeft_toLeftOf="@id/guideline1"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    />
-
-                <Button
-                    android:id="@+id/btn_calc_add"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginRight="15dp"
-                    android:backgroundTint="#9C5ECC"
-                    android:paddingHorizontal="30dp"
-                    android:text="정산 추가"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    app:layout_constraintRight_toRightOf="@id/guideline1"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="1dp"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </RelativeLayout>
-
     </LinearLayout>
-
-
-
 </com.google.android.material.card.MaterialCardView>
