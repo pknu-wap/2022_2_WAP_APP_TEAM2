@@ -13,9 +13,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FinalConfirmationNewReceiptLayoutBinding
 import com.example.wapapp2.databinding.FragmentNewReceiptBinding
 import com.example.wapapp2.databinding.ReceiptProductViewBinding
@@ -25,7 +25,7 @@ import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 
 
-open class NewReceiptFragment : Fragment() {
+class NewReceiptFragment : Fragment() {
     private lateinit var binding: FragmentNewReceiptBinding
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
@@ -130,8 +130,20 @@ open class NewReceiptFragment : Fragment() {
             super.onViewCreated(view, savedInstanceState)
             setWidthPercent(90, 75)
 
+            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner, object : Observer<Boolean> {
+                var count = 0
+                val totalCount = newReceiptViewModel.getReceiptCount()
+
+                override fun onChanged(t: Boolean?) {
+                    if (++count == totalCount) {
+                        //추가 종료
+                    }
+                }
+            })
+
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
+                newReceiptViewModel.addAllReceipts()
                 dismiss()
             }
         }
@@ -144,14 +156,14 @@ open class NewReceiptFragment : Fragment() {
 
                 fun bind(receiptDTO: ReceiptDTO) {
                     viewBinding.productsList.removeAllViews()
-                    viewBinding.receiptName.text = receiptDTO.title
+                    viewBinding.receiptName.text = receiptDTO.name
 
                     viewBinding.totalMoney.text = receiptDTO.totalMoney.toString()
                     var productItemBinding: ReceiptProductViewBinding? = null
 
                     for (product in receiptDTO.getProducts()) {
                         productItemBinding = ReceiptProductViewBinding.inflate(layoutInflater, viewBinding.productsList, false)
-                        productItemBinding.productName.text = product.itemName
+                        productItemBinding.productName.text = product.name
                         productItemBinding.productPrice.text = product.price.toString()
 
                         viewBinding.productsList.addView(productItemBinding.root)

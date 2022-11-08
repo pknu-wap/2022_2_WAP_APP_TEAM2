@@ -1,8 +1,16 @@
 package com.example.wapapp2.model
 
+import com.google.firebase.firestore.Exclude
 import java.io.Serializable
 
-data class BankAccountDTO(val bankDTO: BankDTO, val accountNumber: String, val accountHolder: String) : Serializable {
+data class BankAccountDTO(
+        @Exclude
+        val bankDTO: BankDTO,
+
+        val accountNumber: String,
+        val accountHolder: String,
+        val bankID: String
+) : Serializable {
     fun toClipboardData(): String = "$accountNumber ${bankDTO.bankName}"
 
     override fun equals(other: Any?): Boolean {

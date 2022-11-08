@@ -24,22 +24,22 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
 
             itemBinding.friendName.text = friendDTO.friendName
 
-            if (checkedSet.contains(friendDTO.uid))
+            if (checkedSet.contains(friendDTO.friendUserId))
                 itemBinding.checkbox.checkedState = MaterialCheckBox.STATE_CHECKED
 
             onCheckedStateChangedListener = MaterialCheckBox.OnCheckedStateChangedListener { checkBox, state ->
                 var conflict: Boolean = false
 
                 if (state == MaterialCheckBox.STATE_CHECKED) {
-                    if (checkedSet.contains(friendDTO.uid))
+                    if (checkedSet.contains(friendDTO.friendUserId))
                         conflict = true
                     else
-                        checkedSet.add(friendDTO.uid)
+                        checkedSet.add(friendDTO.friendUserId)
                 } else {
-                    if (!checkedSet.contains(friendDTO.uid))
+                    if (!checkedSet.contains(friendDTO.friendUserId))
                         conflict = true
                     else
-                        checkedSet.remove(friendDTO.uid)
+                        checkedSet.remove(friendDTO.friendUserId)
                 }
 
                 if (!conflict)
@@ -67,7 +67,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
         if (ignoreIdSet.isNotEmpty()) {
             val removeIdxs = ArrayList<Int>()
             for (idx in friendsList.size - 1 downTo 0) {
-                if (ignoreIdSet.contains(friendsList[idx].uid)) {
+                if (ignoreIdSet.contains(friendsList[idx].friendUserId)) {
                     removeIdxs.add(idx)
                 }
             }
@@ -81,7 +81,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
     }
 
     fun uncheckItem(friendDTO: FriendDTO) {
-        checkedSet.remove(friendDTO.uid)
+        checkedSet.remove(friendDTO.friendUserId)
         notifyDataSetChanged()
     }
 

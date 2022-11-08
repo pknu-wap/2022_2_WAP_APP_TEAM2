@@ -9,9 +9,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.view.*
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
@@ -198,7 +196,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
 
         inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(receipt: ReceiptDTO) {
-                binding.description.text = "[ " + receipt.title + " ] - 김진우"
+                binding.description.text = "[ " + receipt.name + " ] - 김진우"
                 binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
                 binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
             }
@@ -219,19 +217,19 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
     }
 
     /** 영수증 세부 항목 Adapter **/
-    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
+    private class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        private class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
 
             fun bind(item: ReceiptProductDTO) {
                 var myMoney = calcMyMoney(item)
-                binding.receiptMenu.text = item.itemName
+                binding.receiptMenu.text = item.name
                 binding.receiptTotalMoney.text = item.price.toString()
                 binding.receiptMyMoney.text = myMoney.toString()
-                binding.receiptPersonCount.text = item.personCount.toString() + "/3"
+                binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
                 binding.recentCalcCkbox.isChecked = true
 
                 summary += myMoney
@@ -241,12 +239,12 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
 
                 binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        item.personCount++;
+                        item.checkedUserIds.add
                         myMoney = calcMyMoney(item)
                         summary += myMoney
 
                         binding.receiptMyMoney.text = myMoney.toString()
-                        binding.receiptPersonCount.text = item.personCount.toString() + "/3"
+                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
                         updateSummary()
 
                     } else {
@@ -255,7 +253,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
                         item.personCount--;
 
                         binding.receiptMyMoney.text = "0"
-                        binding.receiptPersonCount.text = item.personCount.toString() + "/3"
+                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
                         updateSummary()
                     }
 
@@ -264,7 +262,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
 
             fun calcMyMoney(item: ReceiptProductDTO): Int {
                 return try {
-                    item.price / item.personCount
+                    item.price / item.checkedUserIds.size
                 } catch (e: ArithmeticException) {
                     0
                 }
@@ -437,7 +435,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
                 val currentFriendDTOList = calcRoomViewModel.currentFriendsList
 
                 for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.uid)
+                    currentFriendsListInRoom.add(dto.friendUserId)
                 }
 
                 putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)

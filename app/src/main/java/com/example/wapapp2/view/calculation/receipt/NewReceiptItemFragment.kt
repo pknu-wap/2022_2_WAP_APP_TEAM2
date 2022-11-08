@@ -2,26 +2,18 @@ package com.example.wapapp2.view.calculation.receipt
 
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.NewReceiptItemViewFragmentBinding
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
-import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.checkerframework.checker.units.qual.s
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
 
 class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter {
     private var _binding: NewReceiptItemViewFragmentBinding? = null
@@ -55,9 +47,9 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         binding.titleText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
                 if (text.isNotEmpty()) {
-                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.title = text
+                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.name = text
                 } else {
-                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.title = "영수증"
+                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.name = "영수증"
                 }
             }
         })
@@ -163,10 +155,10 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         itemBinding.calculationItemNameEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
                 if (text.isNotEmpty()) {
-                    productDTO.itemName = text
+                    productDTO.name = text
                 } else {
                     itemBinding.calculationItemNameEditText.text = "".toEditable()
-                    productDTO.itemName = ""
+                    productDTO.name = ""
                 }
             }
         })

@@ -4,6 +4,8 @@ import com.example.wapapp2.R
 import com.example.wapapp2.model.*
 import com.example.wapapp2.view.login.Profiles
 import org.joda.time.DateTime
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DummyData {
     companion object {
@@ -15,31 +17,29 @@ class DummyData {
             return testList
         }
 
-        fun getRoom(): CalcRoomData {
-            return CalcRoomData("0", "배달 정산", getPeople())
+        fun getRoom(): CalcRoomDTO {
+            return CalcRoomDTO(Date(), "0", arrayListOf("0"), arrayListOf("0"), arrayListOf("0", "1"), CalcRoomDTO.RecentMsg("", "", Date
+            (), ""), "정산방", getPeople())
         }
 
         fun getChatList(): ArrayList<ChatDTO> {
-            var dateTime = DateTime.now()
             val peopleList = getPeople()
 
             // test data
             val testList = ArrayList<ChatDTO>()
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "안녕하세요", R.drawable.ic_baseline_person_24))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "안녕하세요", ""))
 
-            dateTime = dateTime.plusMinutes(2)
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, dateTime.toString(), "네!! 안녕하세요!", R.drawable.ic_baseline_person_24))
-            dateTime = dateTime.plusMinutes(1)
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, dateTime.toString(), "네!! 안녕하세요.", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, dateTime.toString(), "~~", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "!", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, dateTime.toString(), "@@", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, dateTime.toString(), "@@", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, dateTime.toString(), "@@", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "1", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "2", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "3", R.drawable.ic_baseline_person_24))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, dateTime.toString(), "4", R.drawable.ic_baseline_person_24))
+            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "네!! 안녕하세요!", ""))
+            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "네!! 안녕하세요.", ""))
+            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "~~", ""))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "!", ""))
+            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "@@", ""))
+            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "@@", ""))
+            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "@@", ""))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "1", ""))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "2", ""))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "3", ""))
+            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "4", ""))
 
 
             return testList
@@ -49,14 +49,14 @@ class DummyData {
             val list = ArrayList<FriendDTO>()
             var uid = 0
 
-            list.add(FriendDTO(uid++.toString(), "김성윤", "ksu8063@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "박준성", "jesp0305@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "김진우", "nbmlon99@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "짱구", "ZZang9@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "훈이", "huni@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "액션가면", "mask@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "원장님", "ceo@naver.com"))
-            list.add(FriendDTO(uid.toString(), "오수", "five@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "김성윤", "김성윤", "ksu8063@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "박준성", "박준성", "jesp0305@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "김진우", "김진우", "nbmlon99@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "짱구", "짱구", "ZZang9@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "훈이", "훈이", "huni@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "액션가면", "액션가면", "mask@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "원장님", "원장님", "ceo@naver.com"))
+            list.add(FriendDTO(uid.toString(), "오수", "오수", "five@naver.com"))
 
             return list
         }
@@ -66,9 +66,9 @@ class DummyData {
             val list = ArrayList<FriendDTO>()
             var uid = 0
 
-            list.add(FriendDTO(uid++.toString(), "김성윤", "ksu8063@naver.com"))
-            list.add(FriendDTO(uid++.toString(), "박준성", "jesp0305@naver.com"))
-            list.add(FriendDTO(uid.toString(), "김진우", "nbmlon99@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "김성윤", "김성윤", "ksu8063@naver.com"))
+            list.add(FriendDTO(uid++.toString(), "박준성", "박준성", "jesp0305@naver.com"))
+            list.add(FriendDTO(uid.toString(), "김진우", "김진우", "nbmlon99@naver.com"))
 
             return list
         }
@@ -76,9 +76,9 @@ class DummyData {
         fun getMyBankAccountList(name: String): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 
-            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name))
-            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", name))
-            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", name))
+            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name, "0"))
+            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", name, "0"))
+            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", name, "0"))
 
             return list
         }
@@ -93,7 +93,7 @@ class DummyData {
 
 
         fun getGroupList(): ArrayList<GroupItemDTO> {
-            return arrayListOf<GroupItemDTO>(
+            return arrayListOf(
                     GroupItemDTO(DateTime.now().minusDays(20).toString(), arrayListOf("김진우", "김성윤", "박준성"), false),
                     GroupItemDTO(DateTime.now().minusDays(7).toString(), arrayListOf("짱구", "훈이", "유리", "철수", "훈이"), true)
             )
@@ -110,18 +110,18 @@ class DummyData {
         fun getReceipts(): ArrayList<ReceiptDTO> {
             val dummyReceipts = ArrayList<ReceiptDTO>()
 
-            val dummyReceipt1 = ReceiptDTO("1", "점심계산", "0")
-            dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 36000, 3))
-            dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 6000, 1))
-            val dummyReceipt2 = ReceiptDTO("2", "저녁계산", "0")
-            dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, 3))
-            dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 25000, 2))
+            val dummyReceipt1 = ReceiptDTO("1", Date(), "", null, "점심계산", "", false)
+            dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 36000, arrayListOf("1")))
+            dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 6000, arrayListOf("1")))
+            val dummyReceipt2 = ReceiptDTO("2", Date(), "", null, "저녁계산", "", false)
+            dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, arrayListOf("1")))
+            dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 25000, arrayListOf("1")))
 
             dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
             return dummyReceipts
         }
 
-        fun getReceipt(): ReceiptDTO = ReceiptDTO("0", "우리 정산 하자!!", "0")
+        fun getReceipt(): ReceiptDTO = ReceiptDTO("0", Date(), "", null, "", "0", false)
     }
 
 }

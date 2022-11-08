@@ -68,7 +68,7 @@ class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adap
                 binding.spaceHeader.layoutParams.height = 6
             }
 
-            time = dateTimeParser.parseDateTime(chatList[position].time)
+            time = dateTimeParser.parseDateTime(chatList[position].sendedTime)
             binding.time.text = timeFormat.print(time)
         }
 
