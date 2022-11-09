@@ -1,15 +1,18 @@
 package com.example.wapapp2.model
 
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
 import java.io.Serializable
 
 data class BankAccountDTO(
         @Exclude
         val bankDTO: BankDTO,
-
+        @PropertyName("accountNumber")
         val accountNumber: String,
+        @PropertyName("accountHolder")
         val accountHolder: String,
-        val bankID: String
+        @PropertyName("bankId")
+        val bankId: String
 ) : Serializable {
     fun toClipboardData(): String = "$accountNumber ${bankDTO.bankName}"
 

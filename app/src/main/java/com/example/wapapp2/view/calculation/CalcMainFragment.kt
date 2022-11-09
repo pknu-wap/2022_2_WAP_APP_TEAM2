@@ -173,8 +173,14 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
 
 
     /** summary 화면에 표시 **/
+
+    private val onUpdateSummaryCallback = OnUpdateSummaryCallback { money ->
+        summary += money
+        val text = "${summary}원"
+        binding.calculationSimpleInfo.summary.text = text
+    }
+
     private fun updateSummary() {
-        binding.calculationSimpleInfo.summary.text = summary.toString() + "원"
     }
 
     private fun updateFixedPay() {
@@ -197,7 +203,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
         inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(receipt: ReceiptDTO) {
                 binding.description.text = "[ " + receipt.name + " ] - 김진우"
-                binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
+                binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts(), onUpdateSummaryCallback)
                 binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
             }
         }
@@ -217,12 +223,13 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
     }
 
     /** 영수증 세부 항목 Adapter **/
-    private class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
+    private class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>,
+                                     private val onUpdateSummaryCallback: OnUpdateSummaryCallback)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-        private class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
-
+        private class ReceiptMenuVH(private val binding: ViewRecentCalcItemBinding,
+                                    private val onUpdateSummaryCallback: OnUpdateSummaryCallback) : RecyclerView.ViewHolder(binding.root) {
 
             fun bind(item: ReceiptProductDTO) {
                 var myMoney = calcMyMoney(item)
@@ -232,29 +239,28 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
                 binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
                 binding.recentCalcCkbox.isChecked = true
 
-                summary += myMoney
 
-                updateSummary()
-
+                onUpdateSummaryCallback.summary(myMoney)
 
                 binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        item.checkedUserIds.add
+                        item.checkedUserIds.add("")
                         myMoney = calcMyMoney(item)
-                        summary += myMoney
+                        onUpdateSummaryCallback.summary(myMoney)
+
 
                         binding.receiptMyMoney.text = myMoney.toString()
                         binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
-                        updateSummary()
+
 
                     } else {
                         myMoney = calcMyMoney(item)
-                        summary -= myMoney
-                        item.personCount--;
+                        onUpdateSummaryCallback.summary(-myMoney)
+
+                        item.checkedUserIds.removeAt(0)
 
                         binding.receiptMyMoney.text = "0"
                         binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
-                        updateSummary()
                     }
 
                 }
@@ -271,7 +277,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return ReceiptMenuVH(ViewRecentCalcItemBinding.inflate(LayoutInflater.from(context)))
+            return ReceiptMenuVH(ViewRecentCalcItemBinding.inflate(LayoutInflater.from(context), parent, false), onUpdateSummaryCallback)
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -457,9 +463,14 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback {
         fun height(height: Int)
     }
 
+    fun interface OnUpdateSummaryCallback {
+        fun summary(money: Int)
+    }
+
     override fun onUpdateMoney(money: Int) {
         paymoney += money
         updateFixedPay()
     }
+
 
 }

@@ -26,21 +26,20 @@ import com.example.wapapp2.viewmodel.NewReceiptViewModel
 
 
 class NewReceiptFragment : Fragment() {
-    private lateinit var binding: FragmentNewReceiptBinding
+    private var _binding: FragmentNewReceiptBinding? = null
+    private val binding get() = _binding!!
+
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
-    private lateinit var myObserver: DefaultLifecycleObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
-        myObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry)
-        lifecycle.addObserver(myObserver)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentNewReceiptBinding.inflate(inflater)
+        _binding = FragmentNewReceiptBinding.inflate(inflater)
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -81,8 +80,18 @@ class NewReceiptFragment : Fragment() {
         adapter.addFragment()
     }
 
-    private class ConfirmReceiptsDialogFragment : DialogFragment() {
-        private lateinit var confirmBinding: FinalConfirmationNewReceiptLayoutBinding
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    class ConfirmReceiptsDialogFragment : DialogFragment() {
+        private var _confirmBinding: FinalConfirmationNewReceiptLayoutBinding? = null
+        private val confirmBinding get() = _confirmBinding!!
         private var adapter: ReceiptsAdapter? = null
         private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
 
@@ -108,7 +117,7 @@ class NewReceiptFragment : Fragment() {
         }
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater)
+            _confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater)
 
             confirmBinding.receiptList.also {
                 it.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
@@ -146,6 +155,15 @@ class NewReceiptFragment : Fragment() {
                 newReceiptViewModel.addAllReceipts()
                 dismiss()
             }
+        }
+
+        override fun onDestroy() {
+            super.onDestroy()
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _confirmBinding = null
         }
 
         private class ReceiptsAdapter(private val receiptList: MutableList<ReceiptDTO>) :

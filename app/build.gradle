@@ -103,5 +103,5 @@ dependencies {
 
     // list, viewpager indicator
     implementation 'me.relex:circleindicator:2.1.6'
-
+    apply plugin: 'com.google.gms.google-services'
 }

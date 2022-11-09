@@ -18,6 +18,9 @@ data class CalcRoomDTO(
         @Exclude
         val people: ArrayList<CalcRoomMemberData>
 ) {
+    @Exclude
+    var id: String? = null
+
     data class RecentMsg(
             val msg: String,
             val msgId: String,

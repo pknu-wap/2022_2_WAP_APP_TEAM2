@@ -16,13 +16,18 @@ data class ReceiptDTO(
         @Exclude
         val id: String,
         @ServerTimestamp
-        val created_time: Date? = null,
+        @PropertyName("createdTime")
+        val createdTime: Date? = null,
+        @PropertyName("imgUrl")
         val imgUrl: String,
         @Exclude
         var imgUriInMyPhone: Uri?,
+        @PropertyName("name")
         var name: String,
-        val payers_id: String,
+        @PropertyName("payersId")
+        val payersId: String,
         @field:JvmField
+        @PropertyName("status")
         val status: Boolean
 ) {
     @Exclude

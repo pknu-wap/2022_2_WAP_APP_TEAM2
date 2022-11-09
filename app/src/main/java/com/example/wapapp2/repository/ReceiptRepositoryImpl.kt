@@ -4,13 +4,9 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
@@ -73,5 +69,40 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }.await()
 
         return documentReference
+    }
+
+    override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String): Boolean {
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+        var result = false
+        receiptCollection.document().update(map).addOnSuccessListener {
+            //영수증 수정 완료
+            result = true
+        }.addOnFailureListener { e ->
+
+        }.await()
+
+        return result
+    }
+
+    override suspend fun modifyProducts(productMapList: ArrayList<HashMap<String, Any?>>, calcRoomId: String): Boolean {
+        var result = false
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+
+        fireStore.runBatch { batch ->
+            for (map in productMapList) {
+                val id = map["id"].toString()
+                map.remove("id")
+
+                batch.update(collection.document(id), map)
+            }
+        }.addOnSuccessListener {
+            //영수증 항목 수정완료
+            result = true
+        }.addOnFailureListener { e ->
+
+        }.await()
+        return result
     }
 }

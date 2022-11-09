@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -8,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.NewReceiptItemViewFragmentBinding
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
+import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -22,9 +25,13 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
     private var receiptId: String? = null
     private var bundle: Bundle? = null
+    private var myLifeCycleObserver: MyLifeCycleObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry)
+        lifecycle.addObserver(myLifeCycleObserver!!)
 
         bundle = arguments ?: savedInstanceState
         receiptId = bundle!!.getString("receiptId")
@@ -33,10 +40,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = NewReceiptItemViewFragmentBinding.inflate(inflater)
-
-        binding.removeReceiptImgBtn.visibility = View.GONE
-        binding.editReceiptImgBtn.visibility = View.GONE
+        _binding = NewReceiptItemViewFragmentBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -101,25 +105,55 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         }
 
 
-        binding.addReceiptImgBtn.setOnClickListener {
-            val dialog = MaterialAlertDialogBuilder(requireActivity())
-                    .setTitle(R.string.add_receipt)
-                    .setNegativeButton(R.string.exit) { dialog, which ->
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton(R.string.shoot_camera) { dialog, which ->
-                        dialog.dismiss()
+        binding.receiptImgBtn.setOnClickListener {
+            if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone == null) {
+                MaterialAlertDialogBuilder(requireActivity())
+                        .setTitle(R.string.add_img)
+                        .setNegativeButton(R.string.exit) { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton(R.string.shoot_camera) { dialog, which ->
+                            dialog.dismiss()
+                            myLifeCycleObserver?.camera(requireActivity()) {
+                                it.data?.extras?.apply {
+                                    val bitmap = get("data") as Bitmap
+                                    Glide.with(requireContext()).load(bitmap).into(binding.receiptImage)
+                                }
 
-                    }
-                    .setPositiveButton(R.string.pick_image) { dialog, which ->
-                        dialog.dismiss()
-                        //myObserver.pickImage()
-                    }.create()
+                            }
+                        }
+                        .setPositiveButton(R.string.pick_image) { dialog, which ->
+                            dialog.dismiss()
+                            pickImage()
+                        }.create().show()
 
-            dialog.show()
+            } else {
+                MaterialAlertDialogBuilder(requireActivity())
+                        .setTitle(R.string.modify_img)
+                        .setNegativeButton(R.string.exit) { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton(R.string.delete_img) { dialog, which ->
+                            dialog.dismiss()
+                            Glide.with(requireContext()).clear(binding.receiptImage)
+                            newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = null
+                            binding.receiptImgBtn.text = getString(R.string.add_img)
+                        }
+                        .setPositiveButton(R.string.receipt_img) { dialog, which ->
+                            dialog.dismiss()
+                            pickImage()
+                        }.create().show()
+            }
         }
+    }
 
+    private fun pickImage() {
+        myLifeCycleObserver?.pickImage(requireActivity()) {
+            newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = it
+            Glide.with(requireContext()).load(it).into(binding.receiptImage)
 
+            binding.receiptImgBtn.text = getString(R.string.modify_img)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
