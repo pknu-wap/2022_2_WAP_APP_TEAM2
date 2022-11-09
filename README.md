@@ -62,9 +62,9 @@
 <table>
   <tr>
     <td align="center">
-    <a href="http://github.com/pknujsp"><img src="https://avatars.githubusercontent.com/pknujsp?v=4" width="100px;" alt=""/><br /><sub><b>JoonSung Park</sub></a><br /><a href="https://github.com/pknu-wap/2022_2_WAP_APP_TEAM1/commits/develop_android?author=pknujsp" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/EnoughKK"><img src="https://avatars.githubusercontent.com/EnoughKK?v=4" width="100px;" alt=""/><br /><sub><b>SungYoon Kim</b></sub></a><br /><a href="https://github.com/pknu-wap/2022_2_WAP_APP_TEAM1/commits/develop_android?author=EnoughKK" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/nbmLon99"><img src="https://avatars.githubusercontent.com/nbmLon99?v=4" width="100px;" at=""/><br /><sub><b>JinWoo Kim</b></sub></a><br /><a href="https://github.com/pknu-wap/2022_2_WAP_APP_TEAM1/commits/develop_server?author=nbmLon99" title="Code">💻</a></td>
+    <a href="http://github.com/pknujsp"><img src="https://avatars.githubusercontent.com/pknujsp?v=4" width="100px;" alt=""/><br /><sub><b>pknujsp</sub></a><br /><p>JoonSung Park</p></td>
+    <td align="center"><a href="https://github.com/EnoughKK"><img src="https://avatars.githubusercontent.com/EnoughKK?v=4" width="100px;" alt=""/><br /><sub><b>EnoughKK</b></sub></a><br /><p>SungYoon Kim</p></td>
+    <td align="center"><a href="https://github.com/nbmLon99"><img src="https://avatars.githubusercontent.com/nbmLon99?v=4" width="100px;" at=""/><br /><sub><b>nbmLon99</b></sub></a><br /><p>JinWoo Kim</p></td>
   </tr>
   
    <tr>
