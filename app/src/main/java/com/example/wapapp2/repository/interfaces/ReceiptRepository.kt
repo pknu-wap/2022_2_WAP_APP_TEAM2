@@ -12,5 +12,6 @@ interface ReceiptRepository {
     suspend fun addProducts(documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String): Boolean
     suspend fun getLastDocumentId(calcRoomId: String): String?
     suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String): Boolean
+    suspend fun deleteReceipt(calcRoomId: String, receiptId: String): Boolean
     suspend fun modifyProducts(productMapList: ArrayList<HashMap<String, Any?>>, calcRoomId: String): Boolean
 }

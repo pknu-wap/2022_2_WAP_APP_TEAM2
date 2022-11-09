@@ -17,9 +17,11 @@ class ModifyReceiptViewModel : ViewModel() {
     val updateReceipt get() = _updateReceipt
     private val _modifyReceiptImg = MutableLiveData<Boolean>()
     val modifyReceiptImg get() = _modifyReceiptImg
+    private val _deleteReceipt = MutableLiveData<Boolean>()
+    val deleteReceipt get() = _deleteReceipt
 
     fun modifyReceipt(originalReceiptDTO: ReceiptDTO, modifiedReceiptDTO: ReceiptDTO, calcRoomId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             //수정 내역을 map으로 저장
             //수정가능 자료 : name, status(정산상태), img_url
             val map = HashMap<String, Any?>()
@@ -30,16 +32,17 @@ class ModifyReceiptViewModel : ViewModel() {
             if (originalReceiptDTO.imgUrl != modifiedReceiptDTO.imgUrl)
                 map["imgUrl"] = modifiedReceiptDTO.imgUrl
 
-            val result = receiptRepositoryImpl.modifyReceipt(map, calcRoomId)
+            val result = async { receiptRepositoryImpl.modifyReceipt(map, calcRoomId) }
+            result.await()
 
             withContext(MainScope().coroutineContext) {
-                updateReceipt.value = result
+                updateReceipt.value = result.await()
             }
         }
     }
 
     fun modifyProducts(productList: ArrayList<HashMap<String, ReceiptProductDTO>>, calcRoomId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             val list = ArrayList<HashMap<String, Any?>>()
             var originalProductDTO: ReceiptProductDTO? = null
             var newProductDTO: ReceiptProductDTO? = null
@@ -61,21 +64,37 @@ class ModifyReceiptViewModel : ViewModel() {
                 list.add(modifiedMap)
             }
 
-            val result = receiptRepositoryImpl.modifyProducts(list, calcRoomId)
+            val result = async { receiptRepositoryImpl.modifyProducts(list, calcRoomId) }
+            result.await()
 
             withContext(MainScope().coroutineContext) {
-                updateReceipt.value = result
+                updateReceipt.value = result.await()
             }
         }
     }
 
     fun modifyReceiptImg(originalImgFileName: String, newImgUri: Uri, calcRoomId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val deleteResult = receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName)
-            val uploadResult: String? = receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId)
+        CoroutineScope(Dispatchers.Default).launch {
+            val deleteResult = async { receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName) }
+            deleteResult.await()
+            val uploadResult = async { receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId) }
+            uploadResult.await()
 
             withContext(MainScope().coroutineContext) {
                 modifyReceiptImg.value = true
+            }
+        }
+    }
+
+    fun deleteReceipt(calcRoomId: String, receiptId: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val deleteResult = async {
+                receiptRepositoryImpl.deleteReceipt(calcRoomId, receiptId)
+            }
+            deleteResult.await()
+
+            withContext(MainScope().coroutineContext) {
+                deleteReceipt.value = deleteResult.await()
             }
         }
     }

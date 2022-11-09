@@ -66,22 +66,23 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String): Boolean {
+    override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-        var result = false
-        receiptCollection.document().update(map).addOnSuccessListener {
-            //영수증 수정 완료
-            result = true
-        }.addOnFailureListener { e ->
-
-        }.await()
-
-        return result
+        receiptCollection.document().update(map).addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
 
-    override suspend fun modifyProducts(productMapList: ArrayList<HashMap<String, Any?>>, calcRoomId: String): Boolean {
-        var result = false
+    override suspend fun deleteReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
+        val receiptDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
+
+        receiptDocument.delete().addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
+    }
+
+    override suspend fun modifyProducts(productMapList: ArrayList<HashMap<String, Any?>>,
+                                        calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
 
@@ -92,12 +93,6 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
 
                 batch.update(collection.document(id), map)
             }
-        }.addOnSuccessListener {
-            //영수증 항목 수정완료
-            result = true
-        }.addOnFailureListener { e ->
-
-        }.await()
-        return result
+        }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
 }
