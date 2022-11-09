@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 
 interface ReceiptImgRepository {
-    suspend fun uploadReceiptImg(uri: Uri, calcRoomId: String): Boolean
+    suspend fun uploadReceiptImg(uri: Uri, calcRoomId: String): String?
     suspend fun deleteReceiptImg(fileName: String): Boolean
     suspend fun downloadReceiptImg(fileName: String, context: Context): Uri?
 }

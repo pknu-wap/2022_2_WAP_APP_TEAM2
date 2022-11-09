@@ -4,13 +4,16 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
-import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     private val fireStore = FirebaseFirestore.getInstance()
+    private val currentUser = FirebaseAuth.getInstance().currentUser
 
     companion object {
         private var INST: ReceiptRepositoryImpl? = null
@@ -23,52 +26,44 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
 
-    override suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String): Boolean {
+    override suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-        var result = false
-        receiptCollection.document().set(receiptDTO).addOnSuccessListener { it1 ->
-            //영수증 추가 완료
-            //영수증 항목 추가작업(추가된 영수증의 document를 가져옴)
-            result = true
-        }.addOnFailureListener { e ->
+        receiptDTO.payersId = currentUser!!.uid
 
-        }.await()
-
-        return result
+        receiptCollection.document().set(receiptDTO).addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
     }
 
-    override suspend fun addProducts(documentReference: DocumentReference, productsList: ArrayList<ReceiptProductDTO>
-    ): Boolean {
-        var result = false
-        fireStore.runBatch { batch ->
-            for (receiptProduct in productsList) {
-                batch.set(documentReference
-                        .collection("products").document(),
-                        receiptProduct)
-            }
-        }.addOnSuccessListener {
-            //영수증 항목 추가 완료
-            //모든 작업 종료됨
-            result = true
-        }.addOnFailureListener { e ->
+    override suspend fun addProducts(documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String
+    ) = suspendCoroutine<Boolean> { continuation ->
+        val writeBatch = fireStore.batch()
 
-        }.await()
-        return result
+        for (receiptProduct in productsList) {
+            writeBatch.set(fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                    .document(documentId).collection(FireStoreNames.products.name).document(), receiptProduct)
+        }
+
+        writeBatch.commit().addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
+
     }
 
-    override suspend fun getLastDocumentReference(calcRoomId: String): DocumentReference? {
+    override suspend fun getLastDocumentId(calcRoomId: String) = suspendCoroutine<String?> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-        var documentReference: DocumentReference? = null
 
-        receiptCollection.orderBy("createdBy", Query.Direction.ASCENDING).limit(1)
-                .get().addOnSuccessListener { it2 ->
-                    documentReference = it2.documents[0].reference
-                }.addOnFailureListener { e ->
-                }.await()
-
-        return documentReference
+        receiptCollection.orderBy("createdTime", Query.Direction.DESCENDING).limit(1)
+                .get().addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        continuation.resume(it.result.documents[0].id)
+                    } else {
+                        continuation.resume(null)
+                    }
+                }
     }
 
     override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String): Boolean {

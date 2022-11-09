@@ -6,12 +6,12 @@ import android.os.Environment
 import androidx.core.net.toUri
 import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import org.joda.time.DateTime
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
 
@@ -27,17 +27,25 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
 
     }
 
-    override suspend fun uploadReceiptImg(uri: Uri, calcRoomId: String): Boolean {
+    override suspend fun uploadReceiptImg(uri: Uri, calcRoomId: String) = suspendCoroutine<String?> { continuation ->
         val fileName = "${calcRoomId}${DateTime.now().toString()}.png"
-        var result = false
+        val ref = storage.reference.child("receiptimgs").child(fileName)
+        var result: String? = null
+        val uploadTask = ref.putFile(uri)
 
-        storage.reference.child("receiptimgs").child(fileName).putFile(uri)
-                .addOnSuccessListener {
-                    result = true
-                }.addOnFailureListener { }
-                .await()
-
-        return result
+        val urlTask = uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            ref.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful)
+                continuation.resume(task.result.toString())
+            else
+                continuation.resume(null)
+        }
     }
 
     override suspend fun deleteReceiptImg(fileName: String): Boolean {
@@ -46,7 +54,9 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
         storage.reference.child("receiptimgs").child(fileName).delete()
                 .addOnSuccessListener {
                     result = true
-                }.addOnFailureListener { }
+                }.addOnFailureListener {
+                    var state = it.message
+                }
                 .await()
 
         return result

@@ -72,10 +72,10 @@ class ModifyReceiptViewModel : ViewModel() {
     fun modifyReceiptImg(originalImgFileName: String, newImgUri: Uri, calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val deleteResult = receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName)
-            val uploadResult = receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId)
+            val uploadResult: String? = receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId)
 
             withContext(MainScope().coroutineContext) {
-                modifyReceiptImg.value = uploadResult
+                modifyReceiptImg.value = true
             }
         }
     }

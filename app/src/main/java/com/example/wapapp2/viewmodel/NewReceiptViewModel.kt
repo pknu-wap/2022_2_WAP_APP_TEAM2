@@ -1,7 +1,5 @@
 package com.example.wapapp2.viewmodel
 
-import android.net.Uri
-import androidx.core.util.lruCache
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptProductDTO
@@ -20,7 +18,7 @@ class NewReceiptViewModel : ViewModel() {
     private val _addReceiptResult = MutableLiveData<Boolean>()
     val addReceiptResult get() = _addReceiptResult
 
-    var calcRoomId: String? = null
+    var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
 
     fun removeProduct(receiptId: String, receiptProductDTO: ReceiptProductDTO): Int {
         try {
@@ -31,23 +29,41 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     private fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val addReceiptResult = receiptRepository.addReceipt(receiptDTO, calcRoomId)
-            if (addReceiptResult) {
-                //영수증 사진 있는 경우 추가
-                receiptDTO.imgUriInMyPhone?.apply {
-                    val addImgResult = receiptImgRepositoryImpl.uploadReceiptImg(this, calcRoomId)
+        CoroutineScope(Dispatchers.Default).launch {
+            //영수증 사진 있는 경우 추가
+            receiptDTO.imgUriInMyPhone?.also {
+                val imgFileName = async {
+                    receiptImgRepositoryImpl.uploadReceiptImg(it, calcRoomId)
                 }
 
-                val lastDocumentReference = receiptRepository.getLastDocumentReference(calcRoomId)
-                lastDocumentReference?.apply {
-                    val addProductsResult = receiptRepository.addProducts(this, receiptDTO.getProducts())
-                    withContext(MainScope().coroutineContext) {
-                        this@NewReceiptViewModel.addReceiptResult.value = addProductsResult
+                imgFileName.await()?.apply {
+                    receiptDTO.imgUrl = this
+                }
+            }
+
+            //영수증 추가
+            val addReceiptResult = async {
+                receiptRepository.addReceipt(receiptDTO, calcRoomId)
+            }
+
+            if (addReceiptResult.await()) {
+                //정산방 영수증 문서들중 마지막 아이템을 가져오기
+                val lastDocumentId = async {
+                    receiptRepository.getLastDocumentId(calcRoomId)
+                }
+
+                if (lastDocumentId.await() != null) {
+                    //영수증 항목 추가
+                    val addProductsResult = async {
+                        receiptRepository
+                                .addProducts(lastDocumentId.await().toString(), receiptDTO.getProducts(), calcRoomId)
                     }
-                }
 
-                if (lastDocumentReference == null) {
+                    addProductsResult.await()
+                    withContext(MainScope().coroutineContext) {
+                        this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
+                    }
+                } else {
                     withContext(MainScope().coroutineContext) {
                         this@NewReceiptViewModel.addReceiptResult.value = false
                     }

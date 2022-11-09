@@ -13,33 +13,33 @@ import kotlin.collections.ArrayList
  * @param name : description of receipt
  */
 data class ReceiptDTO(
-        @Exclude
-        val id: String,
+        @get:Exclude
+        var id: String,
         @ServerTimestamp
         @PropertyName("createdTime")
-        val createdTime: Date? = null,
+        var createdTime: Date? = null,
         @PropertyName("imgUrl")
-        val imgUrl: String,
-        @Exclude
+        var imgUrl: String,
+        @get:Exclude
         var imgUriInMyPhone: Uri?,
         @PropertyName("name")
         var name: String,
         @PropertyName("payersId")
-        val payersId: String,
+        var payersId: String,
         @field:JvmField
         @PropertyName("status")
-        val status: Boolean
+        var status: Boolean
 ) {
-    @Exclude
-    private val productList = ArrayList<ReceiptProductDTO>()
-
-    @Exclude
+    @get:Exclude
     public var totalMoney = 0
 
-    @Exclude
+    @get:Exclude
+    private val productList = ArrayList<ReceiptProductDTO>()
+
+    @get:Exclude
     public var myMoney = 0
 
-    @Exclude
+    @get:Exclude
     public val date: String = DateTime.now().toString()
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
@@ -47,7 +47,10 @@ data class ReceiptDTO(
         totalMoney += receiptProductDTO.price
     }
 
+    @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
+
+
     fun removeProduct(receiptProductDTO: ReceiptProductDTO): Int {
         for ((index, value) in productList.withIndex()) {
             if (value == receiptProductDTO) {

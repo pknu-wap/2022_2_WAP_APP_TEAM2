@@ -18,8 +18,9 @@ class DummyData {
         }
 
         fun getRoom(): CalcRoomDTO {
-            return CalcRoomDTO(Date(), "0", arrayListOf("0"), arrayListOf("0"), arrayListOf("0", "1"), CalcRoomDTO.RecentMsg("", "", Date
-            (), ""), "정산방", getPeople())
+            return CalcRoomDTO(
+                    Date(), Date(), "", arrayListOf("0"), arrayListOf("0", "1"), arrayListOf("0"),
+                    CalcRoomDTO.RecentMsg("", "", Date(), ""), "정산방", getPeople())
         }
 
         fun getChatList(): ArrayList<ChatDTO> {

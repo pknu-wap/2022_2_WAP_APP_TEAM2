@@ -12,11 +12,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(applicationContext)
-        AppCheckRepository.initialize()
-        FriendsRepository.initialize()
         JodaTimeAndroid.init(applicationContext)
-        ReceiptImgRepositoryImpl.initialize()
-        ReceiptRepositoryImpl.initialize()
     }
 
 }

@@ -1,17 +1,20 @@
 package com.example.wapapp2.model
 
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.*
 
 data class ChatDTO(
         @Exclude
-        val userName: String,
+        var userName: String,
         @Exclude
-        val userId: String,
-
+        var userId: String,
         @ServerTimestamp
-        val sendedTime: Date? = null,
-        val msg: String,
-        val senderId: String
+        @PropertyName("sendedTime")
+        var sendedTime: Date? = null,
+        @PropertyName("msg")
+        var msg: String,
+        @PropertyName("senderId")
+        var senderId: String
 )
