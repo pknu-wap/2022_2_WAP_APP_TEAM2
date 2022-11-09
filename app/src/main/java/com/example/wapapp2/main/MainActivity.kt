@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.ActivityMainBinding
 import com.example.wapapp2.repository.AppCheckRepository
-import com.example.wapapp2.repository.FriendsRepository
+import com.example.wapapp2.repository.FriendsRepositoryImpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.main.RootTransactionFragment
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         ReceiptImgRepositoryImpl.initialize()
         ReceiptRepositoryImpl.initialize()
         AppCheckRepository.initialize()
-        FriendsRepository.initialize()
+        FriendsRepositoryImpl.initialize()
     }
 
     override fun onStart() {
