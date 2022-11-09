@@ -34,7 +34,7 @@
         android:layout_marginTop="16dp">
 
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/email_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -50,7 +50,7 @@
             />
 
         <EditText
-            android:id="@+id/editTextTextPassword"
+            android:id="@+id/password_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -74,7 +74,7 @@
         >
 
         <Button
-            android:id="@+id/btn_signin"
+            android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:backgroundTint="#FFFBFB"
