@@ -15,7 +15,7 @@
 <div>
   <div style="float: left">
     <img align="left" width="121" alt="WAP_APP_2TEAM_ICON"  
-      src="https://github.com/pknu-wap/2022_2_WAP_APP_TEAM2/blob/feature/%2353/optimize_ongoing_dutch_fragment/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png">
+      src="https://github.com/pknu-wap/2022_2_WAP_APP_TEAM2/blob/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png">
   </div>
   <div>
     <h3>#우정하자</h3>
