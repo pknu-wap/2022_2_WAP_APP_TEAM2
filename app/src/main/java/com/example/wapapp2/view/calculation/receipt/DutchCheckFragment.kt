@@ -25,7 +25,7 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
     private lateinit var binding: DutchCheckFragmentBinding
     val onFixOngoingReceipt: OnFixOngoingCallback
     val onUpdateSummaryCallback: OnUpdateSummaryCallback
-    val receiptViewModel: ReceiptViewModel by viewModels()
+    val receiptViewModel: ReceiptViewModel by viewModels({ requireParentFragment() })
 
     init {
         this.onFixOngoingReceipt = onFixOngoingReceipt
@@ -95,8 +95,7 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
                 binding.receiptMenu.text = product.name
                 binding.receiptTotalMoney.text = DecimalFormat("#,###").format(product.price)
                 binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
-                binding.receiptPersonCount.text = "${product.personCount}/3"
-                binding.recentCalcCkbox.isChecked = true
+
 
                 receiptViewModel.updateSummary_forNewProduct(product)
 
@@ -114,6 +113,9 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
                     }
 
                 }
+
+                binding.receiptPersonCount.text = "${product.personCount}/3"
+                binding.recentCalcCkbox.isChecked = true
             }
 
         }

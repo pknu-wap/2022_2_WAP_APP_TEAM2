@@ -8,6 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
+import com.example.wapapp2.repository.AppCheckRepository
+import com.example.wapapp2.repository.FriendsRepositoryImpl
+import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
+import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -24,10 +28,10 @@ class LoginFragment : Fragment() {
     }
 
     fun emailLogin() {
-        if(binding.emailEdittext.text.toString().isNullOrEmpty() ||
+        if (binding.emailEdittext.text.toString().isNullOrEmpty() ||
                 binding.passwordEdittext.text.toString().isNullOrEmpty()) {
             Toast.makeText(context,
-                "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
+                    "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
         } else {
             signinEmail()
         }
@@ -35,24 +39,28 @@ class LoginFragment : Fragment() {
 
     fun signinEmail() {
         auth?.signInWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())
-            ?.addOnCompleteListener { task ->
-                if(task.isSuccessful){
-                    moveMainPage(auth?.currentUser)
-                } else {
-                    Toast.makeText(context, "이메일이나 비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT).show()
+                ?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        moveMainPage(auth?.currentUser)
+                    } else {
+                        Toast.makeText(context, "이메일이나 비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
     }
 
-    fun moveMainPage(user : FirebaseUser?){
+    fun moveMainPage(user: FirebaseUser?) {
         if (user != null) {
             val rootTransactionFragment = RootTransactionFragment()
 
+            ReceiptImgRepositoryImpl.initialize()
+            ReceiptRepositoryImpl.initialize()
+            AppCheckRepository.initialize()
+            FriendsRepositoryImpl.initialize()
+
             parentFragmentManager
-                .beginTransaction()
-                .hide(this@LoginFragment)
-                .add(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)
-                .commitAllowingStateLoss()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)
+                    .commitAllowingStateLoss()
         }
     }
 
