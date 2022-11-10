@@ -34,22 +34,6 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, loginFragment,
                 LoginFragment::class.java.name).commitAllowingStateLoss()
 
-
-        //test용으로 naversovc@gmail.com로 자동로그인
-        val auth = FirebaseAuth.getInstance()
-
-        if (auth.currentUser != null) {
-            onSignIn(auth.currentUser!!)
-        } else {
-            auth.signInWithEmailAndPassword("naversovc@gmail.com", "@google0909")
-                    .addOnSuccessListener {
-                        onSignIn(it.user!!)
-                    }.addOnFailureListener {
-                        Toast.makeText(this, "naversovc@gmail.com 로그인 실패", Toast.LENGTH_SHORT).show()
-                        accountSignViewModel.isSignIn = false
-                        accountSignViewModel.signInUser = null
-                    }
-        }
     }
 
     private fun onSignIn(user: FirebaseUser) {
@@ -57,10 +41,6 @@ class MainActivity : AppCompatActivity() {
         accountSignViewModel.isSignIn = true
         Toast.makeText(this, "naversovc@gmail.com 로그인 완료", Toast.LENGTH_SHORT).show()
 
-        ReceiptImgRepositoryImpl.initialize()
-        ReceiptRepositoryImpl.initialize()
-        AppCheckRepository.initialize()
-        FriendsRepositoryImpl.initialize()
     }
 
     override fun onStart() {

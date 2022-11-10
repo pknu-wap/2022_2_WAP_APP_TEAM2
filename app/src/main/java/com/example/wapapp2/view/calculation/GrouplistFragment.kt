@@ -101,10 +101,6 @@ class GrouplistFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
-        // 알림 테스트
-        TestLogics.notifyChatNotification(requireContext())
-        TestLogics.notifyCalcNotification(requireContext())
     }
 
     private enum class ItemViewType {

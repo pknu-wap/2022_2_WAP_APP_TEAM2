@@ -25,6 +25,20 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
 
     }
 
+    /** receipt_product 컬렉션의 참여 유저 id에서 자기 아이디 추가
+     * when : checked
+     * **/
+    override fun addMyID_fromProductParticipantIDs(product_id: String) {
+
+    }
+
+    /** receipt_product 컬렉션의 참여 유저 id에서 자기 아이디 제외
+     * when : unchecked
+     * **/
+    override fun subMyID_fromProductParticipantIDs(product_id: String) {
+
+    }
+
 
     override suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)

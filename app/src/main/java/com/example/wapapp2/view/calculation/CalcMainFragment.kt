@@ -111,7 +111,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     }
 
 
-
     private fun updateFixedPay() {
         if (paymoney >= 0) {
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"

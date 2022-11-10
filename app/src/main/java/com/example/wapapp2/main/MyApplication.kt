@@ -4,8 +4,6 @@ import android.app.Application
 
 import com.google.firebase.FirebaseApp
 
-import com.example.wapapp2.repository.ReceiptRepository
-
 import net.danlew.android.joda.JodaTimeAndroid
 
 class MyApplication : Application() {
