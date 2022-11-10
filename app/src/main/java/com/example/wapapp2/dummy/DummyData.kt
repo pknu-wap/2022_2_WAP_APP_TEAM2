@@ -123,6 +123,10 @@ class DummyData {
         }
 
         fun getReceipt(): ReceiptDTO = ReceiptDTO("0", Date(), "", null, "", "0", false)
+
+
+        val testCalcRoomId = "LvJY5fz6TjlTDaHHX53l"
+
     }
 
 }

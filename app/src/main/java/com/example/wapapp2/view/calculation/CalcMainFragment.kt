@@ -48,7 +48,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     /** summary of FixedPay **/
     private var paymoney = 0
-
+    private var calcRoomId: String = DummyData.testCalcRoomId
 
     private var chatInputLayoutHeight = 0
 
@@ -208,6 +208,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
             val fragment = CheckReceiptFragment()
+            fragment.arguments = Bundle().apply {
+                putString("calcRoomId", calcRoomId)
+            }
             val fragmentManager = parentFragmentManager
             fragmentManager
                     .beginTransaction()

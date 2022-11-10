@@ -13,13 +13,13 @@
         android:layout_alignParentTop="true"
         >
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        app:title="정산 목록"
-        />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+            app:title="정산 목록"
+            />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,16 +28,19 @@
         android:layout_height="match_parent"
         android:layout_below="@id/topAppBarLayout"
         android:layout_marginTop="0dp"
-        android:background="#F1F1F1">
+        android:background="#F1F1F1"
+        >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_editreceipt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
