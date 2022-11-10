@@ -17,6 +17,12 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     var auth: FirebaseAuth? = null
 
+    override fun onStart() {
+        super.onStart()
+
+        moveMainPage(auth?.currentUser)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
