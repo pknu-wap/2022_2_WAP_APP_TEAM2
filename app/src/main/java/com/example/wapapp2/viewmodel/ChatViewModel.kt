@@ -10,7 +10,7 @@ import com.example.wapapp2.view.chat.`interface`.OnChatRecievedCallback
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
-    private val observer : = LiveData<OnChatRecievedCallback>()
+    //private val observer : = LiveData<OnChatRecievedCallback>()
     private var chatList = MutableLiveData<ArrayList<ChatDTO>>()
     private val chatRepository = ChatRepository.getINSTANCE()
 

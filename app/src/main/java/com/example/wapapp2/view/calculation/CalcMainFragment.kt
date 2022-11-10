@@ -44,12 +44,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
-    private val receiptViewModel: ReceiptViewModel by viewModels()
 
     /** summary of FixedPay **/
     private var paymoney = 0
-
-
     private var chatInputLayoutHeight = 0
 
 
@@ -103,7 +100,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 R.id.menu -> {
                     binding.root.openDrawer(binding.sideNavigation)
                 }
-
                 else -> {}
             }
             true
@@ -120,34 +116,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
 
         }
-    }
-
-
-    private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        inner class FriendsVH(val binding: ChatFriendsItemBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(item: Profiles) {
-                binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
-                binding.friendName.text = item.name
-
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-            return FriendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
-
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            (holder as FriendsVH).bind(items[position])
-        }
-
-        override fun getItemCount(): Int {
-            return items.size
-        }
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -195,7 +163,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                         chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
 
                         binding.chat.layoutParams = chatFragmentContainerLayoutParams
-                        updateSummaryUI()
                     }
                 }
             })
@@ -245,7 +212,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
 
             val dummyFriends = DummyData.getProfiles()
-            binding.friends.adapter = FriendsAdapter(context, dummyFriends)
+            binding.friends.adapter = CalcUserAdapter(context, dummyFriends)
         }
     }
 
@@ -265,8 +232,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 .commitAllowingStateLoss()
     }
 
-    override fun updateSummaryUI() {
-        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(receiptViewModel.getCurrentSummary())
+    override fun updateSummaryUI(summary : Int) {
+        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
     }
 
 }

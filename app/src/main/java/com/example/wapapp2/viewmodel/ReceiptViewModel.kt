@@ -10,6 +10,8 @@ class ReceiptViewModel(application: Application) : AndroidViewModel(application)
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private var currentMySummary = 0
 
+    val getCurrentSummary get() = currentMySummary
+
     fun updateSummary_forNewProduct(productDTO: ReceiptProductDTO) {
         currentMySummary += try {
             productDTO.price / productDTO.personCount

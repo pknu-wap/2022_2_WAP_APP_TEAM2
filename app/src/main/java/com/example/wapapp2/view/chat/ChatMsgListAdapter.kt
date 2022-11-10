@@ -111,7 +111,7 @@ class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adap
 
 
     fun onRecived_NewMessage(){
-        chatList.add(ChatDTO("Annonymous","",DateTime.now().toString(),"새로 추가되는 메시지 입니다.",R.drawable.man))
+        chatList.add(ChatDTO("Annonymous","", Date() ,"새로 추가되는 메시지 입니다.",""))
     }
 
 }
