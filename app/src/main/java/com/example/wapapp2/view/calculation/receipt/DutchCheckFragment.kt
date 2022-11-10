@@ -22,10 +22,10 @@ import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSummaryCallback: OnUpdateSummaryCallback) : Fragment() {
-    private lateinit var binding : DutchCheckFragmentBinding
-    val onFixOngoingReceipt : OnFixOngoingCallback
-    val onUpdateSummaryCallback : OnUpdateSummaryCallback
-    val receiptViewModel : ReceiptViewModel by viewModels()
+    private lateinit var binding: DutchCheckFragmentBinding
+    val onFixOngoingReceipt: OnFixOngoingCallback
+    val onUpdateSummaryCallback: OnUpdateSummaryCallback
+    val receiptViewModel: ReceiptViewModel by viewModels()
 
     init {
         this.onFixOngoingReceipt = onFixOngoingReceipt
@@ -39,10 +39,9 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
         binding.viewReceipts.adapter = ReceiptAdapter(requireContext(), DummyData.getReceipts())
 
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            if (isChecked){
+            if (isChecked) {
 
-            }
-            else{
+            } else {
                 //임시로 구현 -> 팀 인원 다 체크후 해야함
                 onFixOngoingReceipt.onFixOngoingReceipt()
             }
@@ -58,7 +57,7 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
 
         inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
             fun bind(receipt: ReceiptDTO) {
-                binding.description.text = "[ " + receipt.title + " ] - 김진우"
+                binding.description.text = "[ " + receipt.name + " ] - 김진우"
                 binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
                 binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
             }
@@ -87,11 +86,15 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
 
 
             fun bind(product: ReceiptProductDTO) {
-                var myPrice = try{product.price / product.personCount} catch (e : ArithmeticException) {0}
+                var myPrice = try {
+                    product.price / product.personCount
+                } catch (e: ArithmeticException) {
+                    0
+                }
 
-                binding.receiptMenu.text = product.itemName
+                binding.receiptMenu.text = product.name
                 binding.receiptTotalMoney.text = DecimalFormat("#,###").format(product.price)
-                binding.receiptMyMoney.text =  DecimalFormat("#,###").format(myPrice)
+                binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
                 binding.receiptPersonCount.text = "${product.personCount}/3"
                 binding.recentCalcCkbox.isChecked = true
 
