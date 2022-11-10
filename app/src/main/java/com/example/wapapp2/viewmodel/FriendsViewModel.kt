@@ -1,19 +1,37 @@
 package com.example.wapapp2.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
-import com.example.wapapp2.repository.FriendsRepository
+import com.example.wapapp2.model.UserDTO
+import com.example.wapapp2.repository.FriendsRepositoryImpl
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-class FriendsViewModel(application: Application) : AndroidViewModel(application) {
-    private val friendsRepository: FriendsRepository = FriendsRepository.getINSTANCE()
+class FriendsViewModel : ViewModel() {
+    private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
 
     val friendsListLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
     val friendCheckedLiveData: MutableLiveData<FriendCheckDTO> = MutableLiveData<FriendCheckDTO>()
-    val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendsRepository.searchResultFriendsLiveData
+    val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendsRepositoryImpl.searchResultFriendsLiveData
     val currentRoomFriendsSet = HashSet<String>()
+
+    private val _searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
+    val searchUsersResult get() = _searchUsersResult
+
+    private val _addMyFriendResult = MutableLiveData<Boolean>()
+    val addMyFriendResult get() = _addMyFriendResult
+
+    private val _deleteMyFriendResult = MutableLiveData<Boolean>()
+    val deleteMyFriendResult get() = _deleteMyFriendResult
+
+    private val _aliasMyFriendResult = MutableLiveData<Boolean>()
+    val aliasMyFriendResult get() = _aliasMyFriendResult
 
     fun checkedFriend(friendDTO: FriendDTO, isChecked: Boolean) {
         val list = friendsListLiveData.value!!
@@ -42,7 +60,55 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun getFriends(word: String) {
-        friendsRepository.getFriendsList(word)
+        friendsRepositoryImpl.getFriendsList(word)
+    }
+
+    fun findUsers(userName: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.findUsers(userName)
+            }
+            result.await()
+            withContext(MainScope().coroutineContext) {
+                searchUsersResult.value = result.await()
+            }
+        }
+    }
+
+    fun addToMyFriend(userDTO: UserDTO, myUid: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.addToMyFriend(userDTO, myUid)
+            }
+            result.await()
+            withContext(MainScope().coroutineContext) {
+                addMyFriendResult.value = result.await()
+            }
+        }
+    }
+
+    fun deleteMyFriend(friendId: String, myUid: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.deleteMyFriend(friendId, myUid)
+            }
+            result.await()
+            withContext(MainScope().coroutineContext) {
+                deleteMyFriendResult.value = result.await()
+            }
+        }
+    }
+
+    fun setAliasToMyFriend(alias: String, friendId: String, myUid: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.setAliasToMyFriend(alias, friendId, myUid)
+            }
+            result.await()
+            withContext(MainScope().coroutineContext) {
+                aliasMyFriendResult.value = result.await()
+            }
+        }
     }
 
     data class FriendCheckDTO(val isChecked: Boolean, val friendDTO: FriendDTO)

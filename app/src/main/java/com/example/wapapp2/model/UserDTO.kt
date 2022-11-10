@@ -4,14 +4,14 @@ import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.PropertyName
 
 data class UserDTO(
-        @Exclude
-        val id: String,
+        @get:Exclude
+        var id: String,
         @PropertyName("email")
-        val email: String,
+        var email: String,
         @PropertyName("gender")
-        val gender: String,
+        var gender: String,
         @PropertyName("imgUri")
-        val imgUri: String,
+        var imgUri: String,
         @PropertyName("name")
-        val name: String
+        var name: String
 )
