@@ -9,6 +9,11 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.getColor
+
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -17,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
@@ -28,18 +35,20 @@ import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
+import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallback, OnUpdateSummaryCallback {
+class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
-    private val receiptViewModel : ReceiptViewModel by viewModels()
+    private val receiptViewModel: ReceiptViewModel by viewModels()
 
     /** summary of FixedPay **/
     private var paymoney = 0
+
 
     private var chatInputLayoutHeight = 0
 
@@ -107,8 +116,12 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
         } else {
             binding.calculationSimpleInfo.summary.text = paymoney.toString()
+
+            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
+
         }
     }
+
 
     private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -117,11 +130,14 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
             fun bind(item: Profiles) {
                 binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
                 binding.friendName.text = item.name
+
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
             return FriendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
+
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -139,17 +155,17 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         outState.putAll(bundle)
     }
 
-    private fun setOngoingFolderView(){
+    private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-            .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt, this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
-            .commitAllowingStateLoss()
+                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt, this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
+                .commitAllowingStateLoss()
 
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
             var expanded = true
             val collapsedMarginBottom = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f,
-                resources.displayMetrics)
+                    resources.displayMetrics)
 
             override fun onClick(v: View?) {
                 expanded = !expanded
@@ -157,7 +173,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
                     R.drawable.ic_baseline_expand_more_24)
                 binding.calculationSimpleInfo.fragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
-                    if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
+                        if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
 
                 // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
                 val cardViewLayoutParams = binding.calculationSimpleInfo.root.layoutParams as FrameLayout.LayoutParams
@@ -186,8 +202,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         })
 
 
-
     }
+
 
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
@@ -216,7 +232,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
                 val currentFriendDTOList = calcRoomViewModel.currentFriendsList
 
                 for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.uid)
+                    currentFriendsListInRoom.add(dto.friendUserId)
                 }
 
                 putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
@@ -245,8 +261,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
 
     override fun onFixOngoingReceipt() {
         childFragmentManager.beginTransaction()
-            .replace( binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
-            .commitAllowingStateLoss()
+                .replace(binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
+                .commitAllowingStateLoss()
     }
 
     override fun updateSummaryUI() {

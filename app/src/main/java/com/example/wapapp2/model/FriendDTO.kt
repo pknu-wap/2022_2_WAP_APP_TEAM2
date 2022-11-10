@@ -1,3 +1,12 @@
 package com.example.wapapp2.model
 
-data class FriendDTO(val uid: String, val friendName: String, val email: String)
+import com.google.firebase.firestore.Exclude
+
+data class FriendDTO(
+        val friendUserId: String,
+        val alias: String,
+        @Exclude
+        val friendName: String,
+        @Exclude
+        val email: String
+)

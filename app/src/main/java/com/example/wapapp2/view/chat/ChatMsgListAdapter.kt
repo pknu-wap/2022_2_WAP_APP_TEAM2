@@ -9,12 +9,19 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DateConverter
 import com.example.wapapp2.databinding.ChatMsgItemBinding
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.viewmodel.ChatViewModel
 import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.format.ISODateTimeFormat.date
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+
 
 class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adapter<ChatMsgListAdapter.ViewHolder>() {
     private val layoutInflater: LayoutInflater
@@ -70,7 +77,8 @@ class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adap
                 binding.spaceHeader.layoutParams.height = 6
             }
 
-            time = dateTimeParser.parseDateTime(chatList[position].time)
+
+            time = dateTimeParser.parseDateTime(DateConverter.toISO8601(chatList[position].sendedTime!!))
             binding.time.text = timeFormat.print(time)
         }
 

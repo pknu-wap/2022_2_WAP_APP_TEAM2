@@ -33,7 +33,6 @@ class ChatNotificationHelper private constructor(context: Context)
         val remoteViews = RemoteViews(context.packageName, R.layout.chat_notification_remoteviews)
         remoteViews.setTextViewText(R.id.member_name, chatDTO.userName)
         remoteViews.setTextViewText(R.id.msg, chatDTO.msg)
-        remoteViews.setImageViewResource(R.id.icon, chatDTO.icon)
 
         notificationObj.notificationBuilder.setContentTitle(roomName)
         notificationObj.notificationBuilder.setCustomContentView(remoteViews)

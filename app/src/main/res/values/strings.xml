@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WapApp2</string>
+    <string name="app_name">우정하자</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -36,9 +36,10 @@
     <string name="invite_friends_list">초대 친구 목록</string>
     <string name="input_search_friend_name">친구 이름 입력</string>
     <string name="hint_input_room_name">방 제목 입력</string>
-    <string name="edit_img">사진 교체</string>
+    <string name="modify_img">사진 편집</string>
+    <string name="replace_img">사진 교체</string>
     <string name="add_img">사진 추가</string>
-    <string name="remove_img">사진 삭제</string>
+    <string name="delete_img">사진 삭제</string>
     <string name="receipt_img">영수증 사진</string>
     <string name="removed_receipt">영수증이 삭제 되었습니다</string>
     <string name="unable_to_remove_receipt">영수증 삭제 불가</string>
