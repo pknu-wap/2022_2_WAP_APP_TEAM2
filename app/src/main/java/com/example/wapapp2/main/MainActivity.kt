@@ -6,10 +6,16 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.ActivityMainBinding
+
 import com.example.wapapp2.repository.AppCheckRepository
 import com.example.wapapp2.repository.FriendsRepository
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
+
+import com.example.wapapp2.dummy.TestLogics
+import com.example.wapapp2.view.login.LoginFragment
+import com.example.wapapp2.view.main.MainHostFragment
+
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.AccountSignViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -24,9 +30,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val rootTransactionFragment = RootTransactionFragment()
-        supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, rootTransactionFragment,
-                RootTransactionFragment::class.java.name).commitAllowingStateLoss()
+        val loginFragment = LoginFragment()
+        supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, loginFragment,
+                LoginFragment::class.java.name).commitAllowingStateLoss()
 
 
         //test용으로 naversovc@gmail.com로 자동로그인
