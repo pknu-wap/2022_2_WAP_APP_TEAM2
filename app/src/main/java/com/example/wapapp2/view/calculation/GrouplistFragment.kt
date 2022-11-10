@@ -35,7 +35,7 @@ class GrouplistFragment : Fragment() {
 
             fragment.arguments = Bundle().apply {
                 val dummyData = DummyData.getRoom()
-                putString("roomId", dummyData.roomId)
+                putString("roomId", dummyData.id)
             }
             val tag = "CalcMain"
 

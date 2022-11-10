@@ -42,7 +42,7 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
 
     fun removeItem(friendDTO: FriendDTO) {
         for ((index, value) in list.withIndex()) {
-            if (value.uid == friendDTO.uid) {
+            if (value.friendUserId == friendDTO.friendUserId) {
                 list.removeAt(index)
                 notifyItemRemoved(index)
                 break

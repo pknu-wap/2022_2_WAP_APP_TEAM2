@@ -13,9 +13,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FinalConfirmationNewReceiptLayoutBinding
 import com.example.wapapp2.databinding.FragmentNewReceiptBinding
 import com.example.wapapp2.databinding.ReceiptProductViewBinding
@@ -25,22 +25,21 @@ import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 
 
-open class NewReceiptFragment : Fragment() {
-    private lateinit var binding: FragmentNewReceiptBinding
+class NewReceiptFragment : Fragment() {
+    private var _binding: FragmentNewReceiptBinding? = null
+    private val binding get() = _binding!!
+
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
-    private lateinit var myObserver: DefaultLifecycleObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
-        myObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry)
-        lifecycle.addObserver(myObserver)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentNewReceiptBinding.inflate(inflater)
+        _binding = FragmentNewReceiptBinding.inflate(inflater)
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -81,8 +80,18 @@ open class NewReceiptFragment : Fragment() {
         adapter.addFragment()
     }
 
-    private class ConfirmReceiptsDialogFragment : DialogFragment() {
-        private lateinit var confirmBinding: FinalConfirmationNewReceiptLayoutBinding
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    class ConfirmReceiptsDialogFragment : DialogFragment() {
+        private var _confirmBinding: FinalConfirmationNewReceiptLayoutBinding? = null
+        private val confirmBinding get() = _confirmBinding!!
         private var adapter: ReceiptsAdapter? = null
         private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
 
@@ -108,7 +117,7 @@ open class NewReceiptFragment : Fragment() {
         }
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater)
+            _confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater)
 
             confirmBinding.receiptList.also {
                 it.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
@@ -130,10 +139,31 @@ open class NewReceiptFragment : Fragment() {
             super.onViewCreated(view, savedInstanceState)
             setWidthPercent(90, 75)
 
+            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner, object : Observer<Boolean> {
+                var count = 0
+                val totalCount = newReceiptViewModel.getReceiptCount()
+
+                override fun onChanged(t: Boolean?) {
+                    if (++count == totalCount) {
+                        //추가 종료
+                    }
+                }
+            })
+
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
+                newReceiptViewModel.addAllReceipts()
                 dismiss()
             }
+        }
+
+        override fun onDestroy() {
+            super.onDestroy()
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _confirmBinding = null
         }
 
         private class ReceiptsAdapter(private val receiptList: MutableList<ReceiptDTO>) :
@@ -144,14 +174,14 @@ open class NewReceiptFragment : Fragment() {
 
                 fun bind(receiptDTO: ReceiptDTO) {
                     viewBinding.productsList.removeAllViews()
-                    viewBinding.receiptName.text = receiptDTO.title
+                    viewBinding.receiptName.text = receiptDTO.name
 
                     viewBinding.totalMoney.text = receiptDTO.totalMoney.toString()
                     var productItemBinding: ReceiptProductViewBinding? = null
 
                     for (product in receiptDTO.getProducts()) {
                         productItemBinding = ReceiptProductViewBinding.inflate(layoutInflater, viewBinding.productsList, false)
-                        productItemBinding.productName.text = product.itemName
+                        productItemBinding.productName.text = product.name
                         productItemBinding.productPrice.text = product.price.toString()
 
                         viewBinding.productsList.addView(productItemBinding.root)

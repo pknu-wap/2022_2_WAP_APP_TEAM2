@@ -8,8 +8,6 @@ import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.notifications.NotificationObj
 import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.ISODateTimeFormat
 
 class CalcNotificationHelper private constructor(context: Context) :
         AbstractNotificationHelper(context, context.getString(R.string.calc_notification_channel_id), context.getString(R.string
@@ -42,14 +40,14 @@ class CalcNotificationHelper private constructor(context: Context) :
         val collapsedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_collapsed_remoteviews)
         collapsedRemoteViews.setTextViewText(R.id.payer, friendDTO.friendName)
         collapsedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
-        collapsedRemoteViews.setTextViewText(R.id.msg, receiptDTO.title)
+        collapsedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
         collapsedRemoteViews.setImageViewResource(R.id.receipt_image, R.drawable.receipt_sample)
 
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_expanded_remoteviews)
         expandedRemoteViews.setTextViewText(R.id.payer, friendDTO.friendName)
         expandedRemoteViews.setTextViewText(R.id.date_time, DateTime.parse(receiptDTO.date).toString(dateTimeFormat))
         expandedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
-        expandedRemoteViews.setTextViewText(R.id.msg, receiptDTO.title)
+        expandedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
         expandedRemoteViews.setImageViewResource(R.id.receipt_image, R.drawable.receipt_sample)
 
         notificationObj.notificationBuilder.setCustomContentView(collapsedRemoteViews)

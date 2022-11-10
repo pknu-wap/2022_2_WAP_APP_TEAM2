@@ -9,6 +9,10 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getColor
+
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -102,13 +106,109 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
     }
 
 
+
+    /** summary 화면에 표시 **/
+
+    private val onUpdateSummaryCallback = OnUpdateSummaryCallback { money ->
+        summary += money
+        val text = "${summary}원"
+        binding.calculationSimpleInfo.summary.text = text
+    }
+
+    private fun updateSummary() {
+    }
+
+
     private fun updateFixedPay() {
         if (paymoney >= 0) {
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
         } else {
             binding.calculationSimpleInfo.summary.text = paymoney.toString()
+
+            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
+
         }
     }
+
+
+    /** 영수증 Adapter **/
+    private inner class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<ReceiptDTO>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+
+        inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
+            fun bind(receipt: ReceiptDTO) {
+                binding.description.text = "[ " + receipt.name + " ] - 김진우"
+                binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts(), onUpdateSummaryCallback)
+                binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            return ReceiptVM(ViewReceiptItemBinding.inflate(LayoutInflater.from(context)))
+        }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            return (holder as ReceiptVM).bind(receipts[position])
+        }
+
+        override fun getItemCount(): Int {
+            return receipts.size
+
+        }
+    }
+
+
+    /** 영수증 세부 항목 Adapter **/
+    private class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>,
+                                     private val onUpdateSummaryCallback: OnUpdateSummaryCallback)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+
+        private class ReceiptMenuVH(private val binding: ViewRecentCalcItemBinding,
+                                    private val onUpdateSummaryCallback: OnUpdateSummaryCallback) : RecyclerView.ViewHolder(binding.root) {
+
+            fun bind(item: ReceiptProductDTO) {
+                var myMoney = calcMyMoney(item)
+                binding.receiptMenu.text = item.name
+                binding.receiptTotalMoney.text = item.price.toString()
+                binding.receiptMyMoney.text = myMoney.toString()
+                binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
+                binding.recentCalcCkbox.isChecked = true
+
+
+                onUpdateSummaryCallback.summary(myMoney)
+
+                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        item.checkedUserIds.add("")
+                        myMoney = calcMyMoney(item)
+                        onUpdateSummaryCallback.summary(myMoney)
+
+
+                        binding.receiptMyMoney.text = myMoney.toString()
+                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
+
+
+                    } else {
+                        myMoney = calcMyMoney(item)
+                        onUpdateSummaryCallback.summary(-myMoney)
+
+                        item.checkedUserIds.removeAt(0)
+
+                        binding.receiptMyMoney.text = "0"
+                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
+                    }
+
+                }
+            }
+
+            fun calcMyMoney(item: ReceiptProductDTO): Int {
+                return try {
+                    item.price / item.checkedUserIds.size
+                } catch (e: ArithmeticException) {
+                    0
+                }
 
     private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -117,11 +217,14 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
             fun bind(item: Profiles) {
                 binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
                 binding.friendName.text = item.name
+
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
             return FriendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
+
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -216,7 +319,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
                 val currentFriendDTOList = calcRoomViewModel.currentFriendsList
 
                 for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.uid)
+                    currentFriendsListInRoom.add(dto.friendUserId)
                 }
 
                 putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
@@ -238,6 +341,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         fun height(height: Int)
     }
 
+    fun interface OnUpdateSummaryCallback {
+        fun summary(money: Int)
+    }
+
     override fun onUpdateMoney(money: Int) {
         paymoney += money
         updateFixedPay() //마지막에 최종 업데이트 되도록 수정 필요
@@ -252,5 +359,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
     override fun updateSummaryUI() {
         binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(receiptViewModel.getCurrentSummary())
     }
+
 
 }

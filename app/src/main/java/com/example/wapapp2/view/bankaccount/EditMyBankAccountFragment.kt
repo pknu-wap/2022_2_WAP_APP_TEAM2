@@ -61,8 +61,9 @@ class EditMyBankAccountFragment : Fragment() {
             // 은행 선택 여부, 계좌번호 입력 여부, 예금주 입력 여부 확인 후 진행
             if (viewModel.selectedBank != null && !binding.editAccountLayout.accountNumberInputEdit.text.isNullOrEmpty()
                     && !binding.editAccountLayout.accountHolderInputEdit.text.isNullOrEmpty()) {
-                val bankAccountDTO = BankAccountDTO(viewModel.selectedBank!!, binding.editAccountLayout.accountNumberInputEdit.text!!.toString(), binding
-                        .editAccountLayout.accountHolderInputEdit.text!!.toString())
+                val bankAccountDTO =
+                        BankAccountDTO(viewModel.selectedBank!!, binding.editAccountLayout.accountNumberInputEdit.text!!.toString(), binding
+                                .editAccountLayout.accountHolderInputEdit.text!!.toString(), viewModel.selectedBank!!.uid)
 
                 //다이얼로그 띄워서 최종 확인 진행
                 val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)

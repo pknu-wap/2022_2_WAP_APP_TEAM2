@@ -20,7 +20,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
         var contains = false
         var idx = 0
         for ((index, value) in list.withIndex()) {
-            if (value.uid == friendDTO.uid) {
+            if (value.friendUserId == friendDTO.friendUserId) {
                 idx = index
                 contains = true
                 break
