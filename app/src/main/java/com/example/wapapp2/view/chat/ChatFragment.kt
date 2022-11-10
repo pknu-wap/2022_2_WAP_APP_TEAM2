@@ -7,20 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.view.calculation.CalcMainFragment
+import com.example.wapapp2.view.chat.`interface`.OnChatRecievedCallback
+import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 
-class ChatFragment : Fragment() {
+class ChatFragment : Fragment(), OnChatRecievedCallback {
     private lateinit var binding: FragmentChatBinding
     private lateinit var chatAdapter: ChatMsgListAdapter
     private lateinit var myAccountViewModel: MyAccountViewModel
     private lateinit var bundle: Bundle
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
+    private val chatViewModel : ChatViewModel by viewModels()
+
 
     fun setViewHeightCallback(callback: CalcMainFragment.ViewHeightCallback) {
         this.viewHeightCallback = callback
@@ -83,4 +88,13 @@ class ChatFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+
+        super.onDestroyView()
+    }
+
+
+    override fun received() {
+        TODO("Not yet implemented")
+    }
 }

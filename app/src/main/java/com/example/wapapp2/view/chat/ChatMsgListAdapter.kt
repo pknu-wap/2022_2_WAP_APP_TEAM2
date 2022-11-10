@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.ChatMsgItemBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.viewmodel.ChatViewModel
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
@@ -98,4 +100,10 @@ class ChatMsgListAdapter(context: Context, val myId: String) : RecyclerView.Adap
     }
 
     override fun getItemCount(): Int = chatList.size
+
+
+    fun onRecived_NewMessage(){
+        chatList.add(ChatDTO("Annonymous","",DateTime.now().toString(),"새로 추가되는 메시지 입니다.",R.drawable.man))
+    }
+
 }
