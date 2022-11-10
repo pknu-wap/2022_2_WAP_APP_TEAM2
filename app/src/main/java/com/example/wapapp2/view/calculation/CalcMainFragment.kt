@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.getColor
 
 import androidx.core.content.ContextCompat.getDrawable
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
@@ -32,18 +35,20 @@ import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
+import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallback, OnUpdateSummaryCallback {
+class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
-    private val receiptViewModel : ReceiptViewModel by viewModels()
+    private val receiptViewModel: ReceiptViewModel by viewModels()
 
     /** summary of FixedPay **/
     private var paymoney = 0
+
 
     private var chatInputLayoutHeight = 0
 
@@ -107,18 +112,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
 
 
 
-    /** summary 화면에 표시 **/
-
-    private val onUpdateSummaryCallback = OnUpdateSummaryCallback { money ->
-        summary += money
-        val text = "${summary}원"
-        binding.calculationSimpleInfo.summary.text = text
-    }
-
-    private fun updateSummary() {
-    }
-
-
     private fun updateFixedPay() {
         if (paymoney >= 0) {
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
@@ -130,85 +123,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         }
     }
 
-
-    /** 영수증 Adapter **/
-    private inner class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<ReceiptDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-
-        inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(receipt: ReceiptDTO) {
-                binding.description.text = "[ " + receipt.name + " ] - 김진우"
-                binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts(), onUpdateSummaryCallback)
-                binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return ReceiptVM(ViewReceiptItemBinding.inflate(LayoutInflater.from(context)))
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return (holder as ReceiptVM).bind(receipts[position])
-        }
-
-        override fun getItemCount(): Int {
-            return receipts.size
-
-        }
-    }
-
-
-    /** 영수증 세부 항목 Adapter **/
-    private class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>,
-                                     private val onUpdateSummaryCallback: OnUpdateSummaryCallback)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-
-        private class ReceiptMenuVH(private val binding: ViewRecentCalcItemBinding,
-                                    private val onUpdateSummaryCallback: OnUpdateSummaryCallback) : RecyclerView.ViewHolder(binding.root) {
-
-            fun bind(item: ReceiptProductDTO) {
-                var myMoney = calcMyMoney(item)
-                binding.receiptMenu.text = item.name
-                binding.receiptTotalMoney.text = item.price.toString()
-                binding.receiptMyMoney.text = myMoney.toString()
-                binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
-                binding.recentCalcCkbox.isChecked = true
-
-
-                onUpdateSummaryCallback.summary(myMoney)
-
-                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        item.checkedUserIds.add("")
-                        myMoney = calcMyMoney(item)
-                        onUpdateSummaryCallback.summary(myMoney)
-
-
-                        binding.receiptMyMoney.text = myMoney.toString()
-                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
-
-
-                    } else {
-                        myMoney = calcMyMoney(item)
-                        onUpdateSummaryCallback.summary(-myMoney)
-
-                        item.checkedUserIds.removeAt(0)
-
-                        binding.receiptMyMoney.text = "0"
-                        binding.receiptPersonCount.text = item.checkedUserIds.size.toString() + "/3"
-                    }
-
-                }
-            }
-
-            fun calcMyMoney(item: ReceiptProductDTO): Int {
-                return try {
-                    item.price / item.checkedUserIds.size
-                } catch (e: ArithmeticException) {
-                    0
-                }
 
     private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -242,17 +156,17 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         outState.putAll(bundle)
     }
 
-    private fun setOngoingFolderView(){
+    private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-            .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt, this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
-            .commitAllowingStateLoss()
+                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt, this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
+                .commitAllowingStateLoss()
 
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
             var expanded = true
             val collapsedMarginBottom = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f,
-                resources.displayMetrics)
+                    resources.displayMetrics)
 
             override fun onClick(v: View?) {
                 expanded = !expanded
@@ -260,7 +174,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
                     R.drawable.ic_baseline_expand_more_24)
                 binding.calculationSimpleInfo.fragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
-                    if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
+                        if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
 
                 // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
                 val cardViewLayoutParams = binding.calculationSimpleInfo.root.layoutParams as FrameLayout.LayoutParams
@@ -289,8 +203,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         })
 
 
-
     }
+
 
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
@@ -341,10 +255,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
         fun height(height: Int)
     }
 
-    fun interface OnUpdateSummaryCallback {
-        fun summary(money: Int)
-    }
-
     override fun onUpdateMoney(money: Int) {
         paymoney += money
         updateFixedPay() //마지막에 최종 업데이트 되도록 수정 필요
@@ -352,13 +262,12 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback , OnFixOngoingCallbac
 
     override fun onFixOngoingReceipt() {
         childFragmentManager.beginTransaction()
-            .replace( binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
-            .commitAllowingStateLoss()
+                .replace(binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
+                .commitAllowingStateLoss()
     }
 
     override fun updateSummaryUI() {
         binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(receiptViewModel.getCurrentSummary())
     }
-
 
 }

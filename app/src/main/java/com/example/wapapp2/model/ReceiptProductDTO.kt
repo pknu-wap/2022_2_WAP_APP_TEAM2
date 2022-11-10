@@ -17,4 +17,7 @@ data class ReceiptProductDTO(
         var price: Int,
         @PropertyName("checkedUserIds")
         var checkedUserIds: ArrayList<String> = ArrayList<String>()
-)
+) {
+    @get:Exclude
+    var personCount: Int = 0
+}
