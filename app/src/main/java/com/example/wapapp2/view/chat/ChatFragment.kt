@@ -44,6 +44,9 @@ class ChatFragment : Fragment() {
             this.adapter = chatAdapter
         }
 
+        //scroll for last message
+        binding.chatList.smoothScrollToPosition(chatAdapter.itemCount-1)
+
         setInputListener()
 
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
