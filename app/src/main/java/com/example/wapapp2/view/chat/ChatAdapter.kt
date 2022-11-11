@@ -20,7 +20,6 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
-
     inner class ChatHolder(val binding: ChatMsgItemBinding) : RecyclerView.ViewHolder(binding.root){
         var time = DateTime()
 
@@ -64,7 +63,7 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
             }
 
         private fun setUserName(position: Int , model: ChatDTO) {
-            if ( model.senderId == myId || equalsTopUserId(model.userId, position)) {
+            if ( model.senderId == myId || equalsTopUserId(model.senderId, position)) {
                 binding.userName.visibility = View.GONE
                 return
             }
