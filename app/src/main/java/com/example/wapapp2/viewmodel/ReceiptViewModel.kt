@@ -19,12 +19,11 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class ReceiptViewModel(application: Application) : AndroidViewModel(application) {
+class ReceiptViewModel : ViewModel() {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private var currentMySummary = 0
 
     val getCurrentSummary get() = currentMySummary
-
     private val _receipts = MutableLiveData<MutableList<ReceiptDTO>>()
     val receipts get() = _receipts
 
