@@ -43,12 +43,31 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         }
     }
 
-    override suspend fun findUsers(email: String) = suspendCoroutine<MutableList<UserDTO>> { continuation ->
+    override suspend fun getMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!)
+                .collection(FireStoreNames.myFriends.name)
+        collection.get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val list = it.result.documents.toMutableList()
+                val dtoList = mutableListOf<FriendDTO>()
+
+                for (v in list) {
+                    dtoList.add(v.toObject<FriendDTO>()!!)
+                }
+
+                continuation.resume(dtoList)
+            } else {
+                continuation.resume(mutableListOf())
+            }
+        }
+    }
+
+    override suspend fun findUsers(email: String): MutableSet<UserDTO> = suspendCoroutine<MutableSet<UserDTO>> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
         collection.whereEqualTo("email", email).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 val list = it.result.documents.toMutableList()
-                val dtoList = mutableListOf<UserDTO>()
+                val dtoSet = mutableSetOf<UserDTO>()
                 var dto: UserDTO? = null
                 val myId = auth.currentUser?.uid
 
@@ -56,13 +75,13 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
                     if (myId != v.id) {
                         dto = v.toObject<UserDTO>()!!
                         dto.id = v.id
-                        dtoList.add(dto)
+                        dtoSet.add(dto)
                     }
                 }
 
-                continuation.resume(dtoList)
+                continuation.resume(dtoSet)
             } else {
-                continuation.resume(mutableListOf())
+                continuation.resume(mutableSetOf())
             }
         }
     }

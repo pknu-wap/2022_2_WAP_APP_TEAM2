@@ -8,21 +8,27 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentFriendsBinding
-import com.example.wapapp2.view.login.ProfileAdapter
+import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.view.login.MyFriendsAdapter
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.view.myprofile.MyprofileFragment
 import com.example.wapapp2.view.main.MainHostFragment
+import com.example.wapapp2.viewmodel.FriendsViewModel
 
 class FriendsFragment : Fragment() {
 
     private var _binding: FragmentFriendsBinding? = null
     private val binding get() = _binding!!
+    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
-    private val friendOnClickListener = ListOnClickListener<Profiles> { item, position ->
+    private val friendOnClickListener = ListOnClickListener<FriendDTO> { item, position ->
     }
+
+    private val myFriendsAdapter = MyFriendsAdapter(friendOnClickListener)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +39,6 @@ class FriendsFragment : Fragment() {
         _binding = FragmentFriendsBinding.inflate(inflater, container, false)
 
         val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
-
-        val profileList = arrayListOf(
-                Profiles(R.drawable.man, "박준성", "jesp0305@naver.com"),
-                Profiles(R.drawable.girl, "김진우", "nbmlon99@naver.com")
-        )
 
         binding.rvMyprofile.setOnClickListener {
             val fragment = MyprofileFragment()
@@ -50,12 +51,12 @@ class FriendsFragment : Fragment() {
                     .commit()
         }
 
-        binding.rvMyprofile.findViewById<ImageView>(R.id.iv_profile).setImageResource(myprofile.gender)
-        binding.rvMyprofile.findViewById<TextView>(R.id.user_name1).text = myprofile.name
-        binding.rvMyprofile.findViewById<TextView>(R.id.user_id1).text = myprofile.userid
+        binding.ivProfile.setImageResource(myprofile.gender)
+        binding.userName1.text = myprofile.name
+        binding.userId1.text = myprofile.userid
 
         binding.rvProfile.setHasFixedSize(true)
-        binding.rvProfile.adapter = ProfileAdapter(profileList, friendOnClickListener)
+        binding.rvProfile.adapter = myFriendsAdapter
 
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
@@ -73,6 +74,15 @@ class FriendsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        friendsViewModel.myFriends.observe(requireActivity()) {
+            myFriendsAdapter.friends = it
+
+            friendsViewModel.myFriendsIdSet.clear()
+            for (v in it) {
+                friendsViewModel.myFriendsIdSet.add(v.friendUserId)
+            }
+        }
+        friendsViewModel.getMyFriends()
     }
 
 }

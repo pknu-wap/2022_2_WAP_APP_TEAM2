@@ -7,6 +7,7 @@ import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
@@ -18,6 +19,11 @@ class FriendsViewModel : ViewModel() {
 
     private val _searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
     val searchUsersResult get() = _searchUsersResult
+
+    private val _myFriends = MutableLiveData<MutableList<FriendDTO>>()
+    val myFriends get() = _myFriends
+
+    val myFriendsIdSet = hashSetOf<String>()
 
     private val _addMyFriendResult = MutableLiveData<Boolean>()
     val addMyFriendResult get() = _addMyFriendResult
@@ -58,14 +64,31 @@ class FriendsViewModel : ViewModel() {
         friendsRepositoryImpl.getFriendsList(word)
     }
 
+    fun getMyFriends() {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.getMyFriends()
+            }
+            result.await()
+            withContext(Main) {
+                myFriends.value = result.await()
+            }
+        }
+    }
+
     fun findUsers(email: String) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
                 friendsRepositoryImpl.findUsers(email)
             }
-            result.await()
-            withContext(MainScope().coroutineContext) {
-                searchUsersResult.value = result.await()
+            val dtoSet = result.await()
+            for (v in dtoSet) {
+                if (myFriendsIdSet.contains(v.id)) {
+                    dtoSet.remove(v)
+                }
+            }
+            withContext(Main) {
+                searchUsersResult.value = dtoSet.toMutableList()
             }
         }
     }

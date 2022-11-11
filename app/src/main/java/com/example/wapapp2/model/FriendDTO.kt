@@ -1,12 +1,17 @@
 package com.example.wapapp2.model
 
+import android.os.Parcelable
 import com.google.firebase.firestore.Exclude
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class FriendDTO(
-        val friendUserId: String,
-        val alias: String,
+        var friendUserId: String,
+        var alias: String,
         @get:Exclude
-        val friendName: String,
+        var friendName: String,
         @get:Exclude
-        val email: String
-)
+        var email: String
+) : Parcelable {
+    constructor() : this("", "", "", "")
+}

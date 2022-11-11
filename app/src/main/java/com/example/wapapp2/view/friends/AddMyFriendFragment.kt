@@ -23,7 +23,7 @@ class AddMyFriendFragment : Fragment() {
     private var _binding: FragmentAddMyFriendBinding? = null
     private val binding get() = _binding!!
 
-    private val friendsViewModel by viewModels<FriendsViewModel>()
+    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
     private val listOnClickListener = ListOnClickListener<UserDTO> { item, pos ->
         MaterialAlertDialogBuilder(requireContext())
