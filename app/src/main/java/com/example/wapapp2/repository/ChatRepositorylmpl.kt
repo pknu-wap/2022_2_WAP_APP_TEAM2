@@ -41,23 +41,19 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
             }
     }
 
-    override suspend fun getRecyclerviewOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
+    override fun getRecyclerviewOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
         val query = fireStore
             .collection("calc_rooms")
             .document(calcRoomDTO.id!!)
             .collection("chats")
             .orderBy("sendedTime")
 
-
-        //query.addSnapshotListener(EventListener<QuerySnapshot>(){})
         val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
             .setQuery(query, SnapshotParser {
                 //id로부터 사람이름
                 ChatDTO(it.getString("userName").toString() , it.id , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
             })
             .build()
-
-
 
         return recyclerOption
     }

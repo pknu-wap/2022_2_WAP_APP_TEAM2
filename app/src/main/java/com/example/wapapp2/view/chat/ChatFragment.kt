@@ -24,7 +24,7 @@ import java.util.*
 
 class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private lateinit var binding: FragmentChatBinding
-    //private lateinit var chatAdapter: ChatMsgListAdapter
+
     private lateinit var chatAdapter_: ChatAdapter
     private lateinit var myAccountViewModel: MyAccountViewModel
     private lateinit var bundle: Bundle
@@ -41,14 +41,7 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
         super.onCreate(savedInstanceState)
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
 
-        //수정필요 -> 생명주기 공부
-        chatViewModel.attach(calcRoomDTO)
-        CoroutineScope(Dispatchers.Default).launch{
-            async {  chatAdapter_ = ChatAdapter("PqbxywH1wjMHbkcWBfkD9annA5Z2", chatViewModel.getOptions())
-            }
-        }
-
-        //chatAdapter = ChatMsgListAdapter(requireContext(), myAccountViewModel.myAccountId)
+        chatAdapter_ = ChatAdapter("", chatViewModel.getOptions(calcRoomDTO))
 
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
@@ -77,11 +70,6 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //chatAdapter.chatList.addAll(DummyData.getChatList())
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
@@ -108,7 +96,6 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     }
 
     override fun onStop() {
-        chatViewModel.detach(calcRoomDTO)
         chatAdapter_.stopListening()
         super.onStop()
     }

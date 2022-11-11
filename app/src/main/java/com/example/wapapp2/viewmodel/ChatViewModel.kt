@@ -14,8 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
-    //private val observer : = LiveData<OnChatRecievedCallback>()
-    private var EnableChatRoom : CalcRoomDTO? = null
+    private lateinit var EnableChatRoom : CalcRoomDTO
     private val chatRepository : ChatRepository = ChatRepositorylmpl.getINSTANCE()
 
 
@@ -23,9 +22,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         EnableChatRoom = calcRoomDTO
     }
 
-    fun detach(calcRoomDTO: CalcRoomDTO){
-        EnableChatRoom = null
-    }
 
     fun sendMsg(chatDTO: ChatDTO){
         CoroutineScope(Dispatchers.Default).launch{
@@ -33,8 +29,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun getOptions() : FirestoreRecyclerOptions<ChatDTO> {
-        return chatRepository.getRecyclerviewOptions(EnableChatRoom!!)
+    fun getOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
+        return chatRepository.getRecyclerviewOptions(calcRoomDTO!!)
     }
 
 
