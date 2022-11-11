@@ -1,8 +1,11 @@
 package com.example.wapapp2.model
 
+import android.os.Parcelable
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.PropertyName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class UserDTO(
         @get:Exclude
         var id: String,
@@ -14,4 +17,6 @@ data class UserDTO(
         var imgUri: String,
         @PropertyName("name")
         var name: String
-)
+) : Parcelable {
+    constructor() : this("", "", "", "", "")
+}

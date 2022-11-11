@@ -31,7 +31,7 @@
         />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/searchview_layout"
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
@@ -63,7 +63,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/save_btn"
-        app:layout_constraintTop_toBottomOf="@id/searchview_layout"
+        app:layout_constraintTop_toBottomOf="@id/search_view"
         tools:itemCount="2"
         tools:listitem="@layout/search_friend_item_view"
         />

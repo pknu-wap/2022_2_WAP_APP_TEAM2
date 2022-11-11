@@ -39,6 +39,10 @@ class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = 
         return itemList.size
     }
 
+    override fun onViewAttachedToWindow(holder: CustomViewHolder) {
+        super.onViewAttachedToWindow(holder)
+    }
+
     class CustomViewHolder(private val binding: ProductItemLayoutInNewCalcBinding,
                            private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) :
             RecyclerView.ViewHolder(binding.root) {

@@ -6,6 +6,7 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.interfaces.FriendsRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
@@ -15,6 +16,7 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
     val searchResultFriendsLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>()
     val dummyFriendsList = DummyData.getMyFriendsList()
     private val fireStore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     companion object {
         private var INSTANCE: FriendsRepositoryImpl? = null
@@ -41,19 +43,26 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         }
     }
 
-    override suspend fun findUsers(userName: String) = suspendCoroutine<MutableList<UserDTO>> { continuation ->
+    override suspend fun findUsers(email: String) = suspendCoroutine<MutableList<UserDTO>> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
-        collection.whereEqualTo("name", userName).get().addOnCompleteListener {
+        collection.whereEqualTo("email", email).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 val list = it.result.documents.toMutableList()
                 val dtoList = mutableListOf<UserDTO>()
+                var dto: UserDTO? = null
+                val myId = auth.currentUser?.uid
+
                 for (v in list) {
-                    dtoList.add(v.toObject<UserDTO>()!!)
+                    if (myId != v.id) {
+                        dto = v.toObject<UserDTO>()!!
+                        dto.id = v.id
+                        dtoList.add(dto)
+                    }
                 }
 
                 continuation.resume(dtoList)
             } else {
-                continuation.resume(mutableListOf<UserDTO>())
+                continuation.resume(mutableListOf())
             }
         }
     }

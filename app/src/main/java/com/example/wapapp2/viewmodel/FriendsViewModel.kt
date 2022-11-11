@@ -3,15 +3,10 @@ package com.example.wapapp2.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
@@ -63,10 +58,10 @@ class FriendsViewModel : ViewModel() {
         friendsRepositoryImpl.getFriendsList(word)
     }
 
-    fun findUsers(userName: String) {
+    fun findUsers(email: String) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
-                friendsRepositoryImpl.findUsers(userName)
+                friendsRepositoryImpl.findUsers(email)
             }
             result.await()
             withContext(MainScope().coroutineContext) {

@@ -7,6 +7,6 @@ data class FriendDTO(
         val alias: String,
         @Exclude
         val friendName: String,
-        @Exclude
+        @get:Exclude
         val email: String
 )

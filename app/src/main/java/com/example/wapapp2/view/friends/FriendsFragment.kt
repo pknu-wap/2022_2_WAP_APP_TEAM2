@@ -18,13 +18,19 @@ import com.example.wapapp2.view.main.MainHostFragment
 
 class FriendsFragment : Fragment() {
 
-    private lateinit var viewBinding: FragmentFriendsBinding
+    private var _binding: FragmentFriendsBinding? = null
+    private val binding get() = _binding!!
 
     private val friendOnClickListener = ListOnClickListener<Profiles> { item, position ->
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        viewBinding = FragmentFriendsBinding.inflate(inflater)
+        _binding = FragmentFriendsBinding.inflate(inflater, container, false)
 
         val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
 
@@ -33,25 +39,36 @@ class FriendsFragment : Fragment() {
                 Profiles(R.drawable.girl, "김진우", "nbmlon99@naver.com")
         )
 
-        viewBinding.rvMyprofile.setOnClickListener {
+        binding.rvMyprofile.setOnClickListener {
             val fragment = MyprofileFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager
             fragmentManager
-                .beginTransaction()
-                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
-                .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
-                .addToBackStack("MyprofileFragment")
-                .commit()
+                    .beginTransaction()
+                    .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
+                    .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
+                    .addToBackStack("MyprofileFragment")
+                    .commit()
         }
 
-        viewBinding.rvMyprofile.findViewById<ImageView>(R.id.iv_profile).setImageResource(myprofile.gender)
-        viewBinding.rvMyprofile.findViewById<TextView>(R.id.user_name1).text = myprofile.name
-        viewBinding.rvMyprofile.findViewById<TextView>(R.id.user_id1).text = myprofile.userid
+        binding.rvMyprofile.findViewById<ImageView>(R.id.iv_profile).setImageResource(myprofile.gender)
+        binding.rvMyprofile.findViewById<TextView>(R.id.user_name1).text = myprofile.name
+        binding.rvMyprofile.findViewById<TextView>(R.id.user_id1).text = myprofile.userid
 
-        viewBinding.rvProfile.setHasFixedSize(true)
-        viewBinding.rvProfile.adapter = ProfileAdapter(profileList, friendOnClickListener)
+        binding.rvProfile.setHasFixedSize(true)
+        binding.rvProfile.adapter = ProfileAdapter(profileList, friendOnClickListener)
 
-        return viewBinding.root
+        binding.addFriendBtn.setOnClickListener {
+            val fragment = AddMyFriendFragment()
+            val fragmentManager = requireParentFragment().parentFragmentManager
+            fragmentManager
+                    .beginTransaction()
+                    .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
+                    .add(R.id.fragment_container_view, fragment, AddMyFriendFragment::class.simpleName)
+                    .addToBackStack(AddMyFriendFragment::class.simpleName)
+                    .commit()
+        }
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
