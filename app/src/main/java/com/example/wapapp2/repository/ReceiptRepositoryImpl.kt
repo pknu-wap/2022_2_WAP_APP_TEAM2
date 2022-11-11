@@ -7,7 +7,7 @@ import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -108,5 +108,48 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 batch.update(collection.document(id), map)
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
+    }
+
+    override suspend fun getReceipts(calcRoomId: String) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+        receiptCollection.get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val list = it.result.documents.toMutableList()
+                var dto: ReceiptDTO? = null
+                val dtoList = mutableListOf<ReceiptDTO>()
+
+                for (v in list) {
+                    dto = v.toObject<ReceiptDTO>()!!
+                    dto.id = v.id
+                    dtoList.add(dto)
+                }
+                continuation.resume(dtoList)
+            } else {
+                continuation.resume(mutableListOf())
+            }
+        }
+    }
+
+    override suspend fun getProducts(receiptId: String,
+                                     calcRoomId: String) = suspendCoroutine<MutableList<ReceiptProductDTO>> { continuation ->
+        val productsCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).collection(FireStoreNames.products.name)
+        productsCollection.get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val list = it.result.documents.toMutableList()
+                var dto: ReceiptProductDTO? = null
+                val dtoList = mutableListOf<ReceiptProductDTO>()
+
+                for (v in list) {
+                    dto = v.toObject<ReceiptProductDTO>()!!
+                    dto.id = v.id
+                    dtoList.add(dto)
+                }
+                continuation.resume(dtoList)
+            } else {
+                continuation.resume(mutableListOf())
+            }
+        }
     }
 }

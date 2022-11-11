@@ -3,15 +3,11 @@ package com.example.wapapp2.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.Dispatchers.Main
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
@@ -23,6 +19,11 @@ class FriendsViewModel : ViewModel() {
 
     private val _searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
     val searchUsersResult get() = _searchUsersResult
+
+    private val _myFriends = MutableLiveData<MutableList<FriendDTO>>()
+    val myFriends get() = _myFriends
+
+    val myFriendsIdSet = hashSetOf<String>()
 
     private val _addMyFriendResult = MutableLiveData<Boolean>()
     val addMyFriendResult get() = _addMyFriendResult
@@ -63,14 +64,31 @@ class FriendsViewModel : ViewModel() {
         friendsRepositoryImpl.getFriendsList(word)
     }
 
-    fun findUsers(userName: String) {
+    fun getMyFriends() {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
-                friendsRepositoryImpl.findUsers(userName)
+                friendsRepositoryImpl.getMyFriends()
             }
             result.await()
-            withContext(MainScope().coroutineContext) {
-                searchUsersResult.value = result.await()
+            withContext(Main) {
+                myFriends.value = result.await()
+            }
+        }
+    }
+
+    fun findUsers(email: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                friendsRepositoryImpl.findUsers(email)
+            }
+            val dtoSet = result.await()
+            for (v in dtoSet) {
+                if (myFriendsIdSet.contains(v.id)) {
+                    dtoSet.remove(v)
+                }
+            }
+            withContext(Main) {
+                searchUsersResult.value = dtoSet.toMutableList()
             }
         }
     }

@@ -58,12 +58,33 @@
             android:hint="비밀번호 확인"
             android:inputType="textPassword"/>
 
+        <EditText
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="이름"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_password_check" />
+
+        <ImageView
+            android:id="@+id/user_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_name"
+            app:srcCompat="@drawable/man"
+            android:layout_marginTop="16dp"/>
+
+
         <Button
             android:id="@+id/btn_signup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
-            app:layout_constraintTop_toBottomOf="@id/user_password_check"
+            android:text="회원가입"
+            app:layout_constraintTop_toBottomOf="@id/user_profile"
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/teal_200" />
 
@@ -71,15 +92,14 @@
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log In"
+            android:text="로그인"
             app:layout_constraintTop_toBottomOf="@id/btn_signup"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/teal_200" />
 
 
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
