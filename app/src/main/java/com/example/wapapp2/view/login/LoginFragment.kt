@@ -35,11 +35,11 @@ class LoginFragment : Fragment() {
             Toast.makeText(context,
                 "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
         } else {
-            signinEmail()
+            loginEmail()
         }
     }
 
-    fun signinEmail() {
+    fun loginEmail() {
         auth?.signInWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())
             ?.addOnCompleteListener { task ->
                 if(task.isSuccessful){
@@ -62,11 +62,22 @@ class LoginFragment : Fragment() {
         }
     }
 
+    fun moveSignup(){
+        val signUpFragment = SignupFragment()
+
+        parentFragmentManager
+            .beginTransaction()
+            .hide(this@LoginFragment)
+            .add(R.id.fragment_container_view, signUpFragment, RootTransactionFragment::class.java.name)
+            .commitAllowingStateLoss()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentLoginBinding.inflate(inflater)
 
         binding.btnLogin.setOnClickListener { emailLogin() }
+        binding.btnSignup.setOnClickListener { moveSignup() }
 
         return binding.root
     }
