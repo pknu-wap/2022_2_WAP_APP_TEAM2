@@ -26,30 +26,45 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topAppBarLayout">
+        android:layout_below="@id/topAppBarLayout"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
 
-            <TextView
-                android:id="@+id/textview1"
-                android:layout_width="wrap_content"
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/title_text_layout"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
-                android:text="멕도날드"
-                android:textSize="18sp"
+                android:hint="@string/input_title"
+                app:endIconMode="clear_text"
+                app:expandedHintEnabled="true"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/title_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
+                android:id="@+id/date_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:text="2022.10.31"
-                app:layout_constraintBottom_toBottomOf="@+id/textview1"
-                app:layout_constraintRight_toRightOf="parent" />
+                app:layout_constraintBottom_toBottomOf="@+id/title_text_layout"
+                app:layout_constraintRight_toRightOf="parent"
+                />
 
             <ImageView
                 android:id="@+id/imageView2"
@@ -58,20 +73,23 @@
                 android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textview1"
-                app:srcCompat="@drawable/receipt" />
+                app:layout_constraintTop_toBottomOf="@+id/title_text_layout"
+                app:srcCompat="@drawable/receipt"
+                />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_editreceipt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:overScrollMode="never"
                 android:nestedScrollingEnabled="false"
+                android:orientation="vertical"
+                android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+                app:layout_constraintTop_toBottomOf="@+id/imageView2"
+                />
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,7 +99,8 @@
                 android:background="#F1F1F1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rv_editreceipt">
+                app:layout_constraintTop_toBottomOf="@+id/rv_editreceipt"
+                >
 
                 <TextView
                     android:id="@+id/textView3"
@@ -93,10 +112,11 @@
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/total_money"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
@@ -104,7 +124,8 @@
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@+id/textView3"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textView3" />
+                    app:layout_constraintTop_toTopOf="@+id/textView3"
+                    />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -117,11 +138,11 @@
                 android:text="수정 완료"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
-
 
 
 </RelativeLayout>

@@ -24,6 +24,7 @@ import com.example.wapapp2.databinding.*
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
@@ -34,21 +35,24 @@ import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
 import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
+import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback {
+class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
+        ParticipantsInCalcRoomFragment.OnNavDrawerListener {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
     private val receiptViewModel: ReceiptViewModel by viewModels()
+    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
     /** summary of FixedPay **/
     private var paymoney = 0
-
+    private var calcRoomId: String = DummyData.testCalcRoomId
 
     private var chatInputLayoutHeight = 0
 
@@ -123,33 +127,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     }
 
 
-    private inner class FriendsAdapter(val context: Context?, val items: ArrayList<Profiles>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        inner class FriendsVH(val binding: ChatFriendsItemBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(item: Profiles) {
-                binding.profileImg.setImageDrawable(getDrawable(requireContext(), item.gender))
-                binding.friendName.text = item.name
-
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
-            return FriendsVH(ChatFriendsItemBinding.inflate(LayoutInflater.from(context)))
-
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            (holder as FriendsVH).bind(items[position])
-        }
-
-        override fun getItemCount(): Int {
-            return items.size
-        }
-
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
@@ -208,6 +185,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
             val fragment = CheckReceiptFragment()
+            fragment.arguments = Bundle().apply {
+                putString("calcRoomId", calcRoomId)
+            }
             val fragmentManager = parentFragmentManager
             fragmentManager
                     .beginTransaction()
@@ -217,36 +197,13 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
+
         }
 
-        binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
-        binding.addFriend.friendName.text = "친구 초대"
-
-
-        binding.addFriend.root.setOnClickListener {
-            binding.root.closeDrawers()
-            val inviteFriendsFragment = InviteFriendsFragment()
-            inviteFriendsFragment.arguments = Bundle().apply {
-                //현재 정산방 친구 목록 ID set생성
-                val currentFriendsListInRoom = ArrayList<String>()
-                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
-
-                for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.friendUserId)
-                }
-
-                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
-            }
-            val tag = "inviteFriends"
-            val fragmentManager = parentFragmentManager
-
-            fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
-                    .addToBackStack(tag).commit()
-
-
-            val dummyFriends = DummyData.getProfiles()
-            binding.friends.adapter = FriendsAdapter(context, dummyFriends)
-        }
+        val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
+        participantsInCalcRoomFragment.onNavDrawerListener = this
+        childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
+                participantsInCalcRoomFragment, "participants").commit()
     }
 
 
@@ -267,6 +224,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun updateSummaryUI() {
         binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(receiptViewModel.getCurrentSummary())
+    }
+
+    override fun closeDrawer() {
+        binding.root.closeDrawers()
     }
 
 }

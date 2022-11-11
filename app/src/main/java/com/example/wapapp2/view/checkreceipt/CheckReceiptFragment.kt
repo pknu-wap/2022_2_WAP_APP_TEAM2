@@ -5,51 +5,75 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment
+import com.example.wapapp2.viewmodel.ReceiptViewModel
 
 class CheckReceiptFragment : Fragment() {
 
-    private lateinit var binding: FragmentCheckReceiptBinding
+    private var _binding: FragmentCheckReceiptBinding? = null
+    private val binding get() = _binding!!
 
-    private val receiptOnClickListener = ListOnClickListener<ReceiptList> { item, position ->
+    private var calcRoomId: String? = null
+    private val receiptViewModel by viewModels<ReceiptViewModel>()
+
+    private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, position ->
         val fragment = EditReceiptFragment()
+        fragment.arguments = Bundle().apply {
+            putParcelable("receiptDTO", item)
+            putString("calcRoomId", calcRoomId)
+        }
         val fragmentManager = parentFragmentManager
 
         fragmentManager
-            .beginTransaction()
-            .hide(this@CheckReceiptFragment)
-            .add(R.id.fragment_container_view, fragment, "EditReceiptFragment")
-            .addToBackStack("EditReceiptFragment")
-            .commit()
+                .beginTransaction()
+                .hide(this@CheckReceiptFragment)
+                .add(R.id.fragment_container_view, fragment, "EditReceiptFragment")
+                .addToBackStack("EditReceiptFragment")
+                .commit()
+    }
+    private val adapter = CheckReceiptAdapter(onClickListener = receiptOnClickListener)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.apply {
+            calcRoomId = getString("calcRoomId")
+        }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCheckReceiptBinding.inflate(inflater)
+        _binding = FragmentCheckReceiptBinding.inflate(inflater)
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        val receiptList = arrayListOf(
-            ReceiptList("22,000원", "멕도날드", "2022.11.02", R.drawable.receipt),
-            ReceiptList("12,000원", "스타벅스", "2022.10.31", R.drawable.receipt),
-            ReceiptList("58,000원", "VIPS", "2022.10.28", R.drawable.receipt)
-        )
-
         binding.rvEditreceipt.setHasFixedSize(true)
-        binding.rvEditreceipt.adapter = CheckReceiptAdapter(receiptList, receiptOnClickListener)
+        binding.rvEditreceipt.adapter = adapter
 
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        receiptViewModel.receipts.observe(viewLifecycleOwner) {
+            adapter.receipts = it
+        }
+
+        receiptViewModel.getReceipts(calcRoomId!!)
     }
 }
