@@ -121,23 +121,11 @@
                 android:textSize="15sp"
                 />
 
-            <include
-                android:id="@+id/add_friend"
-                layout="@layout/chat_friends_item"
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/participants_fragment_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/friends"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="6"
-                tools:listitem="@layout/chat_friends_item"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 />
 
             <com.google.android.material.divider.MaterialDivider

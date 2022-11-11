@@ -1,8 +1,10 @@
 package com.example.wapapp2.model
 
 import android.net.Uri
+import android.os.Parcelable
 import com.google.firebase.firestore.*
 import com.google.firebase.ktx.Firebase
+import kotlinx.parcelize.Parcelize
 import org.joda.time.DateTime
 import java.lang.Exception
 import java.util.*
@@ -12,6 +14,7 @@ import kotlin.collections.ArrayList
 /** 영수증
  * @param name : description of receipt
  */
+@Parcelize
 data class ReceiptDTO(
         @get:Exclude
         var id: String,
@@ -28,19 +31,20 @@ data class ReceiptDTO(
         var payersId: String,
         @field:JvmField
         @PropertyName("status")
-        var status: Boolean
-) {
-    @get:Exclude
-    public var totalMoney = 0
+        var status: Boolean,
+        @get:Exclude
+        public var totalMoney: Int = 0,
 
-    @get:Exclude
-    private val productList = ArrayList<ReceiptProductDTO>()
+        @get:Exclude
+        private val productList: ArrayList<ReceiptProductDTO> = ArrayList<ReceiptProductDTO>(),
 
-    @get:Exclude
-    public var myMoney = 0
+        @get:Exclude
+        public var myMoney: Int = 0,
 
-    @get:Exclude
-    public val date: String = DateTime.now().toString()
+        @get:Exclude
+        public val date: String = DateTime.now().toString()
+) : Parcelable {
+    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)

@@ -16,6 +16,9 @@ import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
@@ -25,17 +28,24 @@ import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
 import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
+import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.ReceiptViewModel
+import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback {
+class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
+        ParticipantsInCalcRoomFragment.OnNavDrawerListener {
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
+    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
     /** summary of FixedPay **/
     private var paymoney = 0
+    private var calcRoomId: String = DummyData.testCalcRoomId
+
     private var chatInputLayoutHeight = 0
 
 
@@ -164,6 +174,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
             val fragment = CheckReceiptFragment()
+            fragment.arguments = Bundle().apply {
+                putString("calcRoomId", calcRoomId)
+            }
             val fragmentManager = parentFragmentManager
             fragmentManager
                     .beginTransaction()
@@ -173,6 +186,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
+        
+        */
         }
         binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
         binding.addFriend.friendName.text = "친구 초대"
@@ -199,7 +214,15 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
                     .addToBackStack(tag).commit()
 
+
+
+*/
         }
+
+        val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
+        participantsInCalcRoomFragment.onNavDrawerListener = this
+        childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
+                participantsInCalcRoomFragment, "participants").commit()
     }
 
 
@@ -220,6 +243,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun updateSummaryUI(summary : Int) {
         binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
+    }
+
+    override fun closeDrawer() {
+        binding.root.closeDrawers()
     }
 
 }
