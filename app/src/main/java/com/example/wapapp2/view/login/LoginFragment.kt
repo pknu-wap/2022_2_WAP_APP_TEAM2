@@ -8,10 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
-import com.example.wapapp2.repository.AppCheckRepository
-import com.example.wapapp2.repository.FriendsRepositoryImpl
-import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
-import com.example.wapapp2.repository.ReceiptRepositoryImpl
+import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -56,6 +53,7 @@ class LoginFragment : Fragment() {
             ReceiptRepositoryImpl.initialize()
             AppCheckRepository.initialize()
             FriendsRepositoryImpl.initialize()
+            ChatRepositorylmpl.initialize()
 
             parentFragmentManager
                     .beginTransaction()
