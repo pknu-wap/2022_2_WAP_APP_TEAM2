@@ -10,57 +10,60 @@ import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentSignupBinding
 import com.google.firebase.auth.FirebaseAuth
 
-class SignupFragment: Fragment() {
+class SignupFragment : Fragment() {
     private var _viewBinding: FragmentSignupBinding? = null
     private val viewBinding get() = _viewBinding!!
 
+    companion object {
+        val TAG = "SignupFragment"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         _viewBinding = FragmentSignupBinding.inflate(inflater, container, false)
 
         var auth = FirebaseAuth.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        fun moveLoginPage(){
+        fun moveLoginPage() {
             val loginFragment = LoginFragment()
 
             parentFragmentManager
-                .beginTransaction()
-                .hide(this@SignupFragment)
-                .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
-                .commitAllowingStateLoss()
+                    .beginTransaction()
+                    .hide(this@SignupFragment)
+                    .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                    .commitAllowingStateLoss()
         }
 
         fun createEmail() {
-            if(viewBinding.userId.text.toString().isNullOrEmpty() ||
-                viewBinding.userPassword.text.toString().isNullOrEmpty()) {
+            if (viewBinding.userId.text.toString().isNullOrEmpty() ||
+                    viewBinding.userPassword.text.toString().isNullOrEmpty()) {
                 Toast.makeText(context,
-                    "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
+                        "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
             } else {
-                if(viewBinding.userPassword.text.toString() == viewBinding.userPasswordCheck.text.toString()){
+                if (viewBinding.userPassword.text.toString() == viewBinding.userPasswordCheck.text.toString()) {
                     auth?.createUserWithEmailAndPassword(viewBinding.userId.text.toString(), viewBinding.userPassword.text.toString())
-                        ?.addOnCompleteListener { task ->
-                            if(task.isSuccessful) {
-                                Toast.makeText(context,
-                                    "회원가입이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
+                            ?.addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Toast.makeText(context,
+                                            "회원가입이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
 
-                                moveLoginPage()
-                            } else {
-                                Toast.makeText(context,
-                                    "이미 가입된 이메일입니다.", Toast.LENGTH_SHORT).show()
+                                    moveLoginPage()
+                                } else {
+                                    Toast.makeText(context,
+                                            "이미 가입된 이메일입니다.", Toast.LENGTH_SHORT).show()
+                                }
                             }
-                        }
                 } else {
                     Toast.makeText(context,
-                        "비밀번호가 다릅니다.", Toast.LENGTH_SHORT).show()
+                            "비밀번호가 다릅니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
