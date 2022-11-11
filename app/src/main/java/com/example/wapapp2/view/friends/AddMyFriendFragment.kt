@@ -32,10 +32,8 @@ class AddMyFriendFragment : Fragment() {
                 .setPositiveButton(R.string.add) { dialog, which ->
                     dialog.dismiss()
                     //추가로직
-
                 }.setNeutralButton(R.string.cancel) { dialog, which ->
                     dialog.dismiss()
-
                 }.create().show()
     }
     private val adapter = SearchUserListAdapter(listOnClickListener)
@@ -65,11 +63,10 @@ class AddMyFriendFragment : Fragment() {
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
+                if (query != null)
                     friendsViewModel.findUsers(query)
-                } else {
+                else
                     Toast.makeText(context, R.string.empty_search_query, Toast.LENGTH_SHORT).show()
-                }
                 return true
             }
 
