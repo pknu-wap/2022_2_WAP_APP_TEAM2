@@ -9,15 +9,12 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
-import androidx.core.content.ContextCompat.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.dummy.DummyData
-import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
@@ -26,11 +23,8 @@ import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
 import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
-import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.ReceiptViewModel
-import org.joda.time.DateTime
 import java.text.DecimalFormat
 
 

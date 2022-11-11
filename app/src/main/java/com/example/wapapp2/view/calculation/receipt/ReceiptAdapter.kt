@@ -44,17 +44,10 @@ class ReceiptAdapter(private val context: Context?, private val receipts: ArrayL
 
         inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
-
             fun bind(product: ReceiptProductDTO) {
-                var myPrice = try {
-                    product.price / product.personCount
-                } catch (e: ArithmeticException) {
-                    0
-                }
-
                 binding.receiptMenu.text = product.name
                 binding.receiptTotalMoney.text = DecimalFormat("#,###").format(product.price)
-                binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
+                binding.receiptMyMoney.text = DecimalFormat("#,###").format(calcMyMoney(product))
 
 
                 receiptViewModel.updateSummary_forNewProduct(product)
@@ -62,7 +55,7 @@ class ReceiptAdapter(private val context: Context?, private val receipts: ArrayL
                 binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
                         receiptViewModel.product_checked(product)
-                        binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
+                        binding.receiptMyMoney.text = DecimalFormat("#,###").format(calcMyMoney(product))
                         binding.receiptPersonCount.text = product.personCount.toString() + "/3"
                         onUpdateSummaryCallback.updateSummaryUI(receiptViewModel.getCurrentSummary)
                     } else {
@@ -76,6 +69,15 @@ class ReceiptAdapter(private val context: Context?, private val receipts: ArrayL
 
                 binding.receiptPersonCount.text = "${product.personCount}/3"
                 binding.recentCalcCkbox.isChecked = true
+
+
+            }
+            fun calcMyMoney(product: ReceiptProductDTO) : Int{
+                return try {
+                    product.price / product.personCount
+                } catch (e: ArithmeticException) {
+                    0
+                }
             }
 
         }
