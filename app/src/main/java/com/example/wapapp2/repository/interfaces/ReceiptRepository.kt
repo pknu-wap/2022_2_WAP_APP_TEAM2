@@ -17,6 +17,6 @@ interface ReceiptRepository {
     suspend fun getReceipts(calcRoomId: String): MutableList<ReceiptDTO>
     suspend fun getProducts(receiptId: String, calcRoomId: String): MutableList<ReceiptProductDTO>
 
-    fun addMyID_fromProductParticipantIDs(product_id: String)
-    fun subMyID_fromProductParticipantIDs(product_id: String)
+    suspend fun addMyID_fromProductParticipantIDs(product_id: String)
+    suspend fun subMyID_fromProductParticipantIDs(product_id: String)
 }
