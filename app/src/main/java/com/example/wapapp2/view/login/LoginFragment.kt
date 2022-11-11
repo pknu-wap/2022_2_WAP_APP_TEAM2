@@ -1,11 +1,13 @@
 package com.example.wapapp2.view.login
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
 import com.example.wapapp2.repository.AppCheckRepository
@@ -20,6 +22,18 @@ import com.google.firebase.auth.FirebaseUser
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     var auth: FirebaseAuth? = null
+    private val onBackPressedCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            if (!parentFragmentManager.popBackStackImmediate()) {
+                requireActivity().finish()
+            }
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
 
     override fun onStart() {
         super.onStart()
@@ -70,14 +84,16 @@ class LoginFragment : Fragment() {
         }
     }
 
-    fun moveSignup(){
+    fun moveSignup() {
         val signUpFragment = SignupFragment()
-
+        val tag = SignupFragment.TAG
+        
         parentFragmentManager
-            .beginTransaction()
-            .hide(this@LoginFragment)
-            .add(R.id.fragment_container_view, signUpFragment, RootTransactionFragment::class.java.name)
-            .commitAllowingStateLoss()
+                .beginTransaction()
+                .hide(this@LoginFragment)
+                .add(R.id.fragment_container_view, signUpFragment, tag)
+                .addToBackStack(tag)
+                .commitAllowingStateLoss()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -93,5 +109,10 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+    }
+
+    override fun onDestroy() {
+        onBackPressedCallback.remove()
+        super.onDestroy()
     }
 }
