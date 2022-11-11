@@ -40,12 +40,12 @@ class SignupFragment: Fragment() {
         }
 
         fun createEmail() {
-            if(viewBinding.userPassword.text == viewBinding.userPasswordCheck.text){
-                if(viewBinding.userId.text.toString().isNullOrEmpty() ||
-                    viewBinding.userPassword.text.toString().isNullOrEmpty()) {
-                    Toast.makeText(context,
-                        "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
-                } else {
+            if(viewBinding.userId.text.toString().isNullOrEmpty() ||
+                viewBinding.userPassword.text.toString().isNullOrEmpty()) {
+                Toast.makeText(context,
+                    "이메일과 비밀번호를 입력해 주세요.", Toast.LENGTH_SHORT).show()
+            } else {
+                if(viewBinding.userPassword.text.toString() == viewBinding.userPasswordCheck.text.toString()){
                     auth?.createUserWithEmailAndPassword(viewBinding.userId.text.toString(), viewBinding.userPassword.text.toString())
                         ?.addOnCompleteListener { task ->
                             if(task.isSuccessful) {
@@ -58,14 +58,14 @@ class SignupFragment: Fragment() {
                                     "이미 가입된 이메일입니다.", Toast.LENGTH_SHORT).show()
                             }
                         }
+                } else {
+                    Toast.makeText(context,
+                        "비밀번호가 다릅니다.", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(context,
-                    "비밀번호가 다릅니다.", Toast.LENGTH_SHORT).show()
             }
         }
 
-        viewBinding.btnLogin.setOnClickListener { createEmail() }
+        viewBinding.btnSignup.setOnClickListener { createEmail() }
         viewBinding.btnLogin.setOnClickListener { moveLoginPage() }
 
         return viewBinding.root

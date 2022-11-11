@@ -14,8 +14,10 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.view.bankaccount.AddMyBankAccountFragment
 import com.example.wapapp2.view.bankaccount.EditMyBankAccountFragment
+import com.example.wapapp2.view.login.LoginFragment
 import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MyprofileFragment : Fragment() {
@@ -77,6 +79,18 @@ class MyprofileFragment : Fragment() {
             val dialog = DialogEditDetailFragment()
             dialog
                 .show(parentFragmentManager, "CustomDialog")
+        }
+
+        binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+
+            val loginFragment = LoginFragment()
+
+            parentFragmentManager
+                .beginTransaction()
+                .hide(this@MyprofileFragment)
+                .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                .commitAllowingStateLoss()
         }
 
         return binding.root
