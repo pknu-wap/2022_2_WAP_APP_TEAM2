@@ -5,6 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class ReceiptViewModel(application: Application) : AndroidViewModel(application) {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -22,12 +26,16 @@ class ReceiptViewModel(application: Application) : AndroidViewModel(application)
 
     fun product_checked(productDTO: ReceiptProductDTO) {
         currentMySummary += productDTO.price / ++productDTO.personCount
-        receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
+        CoroutineScope(Dispatchers.Default).launch {
+            receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
+        }
     }
 
     fun product_unchecked(productDTO: ReceiptProductDTO) {
         currentMySummary -= productDTO.price / productDTO.personCount--
-        receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
+        CoroutineScope(Dispatchers.Default).launch {
+            receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
+        }
     }
 
     fun getCurrentSummary(): Int {
