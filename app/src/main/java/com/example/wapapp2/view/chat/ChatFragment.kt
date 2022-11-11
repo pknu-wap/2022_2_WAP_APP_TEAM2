@@ -1,25 +1,31 @@
 package com.example.wapapp2.view.chat
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.databinding.FragmentChatBinding
-import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.CalcRoomDTO
+import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
-import com.example.wapapp2.view.chat.`interface`.OnChatRecievedCallback
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.util.*
 
-class ChatFragment : Fragment(), OnChatRecievedCallback {
+class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private lateinit var binding: FragmentChatBinding
-    private lateinit var chatAdapter: ChatMsgListAdapter
+    //private lateinit var chatAdapter: ChatMsgListAdapter
+    private lateinit var chatAdapter_: ChatAdapter
     private lateinit var myAccountViewModel: MyAccountViewModel
     private lateinit var bundle: Bundle
 
@@ -33,9 +39,16 @@ class ChatFragment : Fragment(), OnChatRecievedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-        chatAdapter = ChatMsgListAdapter(requireContext(), myAccountViewModel.myAccountId)
+
+        //수정필요 -> 생명주기 공부
+        chatViewModel.attach(calcRoomDTO)
+        CoroutineScope(Dispatchers.Default).launch{
+            async {  chatAdapter_ = ChatAdapter("PqbxywH1wjMHbkcWBfkD9annA5Z2", chatViewModel.getOptions())
+            }
+        }
+
+        //chatAdapter = ChatMsgListAdapter(requireContext(), myAccountViewModel.myAccountId)
 
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
@@ -46,12 +59,11 @@ class ChatFragment : Fragment(), OnChatRecievedCallback {
 
         binding.chatList.apply {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            this.adapter = chatAdapter
+            this.adapter = chatAdapter_
+
+            //scroll for last message
+            //this.smoothScrollToPosition(-1)
         }
-
-        //scroll for last message
-        binding.chatList.smoothScrollToPosition(chatAdapter.itemCount-1)
-
         setInputListener()
 
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -67,9 +79,7 @@ class ChatFragment : Fragment(), OnChatRecievedCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        chatAdapter.chatList.addAll(DummyData.getChatList())
-
+        //chatAdapter.chatList.addAll(DummyData.getChatList())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -81,6 +91,9 @@ class ChatFragment : Fragment(), OnChatRecievedCallback {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
+                val newChat = ChatDTO("김진우","PqbxywH1wjMHbkcWBfkD9annA5Z2", Date(),binding.textInputLayout.editText!!.text.toString(),"PqbxywH1wjMHbkcWBfkD9annA5Z2")
+                binding.textInputLayout.editText!!.text.clear()
+                chatViewModel.sendMsg(newChat)
                 // 전송
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
@@ -88,13 +101,16 @@ class ChatFragment : Fragment(), OnChatRecievedCallback {
         }
     }
 
-    override fun onDestroyView() {
-
-        super.onDestroyView()
+    override fun onStart() {
+        chatViewModel.attach(calcRoomDTO)
+        chatAdapter_.startListening()
+        super.onStart()
     }
 
-
-    override fun received() {
-        TODO("Not yet implemented")
+    override fun onStop() {
+        chatViewModel.detach(calcRoomDTO)
+        chatAdapter_.stopListening()
+        super.onStop()
     }
+
 }
