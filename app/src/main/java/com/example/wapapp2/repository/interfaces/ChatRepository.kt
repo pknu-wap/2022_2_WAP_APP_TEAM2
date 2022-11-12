@@ -6,5 +6,4 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
 interface ChatRepository {
     suspend fun sendMsg(calcRoomDTO: CalcRoomDTO, chatDTO: ChatDTO)
-    fun getRecyclerviewOptions(calcRoomDTO: CalcRoomDTO): FirestoreRecyclerOptions<ChatDTO>
 }
