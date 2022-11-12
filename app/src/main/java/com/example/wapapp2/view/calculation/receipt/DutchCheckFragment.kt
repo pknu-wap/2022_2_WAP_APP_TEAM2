@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
+import ReceiptAdapter
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -36,11 +37,10 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
     ): View? {
         binding = DutchCheckFragmentBinding.inflate(inflater)
 
-        binding.viewReceipts.adapter = ReceiptAdapter(requireContext(), DummyData.getReceipts())
-
+        binding.viewReceipts.adapter = ReceiptAdapter(requireContext(), DummyData.getReceipts(), this.receiptViewModel, this.onUpdateSummaryCallback )
+        onUpdateSummaryCallback.updateSummaryUI(receiptViewModel.getCurrentSummary)
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-
             } else {
                 //임시로 구현 -> 팀 인원 다 체크후 해야함
                 onFixOngoingReceipt.onFixOngoingReceipt()
@@ -48,90 +48,6 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
         })
 
         return binding.root
-    }
-
-    /** 영수증 Adapter **/
-    private inner class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<ReceiptDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-
-        inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(receipt: ReceiptDTO) {
-                binding.description.text = "[ " + receipt.name + " ] - 김진우"
-                binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
-                binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return ReceiptVM(ViewReceiptItemBinding.inflate(LayoutInflater.from(context)))
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return (holder as ReceiptVM).bind(receipts[position])
-        }
-
-        override fun getItemCount(): Int {
-            return receipts.size
-        }
-
-    }
-
-    /** 영수증 세부 항목 Adapter **/
-    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-
-        inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
-
-
-            fun bind(product: ReceiptProductDTO) {
-                var myPrice = try {
-                    product.price / product.personCount
-                } catch (e: ArithmeticException) {
-                    0
-                }
-
-                binding.receiptMenu.text = product.name
-                binding.receiptTotalMoney.text = DecimalFormat("#,###").format(product.price)
-                binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
-
-
-                receiptViewModel.updateSummary_forNewProduct(product)
-
-                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        receiptViewModel.product_checked(product)
-                        binding.receiptMyMoney.text = DecimalFormat("#,###").format(myPrice)
-                        binding.receiptPersonCount.text = product.personCount.toString() + "/3"
-                        onUpdateSummaryCallback.updateSummaryUI()
-                    } else {
-                        receiptViewModel.product_unchecked(product)
-                        binding.receiptMyMoney.text = "0"
-                        binding.receiptPersonCount.text = product.personCount.toString() + "/3"
-                        onUpdateSummaryCallback.updateSummaryUI()
-                    }
-
-                }
-
-                binding.receiptPersonCount.text = "${product.personCount}/3"
-                binding.recentCalcCkbox.isChecked = true
-            }
-
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return ReceiptMenuVH(ViewRecentCalcItemBinding.inflate(LayoutInflater.from(context)))
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return (holder as ReceiptMenuVH).bind(items[position])
-        }
-
-        override fun getItemCount(): Int {
-            return items.size
-        }
-
     }
 
 

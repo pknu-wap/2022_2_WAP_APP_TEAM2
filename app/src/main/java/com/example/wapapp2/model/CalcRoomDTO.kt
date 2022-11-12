@@ -30,7 +30,7 @@ data class CalcRoomDTO(
         val people: ArrayList<CalcRoomMemberData>
 ) {
     @Exclude
-    var id: String? = null
+    var id: String? = "LvJY5fz6TjlTDaHHX53l"
 
     data class RecentMsg(
             @PropertyName("msg")

@@ -1,26 +1,34 @@
 package com.example.wapapp2.view.chat
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.databinding.FragmentChatBinding
-import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.model.CalcRoomDTO
+import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
+import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import java.util.*
 
-class ChatFragment : Fragment() {
+class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private lateinit var binding: FragmentChatBinding
-    private lateinit var chatAdapter: ChatMsgListAdapter
-    private lateinit var myAccountViewModel: MyAccountViewModel
+
+    private lateinit var chatAdapter_: ChatAdapter
     private lateinit var bundle: Bundle
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
+    private val chatViewModel : ChatViewModel by viewModels()
+    private lateinit var myAccountViewModel: MyAccountViewModel
+
 
     fun setViewHeightCallback(callback: CalcMainFragment.ViewHeightCallback) {
         this.viewHeightCallback = callback
@@ -28,10 +36,8 @@ class ChatFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-        chatAdapter = ChatMsgListAdapter(requireContext(), myAccountViewModel.myAccountId)
-
+        chatAdapter_ = ChatAdapter(myAccountViewModel.myAccountId, chatViewModel.getOptions(calcRoomDTO))
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
@@ -41,9 +47,11 @@ class ChatFragment : Fragment() {
 
         binding.chatList.apply {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            this.adapter = chatAdapter
-        }
+            this.adapter = chatAdapter_
+            //scroll for last message
+            //this.smoothScrollToPosition(chatAdapter_.itemCount -1)
 
+        }
         setInputListener()
 
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -57,13 +65,6 @@ class ChatFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        chatAdapter.chatList.addAll(DummyData.getChatList())
-
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
@@ -73,11 +74,25 @@ class ChatFragment : Fragment() {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
+                val newChat = ChatDTO(myAccountViewModel.myName  ,myAccountViewModel.myAccountId, Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
+                binding.textInputLayout.editText!!.text.clear()
+                chatViewModel.sendMsg(newChat)
                 // 전송
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onStart() {
+        chatViewModel.attach(calcRoomDTO)
+        chatAdapter_.startListening()
+        super.onStart()
+    }
+
+    override fun onStop() {
+        chatAdapter_.stopListening()
+        super.onStop()
     }
 
 }

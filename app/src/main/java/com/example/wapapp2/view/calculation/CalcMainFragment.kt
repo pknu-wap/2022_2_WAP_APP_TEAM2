@@ -9,13 +9,14 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 
+
 import androidx.core.content.ContextCompat.getColor
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
-import com.example.wapapp2.databinding.*
+import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
@@ -24,10 +25,12 @@ import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
 import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.chat.ChatFragment
+
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
+
 import java.text.DecimalFormat
 
 
@@ -37,7 +40,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private lateinit var bundle: Bundle
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
-    private val receiptViewModel: ReceiptViewModel by viewModels()
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
     /** summary of FixedPay **/
@@ -78,7 +80,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
         setSideMenu()
 
-        val chatFragment = ChatFragment()
+        val chatFragment = ChatFragment(DummyData.getRoom())
         chatFragment.arguments = bundle
 
         chatFragment.setViewHeightCallback { height ->
@@ -97,7 +99,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 R.id.menu -> {
                     binding.root.openDrawer(binding.sideNavigation)
                 }
-
                 else -> {}
             }
             true
@@ -115,7 +116,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
         }
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -162,7 +162,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                         chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
 
                         binding.chat.layoutParams = chatFragmentContainerLayoutParams
-                        updateSummaryUI()
                     }
                 }
             })
@@ -187,7 +186,34 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
+        
+        /*
+        }
+        binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
+        binding.addFriend.friendName.text = "친구 초대"
+        binding.friends.adapter = CalcUserAdapter(context, DummyData.getProfiles())
 
+
+        binding.addFriend.root.setOnClickListener {
+            binding.root.closeDrawers()
+            val inviteFriendsFragment = InviteFriendsFragment()
+            inviteFriendsFragment.arguments = Bundle().apply {
+                //현재 정산방 친구 목록 ID set생성
+                val currentFriendsListInRoom = ArrayList<String>()
+                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
+
+                for (dto in currentFriendDTOList) {
+                    currentFriendsListInRoom.add(dto.friendUserId)
+                }
+
+                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
+            }
+            val tag = "inviteFriends"
+            val fragmentManager = parentFragmentManager
+
+            fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
+                    .addToBackStack(tag).commit()
+*/
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
@@ -212,8 +238,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 .commitAllowingStateLoss()
     }
 
-    override fun updateSummaryUI() {
-        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(receiptViewModel.getCurrentSummary())
+    override fun updateSummaryUI(summary : Int) {
+        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
     }
 
     override fun closeDrawer() {

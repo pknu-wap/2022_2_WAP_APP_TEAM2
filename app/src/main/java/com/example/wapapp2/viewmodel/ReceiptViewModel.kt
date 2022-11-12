@@ -9,6 +9,10 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
@@ -19,6 +23,7 @@ class ReceiptViewModel : ViewModel() {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private var currentMySummary = 0
 
+    val getCurrentSummary get() = currentMySummary
     private val _receipts = MutableLiveData<MutableList<ReceiptDTO>>()
     val receipts get() = _receipts
 
@@ -35,12 +40,16 @@ class ReceiptViewModel : ViewModel() {
 
     fun product_checked(productDTO: ReceiptProductDTO) {
         currentMySummary += productDTO.price / ++productDTO.personCount
-        receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
+        CoroutineScope(Dispatchers.Default).launch {
+            receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
+        }
     }
 
     fun product_unchecked(productDTO: ReceiptProductDTO) {
         currentMySummary -= productDTO.price / productDTO.personCount--
-        receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
+        CoroutineScope(Dispatchers.Default).launch {
+            receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
+        }
     }
 
     fun getCurrentSummary(): Int {

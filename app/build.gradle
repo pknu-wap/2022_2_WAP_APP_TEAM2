@@ -103,6 +103,9 @@ dependencies {
     //for Calender
     implementation 'net.danlew:android.joda:2.9.9.3'
 
+    // FirebaseUI for Cloud Firestore
+    implementation 'com.firebaseui:firebase-ui-firestore:8.0.2'
+
     // list, viewpager indicator
     implementation 'me.relex:circleindicator:2.1.6'
     apply plugin: 'com.google.gms.google-services'
