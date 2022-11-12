@@ -37,25 +37,6 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
             .set(chatDTO)
             .addOnFailureListener { exception ->
                 TODO("전송실패")
-
             }
     }
-
-    override fun getRecyclerviewOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
-        val query = fireStore
-            .collection("calc_rooms")
-            .document(calcRoomDTO.id!!)
-            .collection("chats")
-            .orderBy("sendedTime")
-
-        val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
-            .setQuery(query, SnapshotParser {
-                //id로부터 사람이름
-                ChatDTO(it.getString("userName").toString() , it.id , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
-            })
-            .build()
-
-        return recyclerOption
-    }
-
 }

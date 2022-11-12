@@ -8,7 +8,10 @@ import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.repository.ChatRepositorylmpl
 import com.example.wapapp2.repository.interfaces.ChatRepository
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.firestore.SnapshotParser
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +33,20 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
-        return chatRepository.getRecyclerviewOptions(calcRoomDTO!!)
+        val query = Firebase.firestore
+            .collection("calc_rooms")
+            .document(calcRoomDTO.id!!)
+            .collection("chats")
+            .orderBy("sendedTime")
+
+        val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
+            .setQuery(query, SnapshotParser {
+                //id로부터 사람이름
+                ChatDTO(it.getString("userName").toString() , it.id , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
+            })
+            .build()
+
+        return recyclerOption
     }
 
 

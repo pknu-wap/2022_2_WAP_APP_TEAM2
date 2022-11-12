@@ -16,21 +16,17 @@ import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private lateinit var binding: FragmentChatBinding
 
     private lateinit var chatAdapter_: ChatAdapter
-    private lateinit var myAccountViewModel: MyAccountViewModel
     private lateinit var bundle: Bundle
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
     private val chatViewModel : ChatViewModel by viewModels()
+    private lateinit var myAccountViewModel: MyAccountViewModel
 
 
     fun setViewHeightCallback(callback: CalcMainFragment.ViewHeightCallback) {
@@ -40,9 +36,7 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-
-        chatAdapter_ = ChatAdapter("", chatViewModel.getOptions(calcRoomDTO))
-
+        chatAdapter_ = ChatAdapter(myAccountViewModel.myAccountId, chatViewModel.getOptions(calcRoomDTO))
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
@@ -53,9 +47,9 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
         binding.chatList.apply {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
             this.adapter = chatAdapter_
-
             //scroll for last message
-            //this.smoothScrollToPosition(-1)
+            //this.smoothScrollToPosition(chatAdapter_.itemCount -1)
+
         }
         setInputListener()
 
@@ -79,7 +73,7 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-                val newChat = ChatDTO("김진우","PqbxywH1wjMHbkcWBfkD9annA5Z2", Date(),binding.textInputLayout.editText!!.text.toString(),"PqbxywH1wjMHbkcWBfkD9annA5Z2")
+                val newChat = ChatDTO(myAccountViewModel.myName  ,myAccountViewModel.myAccountId, Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)
                 // 전송
