@@ -12,9 +12,9 @@ import com.example.wapapp2.model.ReceiptDTO
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CheckReceiptAdapter(private val receiptList: MutableList<ReceiptDTO> = mutableListOf(), private val onClickListener:
+class ReceiptsAdapter(private val receiptList: MutableList<ReceiptDTO> = mutableListOf(), private val onClickListener:
 ListOnClickListener<ReceiptDTO>) :
-        RecyclerView.Adapter<CheckReceiptAdapter.CustomViewHolder>() {
+        RecyclerView.Adapter<ReceiptsAdapter.CustomViewHolder>() {
 
     var receipts = receiptList
         @SuppressLint("NotifyDataSetChanged")
