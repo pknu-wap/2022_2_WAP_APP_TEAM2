@@ -16,6 +16,10 @@ import com.example.wapapp2.view.friends.FriendsFragment
 class MainHostFragment : Fragment() {
     private lateinit var binding: FragmentMainHostBinding
 
+    companion object {
+        val TAG = "MainHost"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -31,8 +35,6 @@ class MainHostFragment : Fragment() {
 
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             val transaction = childFragmentManager.beginTransaction()
-            val bundle = Bundle()
-
             val currentFragment = childFragmentManager.primaryNavigationFragment
 
             if (currentFragment != null) {
@@ -40,32 +42,26 @@ class MainHostFragment : Fragment() {
             }
 
             val fragmentTag = item.title.toString()
-
             var newFragment: Fragment? = childFragmentManager.findFragmentByTag(fragmentTag)
 
             if (newFragment == null) {
                 when (item.itemId) {
                     R.id.calendar -> {
                         newFragment = CalenderFragment()
-
                         true
                     }
                     R.id.calculation -> {
                         newFragment = GrouplistFragment()
                         true
                     }
-
                     R.id.friends -> {
                         newFragment = FriendsFragment()
                         true
                     }
-
                     else -> false
                 }
 
-                transaction.add(binding.fragmentContainerView.id, newFragment!!,
-                        tag).addToBackStack(tag)
-
+                transaction.add(binding.fragmentContainerView.id, newFragment!!, tag).addToBackStack(tag)
             } else {
                 transaction.show(newFragment)
             }

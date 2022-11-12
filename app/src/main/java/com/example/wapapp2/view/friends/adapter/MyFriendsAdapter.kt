@@ -22,10 +22,7 @@ class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDT
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int, model: FriendDTO) {
         holder.bind(model)
     }
-    
-    override fun onDataChanged() {
-        super.onDataChanged()
-    }
+
 
     class CustomViewHolder(private val binding: MyFriendItemViewBinding,
                            private val onClickListener: ListOnClickListener<FriendDTO>) :

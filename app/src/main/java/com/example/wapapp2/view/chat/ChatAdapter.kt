@@ -14,7 +14,8 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 
-class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) : FirestoreRecyclerAdapter<ChatDTO, RecyclerView.ViewHolder>(option) {
+class ChatAdapter(val myId: String, option: FirestoreRecyclerOptions<ChatDTO>) :
+        FirestoreRecyclerAdapter<ChatDTO, RecyclerView.ViewHolder>(option) {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
@@ -23,10 +24,10 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
         SENDED, RECEVEIED
     }
 
-    inner class ChatHolder_sended(val binding: ChatMsgItemSendedBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder{
+    inner class ChatHolder_sended(val binding: ChatMsgItemSendedBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder {
         var time = DateTime()
 
-        override fun bind(position: Int, model : ChatDTO) {
+        override fun bind(position: Int, model: ChatDTO) {
             binding.msg.text = model.msg
             time = dateTimeParser.parseDateTime(DateConverter.toISO8601(model.sendedTime!!))
             binding.time.text = timeFormat.print(time)
@@ -34,18 +35,18 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
     }
 
 
-    inner class ChatHolder_received(val binding: ChatMsgItemReceivedBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder{
+    inner class ChatHolder_received(val binding: ChatMsgItemReceivedBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder {
         var time = DateTime()
 
-        override fun bind(position: Int, model : ChatDTO) {
+        override fun bind(position: Int, model: ChatDTO) {
             binding.msg.text = model.msg
             time = dateTimeParser.parseDateTime(DateConverter.toISO8601(model.sendedTime!!))
             binding.time.text = timeFormat.print(time)
             setUserName(position, model)
-            }
+        }
 
-        private fun setUserName(position: Int , model: ChatDTO) {
-            if ( model.senderId == myId || equalsTopUserId(model.senderId, position)) {
+        private fun setUserName(position: Int, model: ChatDTO) {
+            if (model.senderId == myId || equalsTopUserId(model.senderId, position)) {
                 binding.userName.visibility = View.GONE
                 return
             }
@@ -59,12 +60,12 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : RecyclerView.ViewHolder {
-        return if(viewType == ItemViewType.RECEVEIED.ordinal) ChatHolder_received(ChatMsgItemReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == ItemViewType.RECEVEIED.ordinal) ChatHolder_received(ChatMsgItemReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if(snapshots[position].senderId == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
+        return if (snapshots[position].senderId == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {

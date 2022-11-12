@@ -18,6 +18,8 @@ import kotlinx.coroutines.Dispatchers.Main
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val fireStore = FirebaseFirestore.getInstance()
 
     val friendsListLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
     val friendCheckedLiveData: MutableLiveData<FriendCheckDTO> = MutableLiveData<FriendCheckDTO>()
@@ -29,8 +31,7 @@ class FriendsViewModel : ViewModel() {
 
     val myFriendsIdSet = hashSetOf<String>()
 
-    private val _addMyFriendResult = MutableLiveData<Boolean>()
-    val addMyFriendResult get() = _addMyFriendResult
+    val addMyFriendResult = MutableLiveData<Boolean>()
 
     private val _deleteMyFriendResult = MutableLiveData<Boolean>()
     val deleteMyFriendResult get() = _deleteMyFriendResult
@@ -134,8 +135,8 @@ class FriendsViewModel : ViewModel() {
 
     fun getMyFriendsOptions(): FirestoreRecyclerOptions<FriendDTO> {
         val query =
-                FirebaseFirestore.getInstance().collection(FireStoreNames.users.name)
-                        .document(FirebaseAuth.getInstance().currentUser?.uid!!)
+                fireStore.collection(FireStoreNames.users.name)
+                        .document(firebaseAuth.currentUser?.uid!!)
                         .collection(FireStoreNames.myFriends.name).orderBy("alias", Query.Direction.ASCENDING)
 
         val option = FirestoreRecyclerOptions.Builder<FriendDTO>()

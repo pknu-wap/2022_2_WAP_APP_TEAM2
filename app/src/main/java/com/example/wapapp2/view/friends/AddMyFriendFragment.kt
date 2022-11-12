@@ -39,6 +39,10 @@ class AddMyFriendFragment : Fragment() {
     }
     private val adapter = SearchUserListAdapter(listOnClickListener)
 
+    companion object {
+        val TAG = "AddMyFriend"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -51,11 +55,12 @@ class AddMyFriendFragment : Fragment() {
 
         binding.loadingView.setContentView(binding.searchUserList)
         binding.loadingView.onSuccessful()
+
         return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 
@@ -63,6 +68,7 @@ class AddMyFriendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         friendsViewModel.searchUsersResult.observe(viewLifecycleOwner) {
             adapter.users = it
+
             if (it.isEmpty())
                 binding.loadingView.onFailed(getString(R.string.no_search_results_found))
             else
@@ -80,11 +86,13 @@ class AddMyFriendFragment : Fragment() {
                     friendsViewModel.findUsers(query)
                 } else
                     Toast.makeText(context, R.string.empty_search_query, Toast.LENGTH_SHORT).show()
+
                 return true
             }
 
             override fun onQueryTextChange(newText: String?) = true
         })
+
     }
 
 

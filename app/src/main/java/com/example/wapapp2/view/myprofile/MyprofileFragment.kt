@@ -25,6 +25,10 @@ class MyprofileFragment : Fragment() {
     private lateinit var binding: FragmentMyprofileBinding
     private val adapter = MyAccountListAdapter()
 
+    companion object {
+        val TAG = "MyProfile"
+    }
+
     private val onClickedPopupMenuListener = object : OnClickedPopupMenuListener {
         override fun onClickedRemove(bankAccountDTO: BankAccountDTO, position: Int) {
             val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
@@ -51,11 +55,11 @@ class MyprofileFragment : Fragment() {
                 it.putSerializable("bankAccountDTO", bankAccountDTO)
             }
             parentFragmentManager
-                .beginTransaction()
-                .hide(this@MyprofileFragment)
-                .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
-                .addToBackStack("MyprofileFragment")
-                .commit()
+                    .beginTransaction()
+                    .hide(this@MyprofileFragment)
+                    .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
+                    .addToBackStack("MyprofileFragment")
+                    .commit()
         }
     }
 
@@ -78,7 +82,7 @@ class MyprofileFragment : Fragment() {
         binding.btnEdit.setOnClickListener {
             val dialog = DialogEditDetailFragment()
             dialog
-                .show(parentFragmentManager, "CustomDialog")
+                    .show(parentFragmentManager, "CustomDialog")
         }
 
         binding.btnLogout.setOnClickListener {
@@ -87,10 +91,10 @@ class MyprofileFragment : Fragment() {
             val loginFragment = LoginFragment()
 
             parentFragmentManager
-                .beginTransaction()
-                .hide(this@MyprofileFragment)
-                .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
-                .commitAllowingStateLoss()
+                    .beginTransaction()
+                    .hide(this@MyprofileFragment)
+                    .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                    .commitAllowingStateLoss()
         }
 
         return binding.root

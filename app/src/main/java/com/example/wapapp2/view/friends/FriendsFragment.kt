@@ -32,13 +32,10 @@ class FriendsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myFriendsAdapter = MyFriendsAdapter(friendOnClickListener, friendsViewModel.getMyFriendsOptions())
-
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFriendsBinding.inflate(inflater, container, false)
-
         binding.loadingView.setContentView(binding.myFriendsList)
         binding.loadingView.onSuccessful()
 
@@ -50,8 +47,8 @@ class FriendsFragment : Fragment() {
             fragmentManager
                     .beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
-                    .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
-                    .addToBackStack("MyprofileFragment")
+                    .add(R.id.fragment_container_view, fragment, MyprofileFragment.TAG)
+                    .addToBackStack(MyprofileFragment.TAG)
                     .commit()
         }
 
@@ -59,29 +56,24 @@ class FriendsFragment : Fragment() {
         binding.userName1.text = myprofile.name
         binding.userId1.text = myprofile.userid
 
-
-
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager
             fragmentManager
                     .beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
-                    .add(R.id.fragment_container_view, fragment, AddMyFriendFragment::class.simpleName)
-                    .addToBackStack(AddMyFriendFragment::class.simpleName)
+                    .add(R.id.fragment_container_view, fragment, AddMyFriendFragment.TAG)
+                    .addToBackStack(AddMyFriendFragment.TAG)
                     .commit()
         }
 
-        binding.myFriendsList.setHasFixedSize(true)
         binding.myFriendsList.adapter = myFriendsAdapter
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //friendsViewModel.getMyFriends()
-
-
     }
 
     override fun onStart() {
