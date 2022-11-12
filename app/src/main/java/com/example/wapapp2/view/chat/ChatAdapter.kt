@@ -18,6 +18,7 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
+
     private enum class ItemViewType {
         SENDED, RECEVEIED
     }
@@ -68,6 +69,10 @@ class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>) 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {
         (holder as ChatHolder).bind(position, model)
+    }
+
+    override fun onDataChanged() {
+        super.onDataChanged()
     }
 
 }
