@@ -39,7 +39,7 @@ class BankTransferDialogFragment : DialogFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putSerializable("bankAccountDTO", bankTransferViewModel.selectedBankAccount)
+        outState.putParcelable("bankAccountDTO", bankTransferViewModel.selectedBankAccount)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +53,7 @@ class BankTransferDialogFragment : DialogFragment() {
         fun newInstance(bankAccountDTO: BankAccountDTO) =
                 BankTransferDialogFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("bankAccountDTO", bankAccountDTO)
+                        putParcelable("bankAccountDTO", bankAccountDTO)
                     }
                 }
     }
@@ -73,7 +73,7 @@ class BankTransferDialogFragment : DialogFragment() {
             }
         }
 
-        binding.bankName.text = bankTransferViewModel.selectedBankAccount!!.bankDTO.bankName
+        binding.bankName.text = bankTransferViewModel.selectedBankAccount!!.bankDTO!!.bankName
         binding.bankAccountNumber.text = bankTransferViewModel.selectedBankAccount!!.accountNumber
         bankTransferViewModel.loadInstalledBankApps(requireContext())
     }

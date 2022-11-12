@@ -43,6 +43,18 @@ class MyBankAccountsViewModel : ViewModel() {
         }
     }
 
+    fun modifyMyBankAccount(bankAccountDTO: BankAccountDTO) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                repository.addMyBankAccount(bankAccountDTO)
+            }
+            result.await()
+            withContext(Main) {
+                addedMyBankAccount.value = result.await()
+            }
+        }
+    }
+
     fun getMyBankAccounts() {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {

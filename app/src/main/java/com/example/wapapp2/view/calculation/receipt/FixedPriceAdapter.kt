@@ -79,7 +79,7 @@ ListOnClickListener<BankAccountDTO>, val onUpdateMoneyCallback: OnUpdateMoneyCal
             RecyclerView.ViewHolder(binding.root) {
             fun bind_account(account: BankAccountDTO) {
                 binding.name.textSize = 14.0F
-                binding.name.text = "${account.bankDTO.bankName}  ${account.accountNumber}  ${account.accountHolder}"
+                binding.name.text = "${account.bankDTO!!.bankName}  ${account.accountNumber}  ${account.accountHolder}"
 
                 binding.root.setOnClickListener {
                     onClickedBankAccountListener.onClicked(account, adapterPosition)

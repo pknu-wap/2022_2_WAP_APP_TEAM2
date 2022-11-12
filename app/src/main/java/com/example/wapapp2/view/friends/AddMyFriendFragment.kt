@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DelayTextWatcher
+import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentAddMyFriendBinding
 import com.example.wapapp2.model.UserDTO
@@ -31,6 +32,7 @@ class AddMyFriendFragment : Fragment() {
                 .setMessage("${item.name} 추가하시겠습니까?")
                 .setPositiveButton(R.string.add) { dialog, which ->
                     dialog.dismiss()
+                    LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_my_friend))
                     friendsViewModel.addToMyFriend(item)
                     //추가로직
                 }.setNeutralButton(R.string.cancel) { dialog, which ->
@@ -76,6 +78,7 @@ class AddMyFriendFragment : Fragment() {
         }
 
         friendsViewModel.addMyFriendResult.observe(viewLifecycleOwner) {
+            LoadingDialogView.clearDialogs()
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 

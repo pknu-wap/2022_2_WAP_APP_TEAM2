@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FinalConfirmationMyBankAccountLayoutBinding
 import com.example.wapapp2.databinding.FragmentAddMyBankAccountBinding
@@ -54,7 +55,7 @@ class AddMyBankAccountFragment : Fragment() {
             if (myBankAccountsViewModel.selectedBank != null && !binding.editAccountLayout.accountNumberInputEdit.text.isNullOrEmpty()
                     && !binding.editAccountLayout.accountHolderInputEdit.text.isNullOrEmpty()) {
                 val selectedBank = myBankAccountsViewModel.selectedBank!!
-                val bankAccountDTO = BankAccountDTO(null, null, accountNumber = binding.editAccountLayout.accountNumberInputEdit.text!!
+                val bankAccountDTO = BankAccountDTO("", null, accountNumber = binding.editAccountLayout.accountNumberInputEdit.text!!
                         .toString(), accountHolder = binding.editAccountLayout.accountHolderInputEdit.text!!.toString(), bankId = selectedBank.uid)
 
 
@@ -69,6 +70,7 @@ class AddMyBankAccountFragment : Fragment() {
                         .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.add) { dialog, index ->
+                            LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_my_bank_account))
                             myBankAccountsViewModel.addMyBankAccount(bankAccountDTO)
                             dialog.dismiss()
                         }.create()
@@ -80,6 +82,7 @@ class AddMyBankAccountFragment : Fragment() {
 
         myBankAccountsViewModel.addedMyBankAccount.observe(viewLifecycleOwner) {
             Toast.makeText(context, R.string.added_new_bank_account, Toast.LENGTH_SHORT).show()
+            LoadingDialogView.clearDialogs()
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }

@@ -68,7 +68,6 @@ class FriendsFragment : Fragment() {
         }
 
         binding.myFriendsList.adapter = myFriendsAdapter
-
         return binding.root
     }
 

@@ -9,7 +9,7 @@ import java.io.Serializable
 @Parcelize
 data class BankAccountDTO(
         @get:Exclude
-        var id: String?,
+        var id: String,
         @get:Exclude
         var bankDTO: BankDTO?,
         @PropertyName("accountNumber")
@@ -21,7 +21,7 @@ data class BankAccountDTO(
 ) : Parcelable {
     constructor() : this("", null, "", "", "")
 
-    fun toClipboardData(): String = "$accountNumber ${bankDTO?.bankName}"
+    fun toClipboardData(): String = "$accountNumber ${bankDTO!!.bankName}"
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other)

@@ -25,7 +25,7 @@ class EditMyBankAccountFragment : Fragment() {
     private val viewModel: MyBankAccountsViewModel by viewModels({ requireParentFragment() })
     private lateinit var binding: FragmentEditMyBankAccountBinding
     private lateinit var adapter: BankListAdapter
-    private var originalBankAccountDTO: BankAccountDTO? = null
+    private lateinit var originalBankAccountDTO: BankAccountDTO
     private val bankOnClickedListener = ListOnClickListener<BankDTO> { item, position ->
         // bankDTO, position을 받음
         viewModel.selectedBank = item
@@ -35,8 +35,8 @@ class EditMyBankAccountFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val bundle = arguments ?: savedInstanceState
 
-        originalBankAccountDTO = bundle!!.getSerializable("bankAccountDTO") as BankAccountDTO
-        adapter = BankListAdapter(viewModel.bankList, bankOnClickedListener, originalBankAccountDTO!!.bankDTO.uid)
+        originalBankAccountDTO = bundle!!.getParcelable("bankAccountDTO")!!
+        adapter = BankListAdapter(viewModel.bankList, bankOnClickedListener, originalBankAccountDTO.bankDTO!!.uid)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -45,8 +45,8 @@ class EditMyBankAccountFragment : Fragment() {
         binding.editAccountLayout.accountHolderInputEdit.text = viewModel.defaultBankAccountHolder!!.toEditable()
         binding.editAccountLayout.bankList.adapter = adapter
 
-        binding.editAccountLayout.accountHolderInputEdit.text = originalBankAccountDTO!!.accountHolder.toEditable()
-        binding.editAccountLayout.accountNumberInputEdit.text = originalBankAccountDTO!!.accountNumber.toEditable()
+        binding.editAccountLayout.accountHolderInputEdit.text = originalBankAccountDTO.accountHolder.toEditable()
+        binding.editAccountLayout.accountNumberInputEdit.text = originalBankAccountDTO.accountNumber.toEditable()
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -62,21 +62,22 @@ class EditMyBankAccountFragment : Fragment() {
             if (viewModel.selectedBank != null && !binding.editAccountLayout.accountNumberInputEdit.text.isNullOrEmpty()
                     && !binding.editAccountLayout.accountHolderInputEdit.text.isNullOrEmpty()) {
                 val bankAccountDTO =
-                        BankAccountDTO(viewModel.selectedBank!!, binding.editAccountLayout.accountNumberInputEdit.text!!.toString(), binding
-                                .editAccountLayout.accountHolderInputEdit.text!!.toString(), viewModel.selectedBank!!.uid)
+                        BankAccountDTO(originalBankAccountDTO.id, viewModel.selectedBank!!, binding.editAccountLayout
+                                .accountNumberInputEdit.text!!.toString(),
+                                binding.editAccountLayout.accountHolderInputEdit.text!!.toString(), viewModel.selectedBank!!.uid)
 
                 //다이얼로그 띄워서 최종 확인 진행
                 val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
                 dialogViewBinding.bankAccountHolder.text = bankAccountDTO.accountHolder
                 dialogViewBinding.bankAccountNumber.text = bankAccountDTO.accountNumber
-                dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO.bankName
-                dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO.iconId)
+                dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO!!.bankName
+                dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
 
                 val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
                         .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.edit) { dialog, index ->
-                            viewModel.addNewMyBankAccount(bankAccountDTO)
+                            viewModel.modifyMyBankAccount(bankAccountDTO)
                             Toast.makeText(context, R.string.edied_my_bank_account, Toast.LENGTH_SHORT).show()
                             dialog.dismiss()
 

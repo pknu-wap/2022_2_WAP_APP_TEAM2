@@ -12,6 +12,7 @@ import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
+import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
@@ -74,6 +75,7 @@ class LoginFragment : Fragment() {
             AppCheckRepository.initialize()
             FriendsRepositoryImpl.initialize()
             ChatRepositorylmpl.initialize()
+            MyBankAccountRepositoryImpl.initialize()
 
             parentFragmentManager
                     .beginTransaction()
@@ -85,7 +87,7 @@ class LoginFragment : Fragment() {
     fun moveSignup() {
         val signUpFragment = SignupFragment()
         val tag = SignupFragment.TAG
-        
+
         parentFragmentManager
                 .beginTransaction()
                 .hide(this@LoginFragment)

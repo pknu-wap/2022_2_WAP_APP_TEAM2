@@ -77,9 +77,9 @@ class DummyData {
         fun getMyBankAccountList(name: String): ArrayList<BankAccountDTO> {
             val list = ArrayList<BankAccountDTO>()
 
-            list.add(BankAccountDTO(BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name, "0"))
-            list.add(BankAccountDTO(BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", name, "0"))
-            list.add(BankAccountDTO(BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", name, "0"))
+            list.add(BankAccountDTO("", BankDTO("토스뱅크", R.drawable.ic_launcher_foreground, "22"), "100000076327", name, "0"))
+            list.add(BankAccountDTO("", BankDTO("신한은행", R.drawable.ic_launcher_foreground, "18"), "110505621776", name, "0"))
+            list.add(BankAccountDTO("", BankDTO("카카오뱅크", R.drawable.ic_launcher_foreground, "20"), "3333104213755", name, "0"))
 
             return list
         }

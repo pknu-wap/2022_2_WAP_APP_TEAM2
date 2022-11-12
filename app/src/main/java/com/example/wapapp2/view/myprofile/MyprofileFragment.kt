@@ -34,14 +34,14 @@ class MyprofileFragment : Fragment() {
             val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
             dialogViewBinding.bankAccountHolder.text = bankAccountDTO.accountHolder
             dialogViewBinding.bankAccountNumber.text = bankAccountDTO.accountNumber
-            dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO.bankName
-            dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO.iconId)
+            dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO!!.bankName
+            dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
 
             val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
                     .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.remove) { dialog, index ->
-                        viewModel.removeMyBankAccount(bankAccountDTO)
+                        viewModel.removeMyBankAccount(bankAccountDTO.id)
                         Toast.makeText(context, R.string.removed_bank_account, Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }.create()
@@ -52,7 +52,7 @@ class MyprofileFragment : Fragment() {
         override fun onClickedEdit(bankAccountDTO: BankAccountDTO, position: Int) {
             val fragment = EditMyBankAccountFragment()
             fragment.arguments = Bundle().also {
-                it.putSerializable("bankAccountDTO", bankAccountDTO)
+                it.putParcelable("bankAccountDTO", bankAccountDTO)
             }
             parentFragmentManager
                     .beginTransaction()
@@ -76,7 +76,6 @@ class MyprofileFragment : Fragment() {
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        adapter.setList(DummyData.getMyBankAccountList("박준성"))
         binding.bankList.adapter = adapter
 
         binding.btnEdit.setOnClickListener {
@@ -121,12 +120,12 @@ class MyprofileFragment : Fragment() {
         inner class ViewHolder(private val viewBinding: BankAccountListItemBinding) : RecyclerView.ViewHolder(viewBinding.root) {
 
             fun bind() {
-                val position = adapterPosition
+                val position = bindingAdapterPosition
 
                 viewBinding.bankAccountHolder.text = list[position].accountHolder
                 viewBinding.bankAccountNumber.text = list[position].accountNumber
-                viewBinding.bankName.text = list[position].bankDTO.bankName
-                viewBinding.icon.setImageResource(list[position].bankDTO.iconId)
+                viewBinding.bankName.text = list[position].bankDTO!!.bankName
+                viewBinding.icon.setImageResource(list[position].bankDTO!!.iconId)
 
                 viewBinding.moreBtn.setOnClickListener { moreBtnView ->
                     //PopupMenu 객체 생성
