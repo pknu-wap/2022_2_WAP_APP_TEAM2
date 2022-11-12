@@ -98,7 +98,7 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
             snapShotListener: NewSnapshotListener<List<FriendDTO>>) = fireStore.collection(FireStoreNames.users
             .name).document(auth.currentUser?.uid!!)
             .collection(FireStoreNames.myFriends.name).addSnapshotListener { snapShot, error ->
-                snapShotListener.onEvent(snapShot, error)
+                //snapShotListener.onEvent(snapShot, error)
             }
 
 
