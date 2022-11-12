@@ -7,11 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentEditReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.view.checkreceipt.CheckReceiptAdapter
-import com.example.wapapp2.view.checkreceipt.ReceiptList
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 import java.text.SimpleDateFormat
 import java.util.*

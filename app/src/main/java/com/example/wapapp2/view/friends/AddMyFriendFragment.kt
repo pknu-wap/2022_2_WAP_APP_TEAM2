@@ -31,6 +31,7 @@ class AddMyFriendFragment : Fragment() {
                 .setMessage("${item.name} 추가하시겠습니까?")
                 .setPositiveButton(R.string.add) { dialog, which ->
                     dialog.dismiss()
+                    friendsViewModel.addToMyFriend(item)
                     //추가로직
                 }.setNeutralButton(R.string.cancel) { dialog, which ->
                     dialog.dismiss()
@@ -47,6 +48,9 @@ class AddMyFriendFragment : Fragment() {
         _binding = FragmentAddMyFriendBinding.inflate(inflater, container, false)
         binding.searchUserList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         binding.searchUserList.adapter = adapter
+
+        binding.loadingView.setContentView(binding.searchUserList)
+        binding.loadingView.onSuccessful()
         return binding.root
     }
 
@@ -59,13 +63,22 @@ class AddMyFriendFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         friendsViewModel.searchUsersResult.observe(viewLifecycleOwner) {
             adapter.users = it
+            if (it.isEmpty())
+                binding.loadingView.onFailed(getString(R.string.no_search_results_found))
+            else
+                binding.loadingView.onSuccessful()
+        }
+
+        friendsViewModel.addMyFriendResult.observe(viewLifecycleOwner) {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null)
+                if (query != null) {
+                    binding.loadingView.onStarted()
                     friendsViewModel.findUsers(query)
-                else
+                } else
                     Toast.makeText(context, R.string.empty_search_query, Toast.LENGTH_SHORT).show()
                 return true
             }

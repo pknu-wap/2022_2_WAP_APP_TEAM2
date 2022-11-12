@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+
+
 import androidx.core.content.ContextCompat.getColor
+
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -22,9 +25,12 @@ import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
 import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.chat.ChatFragment
-import com.example.wapapp2.view.checkreceipt.CheckReceiptFragment
+
+import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.ReceiptViewModel
+
 import java.text.DecimalFormat
 
 
@@ -167,7 +173,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     private fun setSideMenu() {
         binding.receiptsList.setOnClickListener {
-            val fragment = CheckReceiptFragment()
+            val fragment = ReceiptsFragment()
             fragment.arguments = Bundle().apply {
                 putString("calcRoomId", calcRoomId)
             }

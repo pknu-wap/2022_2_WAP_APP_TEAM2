@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentFriendsBinding
@@ -32,11 +33,12 @@ class FriendsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFriendsBinding.inflate(inflater, container, false)
+
+        binding.loadingView.setContentView(binding.myFriendsList)
 
         val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
 
@@ -55,8 +57,19 @@ class FriendsFragment : Fragment() {
         binding.userName1.text = myprofile.name
         binding.userId1.text = myprofile.userid
 
-        binding.rvProfile.setHasFixedSize(true)
-        binding.rvProfile.adapter = myFriendsAdapter
+        myFriendsAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                if (myFriendsAdapter.itemCount > 0) {
+                    binding.loadingView.onSuccessful()
+                } else {
+                    binding.loadingView.onFailed(getString(R.string.empty_my_friends))
+                }
+            }
+        })
+
+        binding.myFriendsList.setHasFixedSize(true)
+        binding.myFriendsList.adapter = myFriendsAdapter
 
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
