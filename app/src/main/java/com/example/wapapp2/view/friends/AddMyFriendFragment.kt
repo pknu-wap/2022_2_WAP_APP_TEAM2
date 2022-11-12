@@ -86,4 +86,6 @@ class AddMyFriendFragment : Fragment() {
             override fun onQueryTextChange(newText: String?) = true
         })
     }
+
+
 }

@@ -1,11 +1,18 @@
 package com.example.wapapp2.viewmodel
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.firestore.SnapshotParser
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 
@@ -19,9 +26,6 @@ class FriendsViewModel : ViewModel() {
 
     private val _searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
     val searchUsersResult get() = _searchUsersResult
-
-    private val _myFriends = MutableLiveData<MutableList<FriendDTO>>()
-    val myFriends get() = _myFriends
 
     val myFriendsIdSet = hashSetOf<String>()
 
@@ -70,9 +74,6 @@ class FriendsViewModel : ViewModel() {
                 friendsRepositoryImpl.getMyFriends()
             }
             result.await()
-            withContext(Main) {
-                myFriends.value = result.await()
-            }
         }
     }
 
@@ -129,6 +130,18 @@ class FriendsViewModel : ViewModel() {
                 aliasMyFriendResult.value = result.await()
             }
         }
+    }
+
+    fun getMyFriendsOptions(): FirestoreRecyclerOptions<FriendDTO> {
+        val query =
+                FirebaseFirestore.getInstance().collection(FireStoreNames.users.name)
+                        .document(FirebaseAuth.getInstance().currentUser?.uid!!)
+                        .collection(FireStoreNames.myFriends.name).orderBy("alias", Query.Direction.ASCENDING)
+
+        val option = FirestoreRecyclerOptions.Builder<FriendDTO>()
+                .setQuery(query, FriendDTO::class.java)
+                .build()
+        return option
     }
 
     data class FriendCheckDTO(val isChecked: Boolean, val friendDTO: FriendDTO)

@@ -19,14 +19,14 @@ import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import java.util.*
 
-class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
+class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
     private lateinit var binding: FragmentChatBinding
 
     private lateinit var chatAdapter_: ChatAdapter
     private lateinit var bundle: Bundle
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
-    private val chatViewModel : ChatViewModel by viewModels()
+    private val chatViewModel: ChatViewModel by viewModels()
     private lateinit var myAccountViewModel: MyAccountViewModel
 
 
@@ -74,7 +74,8 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment() {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-                val newChat = ChatDTO(myAccountViewModel.myName  ,myAccountViewModel.myAccountId, Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
+                val newChat =
+                        ChatDTO(myAccountViewModel.myName, myAccountViewModel.myAccountId, Date(), binding.textInputLayout.editText!!.text.toString(), myAccountViewModel.myAccountId)
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)
                 // 전송

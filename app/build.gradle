@@ -109,4 +109,6 @@ dependencies {
     // list, viewpager indicator
     implementation 'me.relex:circleindicator:2.1.6'
     apply plugin: 'com.google.gms.google-services'
+
+    implementation 'androidx.paging:paging-runtime-ktx:3.1.1'
 }
