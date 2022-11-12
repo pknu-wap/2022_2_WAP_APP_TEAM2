@@ -30,6 +30,10 @@ class AddMyBankAccountFragment : Fragment() {
         myBankAccountsViewModel.selectedBank = item
     }
 
+    companion object {
+        val TAG = "AddMyBankAccountFragment"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = BankListAdapter(myBankAccountsViewModel.bankList, bankOnClickedListener)
@@ -38,6 +42,7 @@ class AddMyBankAccountFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         _binding = FragmentAddMyBankAccountBinding.inflate(inflater)
+
         binding.editAccountLayout.accountHolderInputEdit.text = myBankAccountsViewModel.defaultBankAccountHolder!!.toEditable()
         binding.editAccountLayout.bankList.adapter = adapter
 
@@ -58,7 +63,6 @@ class AddMyBankAccountFragment : Fragment() {
                 val bankAccountDTO = BankAccountDTO("", null, accountNumber = binding.editAccountLayout.accountNumberInputEdit.text!!
                         .toString(), accountHolder = binding.editAccountLayout.accountHolderInputEdit.text!!.toString(), bankId = selectedBank.uid)
 
-
                 //다이얼로그 띄워서 최종 확인 진행
                 val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
                 dialogViewBinding.bankAccountHolder.text = bankAccountDTO.accountHolder
@@ -66,15 +70,15 @@ class AddMyBankAccountFragment : Fragment() {
                 dialogViewBinding.selectedBank.text = selectedBank.bankName
                 dialogViewBinding.icon.setImageResource(selectedBank.iconId)
 
-                val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
-                        .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
+                MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
+                        .setView(dialogViewBinding.root).setNegativeButton(R.string.cancel) { dialog, index ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.add) { dialog, index ->
                             LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_my_bank_account))
                             myBankAccountsViewModel.addMyBankAccount(bankAccountDTO)
                             dialog.dismiss()
-                        }.create()
-                dialog.show()
+                        }.create().show()
+
             } else {
                 Toast.makeText(context, R.string.please_recheck_the_input_values, Toast.LENGTH_SHORT).show()
             }

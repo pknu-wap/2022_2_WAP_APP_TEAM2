@@ -10,6 +10,9 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.model.BankDTO
 import com.example.wapapp2.repository.MyBankAccountRepositoryImpl
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
@@ -17,18 +20,31 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class MyBankAccountsViewModel : ViewModel() {
-    val bankList = ArrayList<BankDTO>()
-    var defaultBankAccountHolder: String? = null
-    var selectedBank: BankDTO? = null
-    val addedMyBankAccount = MutableLiveData<Boolean>()
-    val removedMyBankAccount = MutableLiveData<Boolean>()
-    val myBankAccounts = MutableLiveData<MutableList<BankAccountDTO>>()
-
+class MyBankAccountsViewModel(application: Application) : AndroidViewModel(application) {
+    private val fireStore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     private val repository = MyBankAccountRepositoryImpl.getINSTANCE()
 
-    fun onSelectedBank(bankDTO: BankDTO) {
-        selectedBank = bankDTO
+    val bankList = mutableListOf<BankDTO>()
+    val bankMaps = mutableMapOf<String, BankDTO>()
+
+    var defaultBankAccountHolder: String? = null
+    var selectedBank: BankDTO? = null
+
+
+    val addedMyBankAccount = MutableLiveData<Boolean>()
+    val removedMyBankAccount = MutableLiveData<Boolean>()
+
+    init {
+        val bankNamesList = application.resources.getStringArray(R.array.bank_name_list)
+        val bankIconsList = application.resources.getIntArray(R.array.bank_icon_list)
+        var bankDTO: BankDTO? = null
+
+        for ((index, value) in bankNamesList.withIndex()) {
+            bankDTO = BankDTO(value, bankIconsList[index], index.toString())
+            bankList.add(bankDTO)
+            bankMaps[index.toString()] = bankDTO
+        }
     }
 
     fun addMyBankAccount(bankAccountDTO: BankAccountDTO) {
@@ -55,18 +71,6 @@ class MyBankAccountsViewModel : ViewModel() {
         }
     }
 
-    fun getMyBankAccounts() {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                repository.getMyBankAccounts()
-            }
-            result.await()
-            withContext(Main) {
-                myBankAccounts.value = result.await()
-            }
-        }
-    }
-
     fun removeMyBankAccount(id: String) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
@@ -77,5 +81,22 @@ class MyBankAccountsViewModel : ViewModel() {
                 removedMyBankAccount.value = result.await()
             }
         }
+    }
+
+    fun getMyBankAccountsOptions(): FirestoreRecyclerOptions<BankAccountDTO> {
+        val query = fireStore.collection(FireStoreNames.users.name)
+                .document(auth.currentUser?.uid!!)
+                .collection(FireStoreNames.bankAccounts.name).orderBy("bankId", Query.Direction.ASCENDING)
+
+        val options = FirestoreRecyclerOptions.Builder<BankAccountDTO>()
+                .setQuery(query) {
+                    val dto = it.toObject<BankAccountDTO>()!!
+                    dto.id = it.id
+                    dto.bankDTO = bankMaps[dto.bankId]
+                    dto
+                }
+                .build()
+
+        return options
     }
 }

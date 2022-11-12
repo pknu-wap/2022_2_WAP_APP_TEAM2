@@ -8,16 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
-import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 
 class LoginFragment : Fragment() {
+    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
     private lateinit var binding: FragmentLoginBinding
     var auth: FirebaseAuth? = null
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {

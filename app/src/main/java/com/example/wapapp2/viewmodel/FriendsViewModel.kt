@@ -13,6 +13,7 @@ import com.firebase.ui.firestore.SnapshotParser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 
@@ -26,8 +27,7 @@ class FriendsViewModel : ViewModel() {
     val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendsRepositoryImpl.searchResultFriendsLiveData
     val currentRoomFriendsSet = HashSet<String>()
 
-    private val _searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
-    val searchUsersResult get() = _searchUsersResult
+    val searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
 
     val myFriendsIdSet = hashSetOf<String>()
 
@@ -69,14 +69,6 @@ class FriendsViewModel : ViewModel() {
         friendsRepositoryImpl.getFriendsList(word)
     }
 
-    fun getMyFriends() {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                friendsRepositoryImpl.getMyFriends()
-            }
-            result.await()
-        }
-    }
 
     fun findUsers(email: String) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -103,7 +95,7 @@ class FriendsViewModel : ViewModel() {
                 )
             }
             result.await()
-            withContext(MainScope().coroutineContext) {
+            withContext(Main) {
                 addMyFriendResult.value = result.await()
             }
         }
@@ -140,7 +132,11 @@ class FriendsViewModel : ViewModel() {
                         .collection(FireStoreNames.myFriends.name).orderBy("alias", Query.Direction.ASCENDING)
 
         val option = FirestoreRecyclerOptions.Builder<FriendDTO>()
-                .setQuery(query, FriendDTO::class.java)
+                .setQuery(query) {
+                    val dto = it.toObject<FriendDTO>()!!
+                    myFriendsIdSet.add(dto.friendUserId)
+                    dto
+                }
                 .build()
         return option
     }
