@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
@@ -13,7 +14,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 
-class CheckReceiptFragment : Fragment() {
+class ReceiptsFragment : Fragment() {
 
     private var _binding: FragmentCheckReceiptBinding? = null
     private val binding get() = _binding!!
@@ -31,12 +32,12 @@ class CheckReceiptFragment : Fragment() {
 
         fragmentManager
                 .beginTransaction()
-                .hide(this@CheckReceiptFragment)
+                .hide(this@ReceiptsFragment)
                 .add(R.id.fragment_container_view, fragment, "EditReceiptFragment")
                 .addToBackStack("EditReceiptFragment")
                 .commit()
     }
-    private val adapter = CheckReceiptAdapter(onClickListener = receiptOnClickListener)
+    private val adapter = ReceiptsAdapter(onClickListener = receiptOnClickListener)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +53,20 @@ class CheckReceiptFragment : Fragment() {
     ): View {
         _binding = FragmentCheckReceiptBinding.inflate(inflater)
 
+        binding.loadingView.setContentView(binding.rvEditreceipt)
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                if (adapter.itemCount > 0)
+                    binding.loadingView.onSuccessful()
+                else
+                    binding.loadingView.onFailed(getString(R.string.empty_receipts))
+            }
+        })
 
         binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter

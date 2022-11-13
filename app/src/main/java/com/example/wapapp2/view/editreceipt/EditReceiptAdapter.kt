@@ -3,16 +3,11 @@ package com.example.wapapp2.view.editreceipt
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptProductDTO
-import com.example.wapapp2.view.checkreceipt.CheckReceiptAdapter
 
 class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
                          private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) : RecyclerView

@@ -1,12 +1,14 @@
 package com.example.wapapp2.repository
 
 import androidx.lifecycle.MutableLiveData
+import com.example.wapapp2.commons.interfaces.NewSnapshotListener
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.interfaces.FriendsRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
@@ -64,31 +66,16 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
 
     override suspend fun findUsers(email: String): MutableSet<UserDTO> = suspendCoroutine<MutableSet<UserDTO>> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
-        collection.whereEqualTo("email", email).get().addOnCompleteListener {
-            if (it.isSuccessful) {
-                val list = it.result.documents.toMutableList()
-                val dtoSet = mutableSetOf<UserDTO>()
-                var dto: UserDTO? = null
-                val myId = auth.currentUser?.uid
-
-                for (v in list) {
-                    if (myId != v.id) {
-                        dto = v.toObject<UserDTO>()!!
-                        dto.id = v.id
-                        dtoSet.add(dto)
-                    }
+        collection.whereGreaterThanOrEqualTo("email", email)
+                .whereLessThan("email", "${email}z")
+                .get().addOnCompleteListener {
+                    continuation.resume(convertToUserDTOSet(it.result.documents))
                 }
-
-                continuation.resume(dtoSet)
-            } else {
-                continuation.resume(mutableSetOf())
-            }
-        }
     }
 
-    override suspend fun addToMyFriend(userDTO: UserDTO, myUid: String) = suspendCoroutine<Boolean> { continuation ->
-        val collection = fireStore.collection(FireStoreNames.users.name).document(myUid).collection("myFriends")
-        collection.document(userDTO.id).set(userDTO).addOnCompleteListener {
+    override suspend fun addToMyFriend(friendDTO: FriendDTO) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!).collection("myFriends")
+        collection.document(friendDTO.friendUserId).set(friendDTO).addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
@@ -105,6 +92,30 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         collection.document(friendId).update("alias", alias).addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
+    }
+
+    override fun addMyFriendsSnapshotListener(
+            snapShotListener: NewSnapshotListener<List<FriendDTO>>) = fireStore.collection(FireStoreNames.users
+            .name).document(auth.currentUser?.uid!!)
+            .collection(FireStoreNames.myFriends.name).addSnapshotListener { snapShot, error ->
+                //snapShotListener.onEvent(snapShot, error)
+            }
+
+
+    private fun convertToUserDTOSet(documents: List<DocumentSnapshot>): MutableSet<UserDTO> {
+        val list = documents.toMutableList()
+        val dtoSet = mutableSetOf<UserDTO>()
+        var dto: UserDTO? = null
+        val myId = auth.currentUser?.uid
+
+        for (v in list) {
+            if (myId != v.id) {
+                dto = v.toObject<UserDTO>()!!
+                dto.id = v.id
+                dtoSet.add(dto)
+            }
+        }
+        return dtoSet
     }
 
 }

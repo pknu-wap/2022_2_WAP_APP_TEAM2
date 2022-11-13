@@ -93,10 +93,12 @@ class FriendsViewModel : ViewModel() {
         }
     }
 
-    fun addToMyFriend(userDTO: UserDTO, myUid: String) {
+    fun addToMyFriend(userDTO: UserDTO) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
-                friendsRepositoryImpl.addToMyFriend(userDTO, myUid)
+                friendsRepositoryImpl.addToMyFriend(
+                        FriendDTO(userDTO.id, userDTO.name, "", userDTO.email)
+                )
             }
             result.await()
             withContext(MainScope().coroutineContext) {
