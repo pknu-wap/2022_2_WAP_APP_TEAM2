@@ -42,7 +42,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
             .setQuery(query, SnapshotParser {
                 //id로부터 사람이름
-                ChatDTO(it.getString("userName").toString() , it.id , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
+                ChatDTO(it.getString("userName").toString() , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
             })
             .build()
 

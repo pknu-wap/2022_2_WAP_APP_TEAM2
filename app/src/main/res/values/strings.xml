@@ -94,4 +94,7 @@
     <string name="empty_my_friends">친구 목록이 비어있습니다</string>
     <string name="empty_receipts">정산 내역이 없습니다</string>
     <string name="no_search_results_found">검색 결과가 없습니다</string>
+    
+    
+    <string name="Firebase_ApiKey"></string>
 </resources>
