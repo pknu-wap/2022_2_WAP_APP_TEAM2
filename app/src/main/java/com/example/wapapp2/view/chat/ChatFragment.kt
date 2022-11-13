@@ -71,7 +71,7 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment(), ScrollListener {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-                val newChat = ChatDTO(myAccountViewModel.myName  ,myAccountViewModel.myAccountId, Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
+                val newChat = ChatDTO(myAccountViewModel.myName  ,Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)
                 binding.chatList.smoothScrollToPosition(chatAdapter_.snapshots.size)
