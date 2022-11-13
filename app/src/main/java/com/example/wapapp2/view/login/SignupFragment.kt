@@ -9,13 +9,16 @@ import androidx.fragment.app.Fragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentSignupBinding
 import com.example.wapapp2.model.UserDTO
+import com.example.wapapp2.model.UserInfoDTO
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 
 class SignupFragment : Fragment() {
     private var _viewBinding: FragmentSignupBinding? = null
     private val viewBinding get() = _viewBinding!!
-    var Firestore: FirebaseFirestore? = null
+    var db: FirebaseFirestore? = null
 
     companion object {
         val TAG = "SignupFragment"
@@ -48,12 +51,18 @@ class SignupFragment : Fragment() {
         }
 
         fun UpdateProfile() {
-            Firestore = FirebaseFirestore.getInstance()
-            var userDTO = UserDTO()
+            db = FirebaseFirestore.getInstance()
+            var gender = "man"
+            viewBinding.radioGroupGender.setOnCheckedChangeListener { radioGroup, checkedID ->
+                when(checkedID){
+                    viewBinding.genderMan.id -> gender = "man"
+                    viewBinding.genderGirl.id -> gender = "girl"
+                }
+            }
 
-//            Firestore!!.collection("users").document()?.set(userDTO).addOnCompleteListener { task ->
-//
-//            }
+            var userInfoDTO = UserInfoDTO( viewBinding.userId.text.toString(), viewBinding.userName.text.toString(), gender, viewBinding.userProfile.drawable.toString())
+
+            db!!.collection("users").document()?.set(userInfoDTO)
         }
 
         fun createEmail() {
@@ -69,6 +78,7 @@ class SignupFragment : Fragment() {
                                     Toast.makeText(context,
                                             "회원가입이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
 
+                                    UpdateProfile()
                                     moveLoginPage()
                                 } else {
                                     Toast.makeText(context,
