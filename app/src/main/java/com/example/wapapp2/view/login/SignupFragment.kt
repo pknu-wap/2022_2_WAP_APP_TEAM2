@@ -8,11 +8,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentSignupBinding
+import com.example.wapapp2.model.UserDTO
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignupFragment : Fragment() {
     private var _viewBinding: FragmentSignupBinding? = null
     private val viewBinding get() = _viewBinding!!
+    var Firestore: FirebaseFirestore? = null
 
     companion object {
         val TAG = "SignupFragment"
@@ -20,6 +23,8 @@ class SignupFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
     }
 
     override fun onCreateView(
@@ -40,6 +45,15 @@ class SignupFragment : Fragment() {
                     .hide(this@SignupFragment)
                     .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
                     .commitAllowingStateLoss()
+        }
+
+        fun UpdateProfile() {
+            Firestore = FirebaseFirestore.getInstance()
+            var userDTO = UserDTO()
+
+//            Firestore!!.collection("users").document()?.set(userDTO).addOnCompleteListener { task ->
+//
+//            }
         }
 
         fun createEmail() {
