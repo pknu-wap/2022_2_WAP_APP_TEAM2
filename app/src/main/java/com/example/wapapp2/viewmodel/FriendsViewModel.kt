@@ -1,6 +1,5 @@
 package com.example.wapapp2.viewmodel
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,14 +8,12 @@ import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
@@ -72,26 +69,19 @@ class FriendsViewModel : ViewModel() {
         }
     }
 
-    fun deleteMyFriend(friendId: String, myUid: String) {
+    fun removeMyFriend(friendId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             //myFriendsIdSet에서 삭제
             myFriendsIdSet.remove(friendId)
 
             val result = async {
-                friendsRepositoryImpl.deleteMyFriend(friendId, myUid)
+                friendsRepositoryImpl.removeMyFriend(friendId)
             }
             result.await()
         }
     }
 
-    fun setAliasToMyFriend(alias: String, friendId: String, myUid: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                friendsRepositoryImpl.setAliasToMyFriend(alias, friendId, myUid)
-            }
-            result.await()
-        }
-    }
+
 
     fun getMyFriendsOptions(): FirestoreRecyclerOptions<FriendDTO> {
         val query =

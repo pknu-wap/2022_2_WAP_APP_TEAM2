@@ -24,7 +24,13 @@ class FriendsFragment : Fragment() {
     private val binding get() = _binding!!
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
+    companion object {
+        const val TAG = "FriendsFragment"
+    }
+
     private val friendOnClickListener = ListOnClickListener<FriendDTO> { item, position ->
+        val fragment = FriendProfileFragment.newInstance(item)
+        fragment.show(childFragmentManager, FriendProfileFragment.TAG)
     }
 
     private lateinit var myFriendsAdapter: MyFriendsAdapter
@@ -85,9 +91,15 @@ class FriendsFragment : Fragment() {
         super.onStop()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         myFriendsAdapter.stopListening()
     }
+
 
 }

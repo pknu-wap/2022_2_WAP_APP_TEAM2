@@ -64,14 +64,6 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         }
     }
 
-    override suspend fun findUsers(email: String): MutableSet<UserDTO> = suspendCoroutine<MutableSet<UserDTO>> { continuation ->
-        val collection = fireStore.collection(FireStoreNames.users.name)
-        collection.whereGreaterThanOrEqualTo("email", email)
-                .whereLessThan("email", "${email}z")
-                .get().addOnCompleteListener {
-                    continuation.resume(convertToUserDTOSet(it.result.documents))
-                }
-    }
 
     override suspend fun addToMyFriend(friendDTO: FriendDTO) = suspendCoroutine<Boolean> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!).collection("myFriends")
@@ -80,15 +72,15 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         }
     }
 
-    override suspend fun deleteMyFriend(friendId: String, myUid: String) = suspendCoroutine<Boolean> { continuation ->
-        val collection = fireStore.collection(FireStoreNames.users.name).document(myUid).collection("myFriends")
+    override suspend fun removeMyFriend(friendId: String) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!).collection("myFriends")
         collection.document(friendId).delete().addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
 
-    override suspend fun setAliasToMyFriend(alias: String, friendId: String, myUid: String) = suspendCoroutine<Boolean> { continuation ->
-        val collection = fireStore.collection(FireStoreNames.users.name).document(myUid).collection("myFriends")
+    override suspend fun setAliasToMyFriend(alias: String, friendId: String) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!).collection("myFriends")
         collection.document(friendId).update("alias", alias).addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
@@ -101,21 +93,5 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
                 //snapShotListener.onEvent(snapShot, error)
             }
 
-
-    private fun convertToUserDTOSet(documents: List<DocumentSnapshot>): MutableSet<UserDTO> {
-        val list = documents.toMutableList()
-        val dtoSet = mutableSetOf<UserDTO>()
-        var dto: UserDTO? = null
-        val myId = auth.currentUser?.uid
-
-        for (v in list) {
-            if (myId != v.id) {
-                dto = v.toObject<UserDTO>()!!
-                dto.id = v.id
-                dtoSet.add(dto)
-            }
-        }
-        return dtoSet
-    }
 
 }

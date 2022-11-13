@@ -3,20 +3,20 @@ package com.example.wapapp2.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.UserDTO
-import com.example.wapapp2.repository.FriendsRepositoryImpl
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.wapapp2.repository.UserRepositoryImpl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 
 class UserViewModel : ViewModel() {
-    private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
+    private val userRepositoryImpl: UserRepositoryImpl = UserRepositoryImpl.getINSTANCE()!!
     val myFriendsIdSet = mutableSetOf<String>()
     val searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
+    val user = MutableLiveData<UserDTO?>()
 
     fun findUsers(email: String) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
-                friendsRepositoryImpl.findUsers(email)
+                userRepositoryImpl.findUsers(email)
             }
             val dtoSet = result.await()
             for (v in dtoSet) {
@@ -26,6 +26,18 @@ class UserViewModel : ViewModel() {
             }
             withContext(Dispatchers.Main) {
                 searchUsersResult.value = dtoSet.toMutableList()
+            }
+        }
+    }
+
+    fun getUser(userId: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                userRepositoryImpl.getUser(userId)
+            }
+            result.await()
+            withContext(Main) {
+                user.value = result.await()
             }
         }
     }

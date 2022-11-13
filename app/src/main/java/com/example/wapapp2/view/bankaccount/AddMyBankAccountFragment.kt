@@ -32,7 +32,7 @@ class AddMyBankAccountFragment : Fragment() {
     }
 
     companion object {
-        val TAG = "AddMyBankAccountFragment"
+        const val TAG = "AddMyBankAccountFragment"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

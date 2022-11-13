@@ -77,6 +77,7 @@ class LoginFragment : Fragment() {
             AppCheckRepository.initialize()
             FriendsRepositoryImpl.initialize()
             ChatRepositorylmpl.initialize()
+            UserRepositoryImpl.initialize()
             MyBankAccountRepositoryImpl.initialize()
 
             parentFragmentManager
