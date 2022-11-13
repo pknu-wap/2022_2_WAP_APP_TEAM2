@@ -36,6 +36,19 @@ class MyBankAccountRepositoryImpl private constructor() : MyBankAccountRepositor
         }
     }
 
+    override suspend fun modifyMyBankAccount(documentId: String,
+                                             map: MutableMap<String, Any?>) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name)
+                .document(auth.currentUser?.uid!!)
+                .collection(FireStoreNames.bankAccounts.name)
+
+        collection.document(documentId)
+                .update(map)
+                .addOnCompleteListener {
+                    continuation.resume(it.isSuccessful)
+                }
+    }
+
     override suspend fun getMyBankAccounts() = suspendCoroutine<MutableList<BankAccountDTO>> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
                 .document(auth.currentUser?.uid!!)

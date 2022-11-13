@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 
 class MyprofileFragment : Fragment() {
-    private val myBankAccountsViewModel: MyBankAccountsViewModel by viewModels()
+    private val myBankAccountsViewModel: MyBankAccountsViewModel by viewModels({ requireActivity() })
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
     private var _binding: FragmentMyprofileBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +40,7 @@ class MyprofileFragment : Fragment() {
                     .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.remove) { dialog, index ->
-                        myBankAccountsViewModel.removeMyBankAccount(bankAccountDTO.id)
+                        myBankAccountsViewModel.removeMyBankAccount(bankAccountDTO)
                         Toast.makeText(context, R.string.removed_bank_account, Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }.create()
@@ -56,8 +56,8 @@ class MyprofileFragment : Fragment() {
             parentFragmentManager
                     .beginTransaction()
                     .hide(this@MyprofileFragment)
-                    .add(R.id.fragment_container_view, fragment, MyprofileFragment.TAG)
-                    .addToBackStack(MyprofileFragment.TAG)
+                    .add(R.id.fragment_container_view, fragment, EditMyBankAccountFragment.TAG)
+                    .addToBackStack(EditMyBankAccountFragment.TAG)
                     .commit()
         }
     }
@@ -65,9 +65,7 @@ class MyprofileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myBankAccountsViewModel.defaultBankAccountHolder = myAccountViewModel.myName
-
         adapter = MyBankAccountsAdapter(myBankAccountsViewModel.getMyBankAccountsOptions(), onClickedPopupMenuListener)
-        adapter.startListening()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -82,6 +80,7 @@ class MyprofileFragment : Fragment() {
         }
 
         binding.bankList.adapter = adapter
+        adapter.startListening()
 
         binding.btnEdit.setOnClickListener {
             val dialog = DialogEditDetailFragment()

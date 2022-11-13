@@ -8,13 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
-import com.example.wapapp2.databinding.BankItemViewBinding
 import com.example.wapapp2.databinding.FinalConfirmationMyBankAccountLayoutBinding
-import com.example.wapapp2.databinding.FragmentAddMyBankAccountBinding
 import com.example.wapapp2.databinding.FragmentEditMyBankAccountBinding
+import com.example.wapapp2.main.MyApplication
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.model.BankDTO
 import com.example.wapapp2.view.bankaccount.adapter.BankListAdapter
@@ -22,13 +20,17 @@ import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class EditMyBankAccountFragment : Fragment() {
-    private val viewModel: MyBankAccountsViewModel by viewModels({ requireParentFragment() })
+    private val viewModel: MyBankAccountsViewModel by viewModels({ requireActivity() })
     private lateinit var binding: FragmentEditMyBankAccountBinding
     private lateinit var adapter: BankListAdapter
     private lateinit var originalBankAccountDTO: BankAccountDTO
     private val bankOnClickedListener = ListOnClickListener<BankDTO> { item, position ->
         // bankDTO, position을 받음
-        viewModel.selectedBank = item
+        viewModel.currentSelectedBank = item
+    }
+
+    companion object {
+        val TAG = "EditMyBankAccountFragment"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +38,8 @@ class EditMyBankAccountFragment : Fragment() {
         val bundle = arguments ?: savedInstanceState
 
         originalBankAccountDTO = bundle!!.getParcelable("bankAccountDTO")!!
-        adapter = BankListAdapter(viewModel.bankList, bankOnClickedListener, originalBankAccountDTO.bankDTO!!.uid)
+        adapter =
+                BankListAdapter(MyApplication.BANK_MAPS.values.toMutableList(), bankOnClickedListener, originalBankAccountDTO.bankDTO!!.uid)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -59,32 +62,29 @@ class EditMyBankAccountFragment : Fragment() {
 
         binding.editBtn.setOnClickListener {
             // 은행 선택 여부, 계좌번호 입력 여부, 예금주 입력 여부 확인 후 진행
-            if (viewModel.selectedBank != null && !binding.editAccountLayout.accountNumberInputEdit.text.isNullOrEmpty()
+            if (viewModel.currentSelectedBank != null && !binding.editAccountLayout.accountNumberInputEdit.text.isNullOrEmpty()
                     && !binding.editAccountLayout.accountHolderInputEdit.text.isNullOrEmpty()) {
-                val bankAccountDTO =
-                        BankAccountDTO(originalBankAccountDTO.id, viewModel.selectedBank!!, binding.editAccountLayout
+                val modifiedBankAccountDTO =
+                        BankAccountDTO(originalBankAccountDTO.id, viewModel.currentSelectedBank!!, binding.editAccountLayout
                                 .accountNumberInputEdit.text!!.toString(),
-                                binding.editAccountLayout.accountHolderInputEdit.text!!.toString(), viewModel.selectedBank!!.uid)
+                                binding.editAccountLayout.accountHolderInputEdit.text!!.toString(), viewModel.currentSelectedBank!!.uid)
 
                 //다이얼로그 띄워서 최종 확인 진행
                 val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
-                dialogViewBinding.bankAccountHolder.text = bankAccountDTO.accountHolder
-                dialogViewBinding.bankAccountNumber.text = bankAccountDTO.accountNumber
-                dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO!!.bankName
-                dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
+                dialogViewBinding.bankAccountHolder.text = modifiedBankAccountDTO.accountHolder
+                dialogViewBinding.bankAccountNumber.text = modifiedBankAccountDTO.accountNumber
+                dialogViewBinding.selectedBank.text = modifiedBankAccountDTO.bankDTO!!.bankName
+                dialogViewBinding.icon.setImageResource(modifiedBankAccountDTO.bankDTO!!.iconId)
 
-                val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
+                MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
                         .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.edit) { dialog, index ->
-                            viewModel.modifyMyBankAccount(bankAccountDTO)
+                            viewModel.modifyMyBankAccount(modifiedBankAccountDTO, originalBankAccountDTO)
                             Toast.makeText(context, R.string.edied_my_bank_account, Toast.LENGTH_SHORT).show()
                             dialog.dismiss()
-
                             requireActivity().onBackPressedDispatcher.onBackPressed()
-                        }.create()
-
-                dialog.show()
+                        }.create().show()
             } else {
                 Toast.makeText(context, R.string.please_recheck_the_input_values, Toast.LENGTH_SHORT).show()
             }

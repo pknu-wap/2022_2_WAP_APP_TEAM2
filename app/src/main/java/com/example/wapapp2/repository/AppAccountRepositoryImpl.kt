@@ -9,6 +9,5 @@ import java.util.prefs.Preferences
 
 class AppAccountRepositoryImpl : AppAccountRepository {
     override fun saveCurrentUser(userDTO: UserDTO) {
-        TODO("Not yet implemented")
     }
 }

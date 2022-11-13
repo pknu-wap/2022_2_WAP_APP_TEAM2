@@ -68,6 +68,8 @@ class FriendsFragment : Fragment() {
         }
 
         binding.myFriendsList.adapter = myFriendsAdapter
+        myFriendsAdapter.startListening()
+
         return binding.root
     }
 
@@ -77,13 +79,15 @@ class FriendsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        myFriendsAdapter.startListening()
     }
 
     override fun onStop() {
         super.onStop()
-        myFriendsAdapter.stopListening()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        myFriendsAdapter.stopListening()
+    }
 
 }

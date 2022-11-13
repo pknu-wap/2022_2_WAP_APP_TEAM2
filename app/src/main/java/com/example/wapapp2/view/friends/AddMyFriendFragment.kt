@@ -17,6 +17,7 @@ import com.example.wapapp2.databinding.FragmentAddMyFriendBinding
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.view.friends.adapter.SearchUserListAdapter
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
@@ -25,6 +26,7 @@ class AddMyFriendFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val userViewModel by viewModels<UserViewModel>()
 
     private val listOnClickListener = ListOnClickListener<UserDTO> { item, pos ->
         MaterialAlertDialogBuilder(requireContext())
@@ -32,9 +34,8 @@ class AddMyFriendFragment : Fragment() {
                 .setMessage("${item.name} 추가하시겠습니까?")
                 .setPositiveButton(R.string.add) { dialog, which ->
                     dialog.dismiss()
-                    LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_my_friend))
                     friendsViewModel.addToMyFriend(item)
-                    //추가로직
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 }.setNeutralButton(R.string.cancel) { dialog, which ->
                     dialog.dismiss()
                 }.create().show()
@@ -47,6 +48,7 @@ class AddMyFriendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userViewModel.myFriendsIdSet.addAll(friendsViewModel.myFriendsIdSet.toMutableSet())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +60,9 @@ class AddMyFriendFragment : Fragment() {
         binding.loadingView.setContentView(binding.searchUserList)
         binding.loadingView.onSuccessful()
 
+        binding.topAppBar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
         return binding.root
     }
 
@@ -68,7 +73,7 @@ class AddMyFriendFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        friendsViewModel.searchUsersResult.observe(viewLifecycleOwner) {
+        userViewModel.searchUsersResult.observe(viewLifecycleOwner) {
             adapter.users = it
 
             if (it.isEmpty())
@@ -77,16 +82,12 @@ class AddMyFriendFragment : Fragment() {
                 binding.loadingView.onSuccessful()
         }
 
-        friendsViewModel.addMyFriendResult.observe(viewLifecycleOwner) {
-            LoadingDialogView.clearDialogs()
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
                     binding.loadingView.onStarted()
-                    friendsViewModel.findUsers(query)
+                    userViewModel.findUsers(query)
                 } else
                     Toast.makeText(context, R.string.empty_search_query, Toast.LENGTH_SHORT).show()
 

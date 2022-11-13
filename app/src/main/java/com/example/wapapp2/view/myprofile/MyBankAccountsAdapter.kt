@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.myprofile
 
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,8 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.BankAccountListItemBinding
 import com.example.wapapp2.model.BankAccountDTO
+import com.firebase.ui.common.ChangeEventType
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestoreException
 
 class MyBankAccountsAdapter(options: FirestoreRecyclerOptions<BankAccountDTO>,
                             private val onClickedPopupMenuListener: MyprofileFragment.OnClickedPopupMenuListener) :
@@ -60,5 +64,13 @@ class MyBankAccountsAdapter(options: FirestoreRecyclerOptions<BankAccountDTO>,
         super.onDataChanged()
     }
 
+    override fun onError(e: FirebaseFirestoreException) {
+        super.onError(e)
+    }
+
+    override fun onChildChanged(type: ChangeEventType, snapshot: DocumentSnapshot, newIndex: Int, oldIndex: Int) {
+        super.onChildChanged(type, snapshot, newIndex, oldIndex)
+        Log.e("내 계좌 목록 어댑터", "${type.name} ${snapshot.metadata.isFromCache}")
+    }
 
 }
