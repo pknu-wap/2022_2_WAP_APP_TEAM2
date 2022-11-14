@@ -11,11 +11,13 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DelayTextWatcher
+import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentAddMyFriendBinding
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.view.friends.adapter.SearchUserListAdapter
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
@@ -24,6 +26,7 @@ class AddMyFriendFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val userViewModel by viewModels<UserViewModel>()
 
     private val listOnClickListener = ListOnClickListener<UserDTO> { item, pos ->
         MaterialAlertDialogBuilder(requireContext())
@@ -32,15 +35,20 @@ class AddMyFriendFragment : Fragment() {
                 .setPositiveButton(R.string.add) { dialog, which ->
                     dialog.dismiss()
                     friendsViewModel.addToMyFriend(item)
-                    //추가로직
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
                 }.setNeutralButton(R.string.cancel) { dialog, which ->
                     dialog.dismiss()
                 }.create().show()
     }
     private val adapter = SearchUserListAdapter(listOnClickListener)
 
+    companion object {
+        val TAG = "AddMyFriend"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userViewModel.myFriendsIdSet.addAll(friendsViewModel.myFriendsIdSet.toMutableSet())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -51,39 +59,45 @@ class AddMyFriendFragment : Fragment() {
 
         binding.loadingView.setContentView(binding.searchUserList)
         binding.loadingView.onSuccessful()
+
+        binding.topAppBar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
         return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        friendsViewModel.searchUsersResult.observe(viewLifecycleOwner) {
+        userViewModel.searchUsersResult.observe(viewLifecycleOwner) {
             adapter.users = it
+
             if (it.isEmpty())
                 binding.loadingView.onFailed(getString(R.string.no_search_results_found))
             else
                 binding.loadingView.onSuccessful()
         }
 
-        friendsViewModel.addMyFriendResult.observe(viewLifecycleOwner) {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
-        }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
                     binding.loadingView.onStarted()
-                    friendsViewModel.findUsers(query)
+                    userViewModel.findUsers(query)
                 } else
                     Toast.makeText(context, R.string.empty_search_query, Toast.LENGTH_SHORT).show()
+
                 return true
             }
 
             override fun onQueryTextChange(newText: String?) = true
         })
+
     }
+
+
 }

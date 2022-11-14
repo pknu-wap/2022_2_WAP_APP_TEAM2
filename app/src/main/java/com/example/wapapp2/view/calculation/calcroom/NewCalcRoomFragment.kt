@@ -20,10 +20,16 @@ import com.example.wapapp2.viewmodel.FriendsViewModel
 class NewCalcRoomFragment : Fragment() {
     private lateinit var binding: FragmentNewCalcRoomBinding
 
+    companion object {
+        const val TAG = "NewCalcRoomFragment"
+    }
+
     private val calcRoomViewModel: FriendsViewModel by viewModels()
 
-    private val onCheckedFriendListener: OnCheckedFriendListener = OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
-    private val onRemovedFriendListener: OnRemovedFriendListener = OnRemovedFriendListener { friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, false) }
+    private val onCheckedFriendListener: OnCheckedFriendListener =
+            OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
+    private val onRemovedFriendListener: OnRemovedFriendListener =
+            OnRemovedFriendListener { friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
