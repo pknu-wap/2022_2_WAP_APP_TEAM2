@@ -79,6 +79,7 @@ class LoginFragment : Fragment() {
             ChatRepositorylmpl.initialize()
             UserRepositoryImpl.initialize()
             MyBankAccountRepositoryImpl.initialize()
+            MyCalcRoomRepositoryImpl.initialize()
 
             parentFragmentManager
                     .beginTransaction()
