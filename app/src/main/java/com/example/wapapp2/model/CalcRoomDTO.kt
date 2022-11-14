@@ -1,18 +1,21 @@
 package com.example.wapapp2.model
 
+import android.os.Parcelable
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
+import kotlinx.parcelize.Parcelize
 import java.util.*
 import kotlin.collections.ArrayList
 
+@Parcelize
 data class CalcRoomDTO(
         @ServerTimestamp
         @PropertyName("createdTime")
-        var createdTime: Date? = null,
+        var createdTime: Date?,
         @ServerTimestamp
         @PropertyName("lastModifiedTime")
-        var lastModifiedTime: Date? = null,
+        var lastModifiedTime: Date?,
         @PropertyName("creatorUserId")
         var creatorUserId: String,
         @PropertyName("endReceiptIds")
@@ -25,13 +28,17 @@ data class CalcRoomDTO(
         var recentMsg: RecentMsg,
         @PropertyName("name")
         var name: String,
-
-        @Exclude
+        @get:Exclude
         val people: ArrayList<CalcRoomMemberData>
-) {
-    @Exclude
+) : Parcelable {
+    constructor() : this(null, null, "", arrayListOf(), arrayListOf(), arrayListOf(), RecentMsg(msg = "", msgId = "", sendedTime = null,
+            senderId = ""), "", arrayListOf())
+
+    @get:Exclude
     var id: String? = "LvJY5fz6TjlTDaHHX53l"
 
+
+    @Parcelize
     data class RecentMsg(
             @PropertyName("msg")
             var msg: String,
@@ -41,5 +48,9 @@ data class CalcRoomDTO(
             var sendedTime: Date? = null,
             @PropertyName("senderId")
             var senderId: String
-    )
+    ) : Parcelable {
+        constructor() : this("", "", null, "")
+    }
+
+
 }

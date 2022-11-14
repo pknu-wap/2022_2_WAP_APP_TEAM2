@@ -39,6 +39,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
+    companion object {
+        const val TAG = "CalcMainFragment"
+    }
+
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
