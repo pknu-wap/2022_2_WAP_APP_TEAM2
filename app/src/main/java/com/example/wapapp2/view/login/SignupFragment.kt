@@ -9,10 +9,7 @@ import androidx.fragment.app.Fragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentSignupBinding
 import com.example.wapapp2.model.UserDTO
-import com.example.wapapp2.model.UserInfoDTO
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 
 class SignupFragment : Fragment() {
@@ -26,7 +23,6 @@ class SignupFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
     }
 
@@ -53,6 +49,8 @@ class SignupFragment : Fragment() {
         fun UpdateProfile() {
             db = FirebaseFirestore.getInstance()
             var gender = "man"
+            var uid = "uid"
+
             viewBinding.radioGroupGender.setOnCheckedChangeListener { radioGroup, checkedID ->
                 when(checkedID){
                     viewBinding.genderMan.id -> gender = "man"
@@ -60,9 +58,9 @@ class SignupFragment : Fragment() {
                 }
             }
 
-            var userInfoDTO = UserInfoDTO( viewBinding.userId.text.toString(), viewBinding.userName.text.toString(), gender, viewBinding.userProfile.drawable.toString())
+            var userDTO = UserDTO("",viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString())
 
-            db!!.collection("users").document()?.set(userInfoDTO)
+            db!!.collection("users").document()?.set(userDTO)
         }
 
         fun createEmail() {
