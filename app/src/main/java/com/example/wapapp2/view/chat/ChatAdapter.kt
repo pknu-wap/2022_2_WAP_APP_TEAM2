@@ -14,8 +14,9 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 
-class ChatAdapter(val myId: String, option: FirestoreRecyclerOptions<ChatDTO>) :
-        FirestoreRecyclerAdapter<ChatDTO, RecyclerView.ViewHolder>(option) {
+
+class ChatAdapter(val myId: String, option : FirestoreRecyclerOptions<ChatDTO>, val scrollListener: ScrollListener) : FirestoreRecyclerAdapter<ChatDTO, RecyclerView.ViewHolder>(option){
+
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
@@ -74,6 +75,7 @@ class ChatAdapter(val myId: String, option: FirestoreRecyclerOptions<ChatDTO>) :
 
     override fun onDataChanged() {
         super.onDataChanged()
+        scrollListener.ScrollToBottom()
     }
 
 }

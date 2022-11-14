@@ -65,6 +65,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 

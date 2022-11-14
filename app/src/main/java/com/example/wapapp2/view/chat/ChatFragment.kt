@@ -19,7 +19,9 @@ import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import java.util.*
 
-class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
+
+class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment(), ScrollListener {
+
     private lateinit var binding: FragmentChatBinding
 
     private lateinit var chatAdapter_: ChatAdapter
@@ -37,7 +39,7 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-        chatAdapter_ = ChatAdapter(myAccountViewModel.myAccountId, chatViewModel.getOptions(calcRoomDTO))
+        chatAdapter_ = ChatAdapter(myAccountViewModel.myAccountId, chatViewModel.getOptions(calcRoomDTO),this@ChatFragment::ScrollToBottom)
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
@@ -48,9 +50,6 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
         binding.chatList.apply {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
             this.adapter = chatAdapter_
-            //scroll for last message
-            //this.smoothScrollToPosition(chatAdapter_.itemCount -1)
-
         }
         setInputListener()
 
@@ -74,10 +73,12 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-                val newChat =
-                        ChatDTO(myAccountViewModel.myName, myAccountViewModel.myAccountId, Date(), binding.textInputLayout.editText!!.text.toString(), myAccountViewModel.myAccountId)
+
+                val newChat = ChatDTO(myAccountViewModel.myName  ,Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
+
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)
+                binding.chatList.smoothScrollToPosition(chatAdapter_.snapshots.size)
                 // 전송
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
@@ -94,6 +95,10 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment() {
     override fun onStop() {
         chatAdapter_.stopListening()
         super.onStop()
+    }
+
+    override fun ScrollToBottom() {
+        binding.chatList.smoothScrollToPosition(chatAdapter_.snapshots.size)
     }
 
 }

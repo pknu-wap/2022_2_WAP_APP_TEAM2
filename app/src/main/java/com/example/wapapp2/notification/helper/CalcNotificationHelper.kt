@@ -1,9 +1,12 @@
 package com.example.wapapp2.notification.helper
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.wapapp2.R
+import com.example.wapapp2.main.MainActivity
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.notifications.NotificationObj

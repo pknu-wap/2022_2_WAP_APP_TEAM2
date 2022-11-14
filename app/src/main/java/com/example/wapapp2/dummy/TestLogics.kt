@@ -21,7 +21,7 @@ class TestLogics private constructor() {
 
         fun notifyChatNotification(context: Context) {
             val helper = ChatNotificationHelper.getINSTANCE(context)
-            helper.notifyNotification(context, "정산1", ChatDTO("남진화", "0", Date(), "반갑습니다!", ""))
+            helper.notifyNotification(context, "정산1", ChatDTO("남진화", Date(), "반갑습니다!", "0"))
         }
 
         fun notifyReceiptNotification(context: Context) {
