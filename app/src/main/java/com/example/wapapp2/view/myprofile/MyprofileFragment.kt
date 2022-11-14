@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
@@ -18,14 +19,14 @@ import com.google.firebase.auth.FirebaseAuth
 
 
 class MyprofileFragment : Fragment() {
-    private val myBankAccountsViewModel: MyBankAccountsViewModel by viewModels({ requireActivity() })
-    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
+    private val myBankAccountsViewModel by activityViewModels<MyBankAccountsViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private var _binding: FragmentMyprofileBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MyBankAccountsAdapter
 
     companion object {
-        val TAG = "MyProfile"
+        const val TAG = "MyProfile"
     }
 
     private val onClickedPopupMenuListener = object : OnClickedPopupMenuListener {
@@ -36,16 +37,14 @@ class MyprofileFragment : Fragment() {
             dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO!!.bankName
             dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
 
-            val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
+            MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
                     .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.remove) { dialog, index ->
                         myBankAccountsViewModel.removeMyBankAccount(bankAccountDTO)
                         Toast.makeText(context, R.string.removed_bank_account, Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
-                    }.create()
-
-            dialog.show()
+                    }.create().show()
         }
 
         override fun onClickedEdit(bankAccountDTO: BankAccountDTO, position: Int) {
@@ -64,7 +63,7 @@ class MyprofileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myBankAccountsViewModel.defaultBankAccountHolder = myAccountViewModel.myName
+        myBankAccountsViewModel.defaultBankAccountHolder = myAccountViewModel.myProfileData.value!!.name
         adapter = MyBankAccountsAdapter(myBankAccountsViewModel.getMyBankAccountsOptions(), onClickedPopupMenuListener)
     }
 
@@ -84,12 +83,11 @@ class MyprofileFragment : Fragment() {
 
         binding.btnEdit.setOnClickListener {
             val dialog = DialogEditDetailFragment()
-            dialog.show(parentFragmentManager, "CustomDialog")
+            dialog.show(parentFragmentManager, DialogEditDetailFragment.TAG)
         }
 
         binding.btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-
             val loginFragment = LoginFragment()
 
             parentFragmentManager
@@ -111,16 +109,13 @@ class MyprofileFragment : Fragment() {
                     .add(R.id.fragment_container_view, addFragment, AddMyBankAccountFragment.TAG)
                     .addToBackStack(AddMyBankAccountFragment.TAG).commit()
         }
+
+        myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
+            binding.myProfileName.text = it.name
+            binding.myAccountId.text = it.email
+        }
     }
 
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -27,16 +27,15 @@ import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.chat.ChatFragment
 
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
-import com.example.wapapp2.viewmodel.CalcRoomViewModel
-import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.ReceiptViewModel
+import com.example.wapapp2.viewmodel.*
 
 import java.text.DecimalFormat
 
 
 class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
         ParticipantsInCalcRoomFragment.OnNavDrawerListener {
-    private lateinit var binding: FragmentCalcMainBinding
+    private var _binding: FragmentCalcMainBinding? = null
+    private val binding get() = _binding!!
     private lateinit var bundle: Bundle
 
     companion object {
@@ -45,6 +44,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
+    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
 
     /** summary of FixedPay **/
     private var paymoney = 0
@@ -72,7 +73,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentCalcMainBinding.inflate(inflater)
+        _binding = FragmentCalcMainBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -109,6 +110,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     private fun updateFixedPay() {
         if (paymoney >= 0) {

@@ -33,8 +33,7 @@ class SignupFragment : Fragment() {
     ): View? {
         _viewBinding = FragmentSignupBinding.inflate(inflater, container, false)
 
-        var auth = FirebaseAuth.getInstance()
-        auth = FirebaseAuth.getInstance()
+        val auth = FirebaseAuth.getInstance()
 
         fun moveLoginPage() {
             val loginFragment = LoginFragment()
@@ -48,17 +47,17 @@ class SignupFragment : Fragment() {
 
         fun UpdateProfile() {
             db = FirebaseFirestore.getInstance()
-            var gender = "man"
-            var uid = "uid"
+            var gender: String = "man"
+            var uid: String = "uid"
 
             viewBinding.radioGroupGender.setOnCheckedChangeListener { radioGroup, checkedID ->
-                when(checkedID){
+                when (checkedID) {
                     viewBinding.genderMan.id -> gender = "man"
                     viewBinding.genderGirl.id -> gender = "girl"
                 }
             }
 
-            var userDTO = UserDTO("",viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString())
+            var userDTO = UserDTO("", viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString(), arrayListOf())
 
             db!!.collection("users").document()?.set(userDTO)
         }

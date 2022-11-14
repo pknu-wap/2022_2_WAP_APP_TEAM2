@@ -24,7 +24,7 @@
         >
 
         <ImageView
-            android:id="@+id/iv_profile"
+            android:id="@+id/my_profile_img"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginStart="8dp"
@@ -37,27 +37,27 @@
             />
 
         <TextView
-            android:id="@+id/user_name1"
+            android:id="@+id/my_profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="name"
             android:textColor="@color/black"
             android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_profile"
-            app:layout_constraintStart_toEndOf="@+id/iv_profile"
-            app:layout_constraintTop_toTopOf="@+id/iv_profile"
+            app:layout_constraintBottom_toBottomOf="@+id/my_profile_img"
+            app:layout_constraintStart_toEndOf="@+id/my_profile_img"
+            app:layout_constraintTop_toTopOf="@+id/my_profile_img"
             />
 
         <TextView
-            android:id="@+id/user_id1"
+            android:id="@+id/my_account_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="ksu8063@naver.com"
-            app:layout_constraintBottom_toBottomOf="@+id/user_name1"
-            app:layout_constraintStart_toEndOf="@+id/user_name1"
-            app:layout_constraintTop_toTopOf="@+id/user_name1"
+            app:layout_constraintBottom_toBottomOf="@+id/my_profile_name"
+            app:layout_constraintStart_toEndOf="@+id/my_profile_name"
+            app:layout_constraintTop_toTopOf="@+id/my_profile_name"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

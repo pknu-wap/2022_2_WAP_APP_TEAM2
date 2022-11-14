@@ -12,6 +12,7 @@ import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentParticipantsInCalcRoomBinding
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.UserDTO
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.ParticipantsInCalcRoomAdapter
 import com.example.wapapp2.view.friends.InviteFriendsFragment
 import com.example.wapapp2.viewmodel.CalcRoomViewModel
@@ -66,12 +67,10 @@ class ParticipantsInCalcRoomFragment : Fragment() {
 
                 putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
             }
-            val tag = "inviteFriends"
             val fragmentManager = requireParentFragment().parentFragmentManager
 
-            fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("CalcMain")!!).add(R.id.fragment_container_view,
-                    inviteFriendsFragment, tag)
-                    .addToBackStack(tag).commit()
+            fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!).add(R.id
+                    .fragment_container_view, inviteFriendsFragment, InviteFriendsFragment.TAG).addToBackStack(InviteFriendsFragment.TAG).commit()
         }
     }
 
@@ -80,7 +79,7 @@ class ParticipantsInCalcRoomFragment : Fragment() {
         _binding = null
     }
 
-    interface OnNavDrawerListener {
+    fun interface OnNavDrawerListener {
         fun closeDrawer()
     }
 }

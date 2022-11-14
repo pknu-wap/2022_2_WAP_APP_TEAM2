@@ -20,7 +20,7 @@ import com.example.wapapp2.viewmodel.MyAccountViewModel
 import java.util.*
 
 
-class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment(), ScrollListener {
+class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
     private lateinit var binding: FragmentChatBinding
 
@@ -39,7 +39,8 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment(), ScrollListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-        chatAdapter_ = ChatAdapter(myAccountViewModel.myAccountId, chatViewModel.getOptions(calcRoomDTO),this@ChatFragment::ScrollToBottom)
+        chatAdapter_ = ChatAdapter(myAccountViewModel.myProfileData.value!!.id, chatViewModel.getOptions(calcRoomDTO),
+                this@ChatFragment::ScrollToBottom)
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
@@ -74,7 +75,8 @@ class ChatFragment(val calcRoomDTO : CalcRoomDTO) : Fragment(), ScrollListener {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
 
-                val newChat = ChatDTO(myAccountViewModel.myName  ,Date(),binding.textInputLayout.editText!!.text.toString(),myAccountViewModel.myAccountId)
+                val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
+                        .toString(), myAccountViewModel.myProfileData.value!!.id)
 
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)

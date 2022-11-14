@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
@@ -17,12 +18,14 @@ import com.example.wapapp2.view.login.Profiles
 import com.example.wapapp2.view.myprofile.MyprofileFragment
 import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 
 class FriendsFragment : Fragment() {
 
     private var _binding: FragmentFriendsBinding? = null
     private val binding get() = _binding!!
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     companion object {
         const val TAG = "FriendsFragment"
@@ -45,23 +48,6 @@ class FriendsFragment : Fragment() {
         binding.loadingView.setContentView(binding.myFriendsList)
         binding.loadingView.onSuccessful()
 
-        val myprofile = Profiles(R.drawable.man, "김성윤", "ksu8063@naver.com")
-
-        binding.rvMyprofile.setOnClickListener {
-            val fragment = MyprofileFragment()
-            val fragmentManager = requireParentFragment().parentFragmentManager
-            fragmentManager
-                    .beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
-                    .add(R.id.fragment_container_view, fragment, MyprofileFragment.TAG)
-                    .addToBackStack(MyprofileFragment.TAG)
-                    .commit()
-        }
-
-        binding.ivProfile.setImageResource(myprofile.gender)
-        binding.userName1.text = myprofile.name
-        binding.userId1.text = myprofile.userid
-
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager
@@ -81,14 +67,7 @@ class FriendsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
+        setMyProfile()
     }
 
     override fun onDestroyView() {
@@ -101,5 +80,22 @@ class FriendsFragment : Fragment() {
         myFriendsAdapter.stopListening()
     }
 
+    private fun setMyProfile() {
+        binding.rvMyprofile.setOnClickListener {
+            val fragment = MyprofileFragment()
+            val fragmentManager = requireParentFragment().parentFragmentManager
+            fragmentManager
+                    .beginTransaction()
+                    .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
+                    .add(R.id.fragment_container_view, fragment, MyprofileFragment.TAG)
+                    .addToBackStack(MyprofileFragment.TAG)
+                    .commit()
+        }
 
+        myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
+            binding.myProfileName.text = it.name
+            binding.myAccountId.text = it.email
+        }
+
+    }
 }

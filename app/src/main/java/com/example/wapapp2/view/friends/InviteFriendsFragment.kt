@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.FragmentInviteFriendsBinding
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
@@ -16,16 +17,24 @@ import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import org.checkerframework.checker.units.qual.s
 import kotlin.collections.HashSet
 
 
 class InviteFriendsFragment : Fragment() {
-    private lateinit var binding: FragmentInviteFriendsBinding
+    private var _binding: FragmentInviteFriendsBinding? = null
+    private val binding get() = _binding!!
+
+    companion object {
+        const val TAG = "InviteFriendsFragment"
+    }
 
     private val friendsViewModel: FriendsViewModel by viewModels()
 
-    private val onCheckedFriendListener: OnCheckedFriendListener = OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
-    private val onRemovedFriendListener: OnRemovedFriendListener = OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
+    private val onCheckedFriendListener: OnCheckedFriendListener =
+            OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
+    private val onRemovedFriendListener: OnRemovedFriendListener =
+            OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
@@ -59,7 +68,7 @@ class InviteFriendsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentInviteFriendsBinding.inflate(inflater)
+        _binding = FragmentInviteFriendsBinding.inflate(inflater)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
@@ -89,20 +98,16 @@ class InviteFriendsFragment : Fragment() {
             searchFriendsListAdapter.setList(it)
         }
 
-        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                s?.apply { friendsViewModel.getFriends(toString()) }
+        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : DelayTextWatcher() {
+            override fun onFinalText(text: String) {
+                friendsViewModel.getFriends(text)
             }
         })
         friendsViewModel.getFriends("")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

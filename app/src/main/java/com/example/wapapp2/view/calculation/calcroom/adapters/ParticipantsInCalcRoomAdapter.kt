@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.ChatFriendsItemBinding
 import com.example.wapapp2.model.UserDTO
-import com.example.wapapp2.view.login.Profiles
 
 class ParticipantsInCalcRoomAdapter(private val listOnClickListener: ListOnClickListener<UserDTO>)
     : RecyclerView.Adapter<ParticipantsInCalcRoomAdapter.ViewHolder>() {
