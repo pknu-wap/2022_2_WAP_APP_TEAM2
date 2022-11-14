@@ -29,6 +29,11 @@ class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
+
+    companion object {
+        const val TAG = "NewReceiptFragment"
+    }
+
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
 

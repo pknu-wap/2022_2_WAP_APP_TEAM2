@@ -7,16 +7,16 @@ import androidx.fragment.app.DialogFragment
 import com.example.wapapp2.databinding.DialogEditMyprofileBinding
 
 
-
 class DialogEditDetailFragment : DialogFragment() {
-    private lateinit var binding: DialogEditMyprofileBinding
+    private var _binding: DialogEditMyprofileBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): android.view.View? {
-        binding = DialogEditMyprofileBinding.inflate(inflater, container, false)
+        _binding = DialogEditMyprofileBinding.inflate(inflater, container, false)
 
         binding.button.setOnClickListener {
             dismiss()
@@ -27,6 +27,7 @@ class DialogEditDetailFragment : DialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        _binding = null
     }
 
 }

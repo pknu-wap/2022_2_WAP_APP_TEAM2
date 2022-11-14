@@ -39,6 +39,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private lateinit var binding: FragmentCalcMainBinding
     private lateinit var bundle: Bundle
 
+    companion object {
+        const val TAG = "CalcMainFragment"
+    }
+
     private val calcRoomViewModel: CalcRoomViewModel by viewModels()
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
 
@@ -186,34 +190,34 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
-        
-        /*
-        }
-        binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
-        binding.addFriend.friendName.text = "친구 초대"
-        binding.friends.adapter = CalcUserAdapter(context, DummyData.getProfiles())
 
-
-        binding.addFriend.root.setOnClickListener {
-            binding.root.closeDrawers()
-            val inviteFriendsFragment = InviteFriendsFragment()
-            inviteFriendsFragment.arguments = Bundle().apply {
-                //현재 정산방 친구 목록 ID set생성
-                val currentFriendsListInRoom = ArrayList<String>()
-                val currentFriendDTOList = calcRoomViewModel.currentFriendsList
-
-                for (dto in currentFriendDTOList) {
-                    currentFriendsListInRoom.add(dto.friendUserId)
-                }
-
-                putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
+            /*
             }
-            val tag = "inviteFriends"
-            val fragmentManager = parentFragmentManager
+            binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
+            binding.addFriend.friendName.text = "친구 초대"
+            binding.friends.adapter = CalcUserAdapter(context, DummyData.getProfiles())
 
-            fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
-                    .addToBackStack(tag).commit()
-*/
+
+            binding.addFriend.root.setOnClickListener {
+                binding.root.closeDrawers()
+                val inviteFriendsFragment = InviteFriendsFragment()
+                inviteFriendsFragment.arguments = Bundle().apply {
+                    //현재 정산방 친구 목록 ID set생성
+                    val currentFriendsListInRoom = ArrayList<String>()
+                    val currentFriendDTOList = calcRoomViewModel.currentFriendsList
+
+                    for (dto in currentFriendDTOList) {
+                        currentFriendsListInRoom.add(dto.friendUserId)
+                    }
+
+                    putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
+                }
+                val tag = "inviteFriends"
+                val fragmentManager = parentFragmentManager
+
+                fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
+                        .addToBackStack(tag).commit()
+    */
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
@@ -238,7 +242,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 .commitAllowingStateLoss()
     }
 
-    override fun updateSummaryUI(summary : Int) {
+    override fun updateSummaryUI(summary: Int) {
         binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
     }
 
