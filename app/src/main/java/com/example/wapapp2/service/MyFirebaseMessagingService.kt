@@ -35,7 +35,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 .collection("users")
                 .document(it.uid)
                 .collection("FCM_TOKEN")
-                .document().set(token)
+                .document().set(mapOf("token" to token))
         }
     }
 
