@@ -12,8 +12,6 @@ import java.util.*
 data class ChatDTO(
         @get:Exclude
         var userName: String,
-        @get:Exclude
-        var userId: String,
         @ServerTimestamp
         @PropertyName("sendedTime")
         var sendedTime: Date? = null,
@@ -22,5 +20,5 @@ data class ChatDTO(
         @PropertyName("senderId")
         var senderId: String
 ) : Parcelable {
-        constructor() : this("", "", null, "", "")
+        constructor() : this( "", null, "", "")
 }

@@ -28,20 +28,10 @@ class DummyData {
 
             // test data
             val testList = ArrayList<ChatDTO>()
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "안녕하세요", ""))
+            testList.add(ChatDTO(peopleList[0].userName,  Date(), "안녕하세요", peopleList[0].userId))
 
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "네!! 안녕하세요!", ""))
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "네!! 안녕하세요.", ""))
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "~~", ""))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "!", ""))
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "@@", ""))
-            testList.add(ChatDTO(peopleList[2].userName, peopleList[2].userId, Date(), "@@", ""))
-            testList.add(ChatDTO(peopleList[1].userName, peopleList[1].userId, Date(), "@@", ""))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "1", ""))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "2", ""))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "3", ""))
-            testList.add(ChatDTO(peopleList[0].userName, peopleList[0].userId, Date(), "4", ""))
-
+            testList.add(ChatDTO(peopleList[1].userName,  Date(), "네!! 안녕하세요!", peopleList[1].userId))
+            testList.add(ChatDTO(peopleList[2].userName,  Date(), "네!! 안녕하세요.", peopleList[2].userId))
 
             return testList
         }
