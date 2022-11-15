@@ -32,7 +32,6 @@ class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDT
 
     override fun onChildChanged(type: ChangeEventType, snapshot: DocumentSnapshot, newIndex: Int, oldIndex: Int) {
         super.onChildChanged(type, snapshot, newIndex, oldIndex)
-        Log.e("내 친구 목록 어댑터", "${type.name} ${snapshot.metadata.isFromCache}")
     }
 
     class CustomViewHolder(private val binding: MyFriendItemViewBinding,
@@ -40,8 +39,8 @@ class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDT
             RecyclerView.ViewHolder(binding.root) {
 
         fun bind(friendDTO: FriendDTO) {
-            binding.userId1.text = friendDTO.email
-            binding.userName1.text = friendDTO.alias
+            binding.myAccountId.text = friendDTO.email
+            binding.myProfileName.text = friendDTO.alias
 
             binding.root.setOnClickListener {
                 onClickListener.onClicked(friendDTO, bindingAdapterPosition)

@@ -81,6 +81,8 @@ class LoginFragment : Fragment() {
             MyBankAccountRepositoryImpl.initialize()
             MyCalcRoomRepositoryImpl.initialize()
 
+            myAccountViewModel.initMyProfile()
+
             parentFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)

@@ -1,13 +1,10 @@
 package com.example.wapapp2.repository
 
-import com.example.wapapp2.databinding.FragmentEditMyBankAccountBinding
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.repository.interfaces.MyCalcRoomRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -37,6 +34,10 @@ class MyCalcRoomRepositoryImpl : MyCalcRoomRepository {
                     continuation.resume(it.isSuccessful)
                 }
     }
+
+    override fun getMyCalcRoomIds(snapshotListener: EventListener<DocumentSnapshot>): ListenerRegistration =
+            firebase.collection(FireStoreNames.users.name).document(auth.currentUser!!.uid)
+                    .addSnapshotListener(snapshotListener)
 
 
 }

@@ -11,7 +11,7 @@
     android:background="#E8E8E8">
 
     <EditText
-        android:id="@+id/edit_name"
+        android:id="@+id/my_profile_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#E8E8E8"
@@ -36,8 +36,8 @@
         android:inputType="number"
         android:textAlignment="viewEnd"
         android:layout_marginRight="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/edit_name"
+        app:layout_constraintBottom_toBottomOf="@+id/my_profile_name"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edit_name" />
+        app:layout_constraintTop_toTopOf="@+id/my_profile_name" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

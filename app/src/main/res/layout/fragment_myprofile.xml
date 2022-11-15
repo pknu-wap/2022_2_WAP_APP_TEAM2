@@ -43,7 +43,7 @@
                 >
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/my_profile_img"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_marginTop="16dp"
@@ -53,7 +53,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/edit_name"
+                    android:id="@+id/my_profile_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -64,10 +64,10 @@
                     android:text="김성윤"
                     android:textAlignment="viewStart"
                     android:textSize="28sp"
-                    app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                    app:layout_constraintBottom_toBottomOf="@+id/my_profile_img"
                     app:layout_constraintEnd_toStartOf="@+id/btn_edit"
-                    app:layout_constraintStart_toEndOf="@+id/imageView"
-                    app:layout_constraintTop_toTopOf="@+id/imageView"
+                    app:layout_constraintStart_toEndOf="@+id/my_profile_img"
+                    app:layout_constraintTop_toTopOf="@+id/my_profile_img"
                     />
 
                 <TextView
@@ -78,11 +78,11 @@
                     android:layout_marginTop="32dp"
                     android:text="우정하자 계정"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView"
+                    app:layout_constraintTop_toBottomOf="@+id/my_profile_img"
                     />
 
                 <TextView
-                    android:id="@+id/edit_password"
+                    android:id="@+id/my_account_id"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
@@ -93,7 +93,7 @@
                     android:text="ksu8063@naver.com"
                     app:layout_constraintBottom_toBottomOf="@+id/textView6"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/edit_name"
+                    app:layout_constraintStart_toStartOf="@+id/my_profile_name"
                     app:layout_constraintTop_toTopOf="@+id/textView6"
                     tools:ignore="TouchTargetSizeCheck"
                     />
@@ -108,7 +108,7 @@
                     android:textSize="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/edit_password"
+                    app:layout_constraintTop_toBottomOf="@id/my_account_id"
                     />
 
                 <ImageButton
@@ -117,9 +117,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:backgroundTint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="@+id/edit_name"
+                    app:layout_constraintBottom_toBottomOf="@+id/my_profile_name"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/edit_name"
+                    app:layout_constraintTop_toTopOf="@+id/my_profile_name"
                     app:srcCompat="@drawable/ic_baseline_settings_24"
                     tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"
                     />

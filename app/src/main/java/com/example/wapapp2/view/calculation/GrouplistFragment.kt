@@ -16,6 +16,7 @@ import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -24,8 +25,9 @@ class GrouplistFragment : Fragment() {
     private var _binding: GroupFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: GroupAdapter
+    private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
+    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -76,15 +78,12 @@ class GrouplistFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
     }
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
-        binding.groupRV.adapter = adapter
-        adapter.startListening()
         return binding.root
     }
 
@@ -102,6 +101,18 @@ class GrouplistFragment : Fragment() {
             }
         })
 
+        myCalcRoomViewModel.myCalcRoomIds.observe(viewLifecycleOwner) {
+            adapter?.stopListening()
+
+            if (adapter == null) {
+                adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
+                binding.groupRV.adapter = adapter
+            } else {
+                adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
+            }
+            adapter!!.startListening()
+        }
+        myCalcRoomViewModel.loadMyCalcRoomIds()
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 
@@ -113,6 +124,6 @@ class GrouplistFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        adapter.stopListening()
+        adapter?.stopListening()
     }
 }
