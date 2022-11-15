@@ -9,8 +9,10 @@ import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptProductDTO
 
-class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
-                         private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) : RecyclerView
+class EditReceiptAdapter(
+        private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
+        private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+) : RecyclerView
 .Adapter<EditReceiptAdapter
 .CustomViewHolder>() {
 
@@ -30,16 +32,13 @@ class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = 
         holder.bind(itemList[position])
     }
 
-    override fun getItemCount(): Int {
-        return itemList.size
-    }
+    override fun getItemCount() = itemList.size
 
-    override fun onViewAttachedToWindow(holder: CustomViewHolder) {
-        super.onViewAttachedToWindow(holder)
-    }
 
-    class CustomViewHolder(private val binding: ProductItemLayoutInNewCalcBinding,
-                           private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) :
+    class CustomViewHolder(
+            private val binding: ProductItemLayoutInNewCalcBinding,
+            private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+    ) :
             RecyclerView.ViewHolder(binding.root) {
         private var nameTextWatcher: DelayTextWatcher? = null
         private var priceTextWatcher: DelayTextWatcher? = null
