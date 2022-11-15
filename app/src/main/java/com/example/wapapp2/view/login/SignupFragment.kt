@@ -57,7 +57,8 @@ class SignupFragment : Fragment() {
                 }
             }
 
-            var userDTO = UserDTO("", viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString(), arrayListOf())
+            var userDTO = UserDTO("", viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString(), arrayListOf(),
+                    arrayListOf(), arrayListOf(), arrayListOf())
 
             db!!.collection("users").document()?.set(userDTO)
         }
