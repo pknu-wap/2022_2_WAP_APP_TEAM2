@@ -7,6 +7,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
+import org.joda.time.DateTime
 
 class NewReceiptViewModel : ViewModel() {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -83,11 +84,11 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "0", false)
+        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("", "", 0, ArrayList<String>())
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 0, arrayListOf(), 0)
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }
@@ -116,7 +117,7 @@ class NewReceiptViewModel : ViewModel() {
     fun calcTotalPrice(receiptId: String): String {
         var price = 0
         for (product in receiptMap[receiptId]!!.getProducts()) {
-            price += product.price
+            price += (product.price * product.count)
         }
 
         receiptMap[receiptId]!!.totalMoney = price
@@ -132,13 +133,5 @@ class NewReceiptViewModel : ViewModel() {
         return price.toString()
     }
 
-    fun checkTotalMoneyWithProductsPrice(receiptId: String, totalPrice: Int): Boolean {
-        var price = 0
-        for (product in receiptMap[receiptId]!!.getProducts()) {
-            price += product.price
-        }
-
-        return totalPrice == price
-    }
 
 }

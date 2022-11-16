@@ -13,12 +13,8 @@ class ModifyReceiptViewModel : ViewModel() {
     private val receiptRepositoryImpl = ReceiptRepositoryImpl.INSTANCE
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
 
-    private val _updateReceipt = MutableLiveData<Boolean>()
-    val updateReceipt get() = _updateReceipt
-    private val _modifyReceiptImg = MutableLiveData<Boolean>()
-    val modifyReceiptImg get() = _modifyReceiptImg
-    private val _deleteReceipt = MutableLiveData<Boolean>()
-    val deleteReceipt get() = _deleteReceipt
+    lateinit var receiptDTO: ReceiptDTO
+    var receiptImgChanged = false
 
     fun modifyReceipt(originalReceiptDTO: ReceiptDTO, modifiedReceiptDTO: ReceiptDTO, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -34,10 +30,6 @@ class ModifyReceiptViewModel : ViewModel() {
 
             val result = async { receiptRepositoryImpl.modifyReceipt(map, calcRoomId) }
             result.await()
-
-            withContext(MainScope().coroutineContext) {
-                updateReceipt.value = result.await()
-            }
         }
     }
 
@@ -67,9 +59,6 @@ class ModifyReceiptViewModel : ViewModel() {
             val result = async { receiptRepositoryImpl.modifyProducts(list, calcRoomId) }
             result.await()
 
-            withContext(MainScope().coroutineContext) {
-                updateReceipt.value = result.await()
-            }
         }
     }
 
@@ -80,9 +69,6 @@ class ModifyReceiptViewModel : ViewModel() {
             val uploadResult = async { receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId) }
             uploadResult.await()
 
-            withContext(MainScope().coroutineContext) {
-                modifyReceiptImg.value = true
-            }
         }
     }
 
@@ -93,9 +79,6 @@ class ModifyReceiptViewModel : ViewModel() {
             }
             deleteResult.await()
 
-            withContext(MainScope().coroutineContext) {
-                deleteReceipt.value = deleteResult.await()
-            }
         }
     }
 }

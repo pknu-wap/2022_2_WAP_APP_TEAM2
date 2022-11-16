@@ -20,10 +20,14 @@ class ReceiptsFragment : Fragment() {
     private var _binding: FragmentCheckReceiptBinding? = null
     private val binding get() = _binding!!
 
-    private var calcRoomId: String? = null
-    private val receiptViewModel by viewModels<ReceiptViewModel>({ requireParentFragment() })
+    companion object {
+        const val TAG = "ReceiptsFragment"
+    }
 
-    private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, position ->
+    private var calcRoomId: String? = null
+    private val receiptViewModel by viewModels<ReceiptViewModel>()
+
+    private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, _position ->
         val fragment = EditReceiptFragment()
         fragment.arguments = Bundle().apply {
             putParcelable("receiptDTO", item)
@@ -38,47 +42,6 @@ class ReceiptsFragment : Fragment() {
                 .commit()
     }
     private lateinit var adapter: ReceiptsAdapter
-
-    private val dataObserver = object : RecyclerView.AdapterDataObserver() {
-        val msg = getString(R.string.empty_receipts)
-
-        override fun onChanged() {
-            super.onChanged()
-            onChangedItemCount()
-        }
-
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            super.onItemRangeChanged(positionStart, itemCount)
-            onChangedItemCount()
-        }
-
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-            super.onItemRangeChanged(positionStart, itemCount, payload)
-            onChangedItemCount()
-        }
-
-        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            super.onItemRangeInserted(positionStart, itemCount)
-            onChangedItemCount()
-        }
-
-        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            super.onItemRangeRemoved(positionStart, itemCount)
-            onChangedItemCount()
-        }
-
-        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-            onChangedItemCount()
-        }
-
-        private fun onChangedItemCount() {
-            if (adapter.itemCount > 0)
-                binding.loadingView.onFailed(msg)
-            else
-                binding.loadingView.onSuccessful()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +60,6 @@ class ReceiptsFragment : Fragment() {
         }
 
         adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(calcRoomId!!))
-        adapter.registerAdapterDataObserver(dataObserver)
 
         binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter
@@ -122,7 +84,6 @@ class ReceiptsFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        adapter.unregisterAdapterDataObserver(dataObserver)
         adapter.stopListening()
     }
 

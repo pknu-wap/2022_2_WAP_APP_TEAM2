@@ -175,29 +175,40 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         val itemBinding = ProductItemLayoutInNewCalcBinding.inflate(layoutInflater)
         val productDTO = newReceiptViewModel.addProduct(receiptId!!)
         itemBinding.root.tag = productDTO
-
         val addedPosition = binding.productsList.childCount - 1
 
-        itemBinding.productPriceEditText.addTextChangedListener(object : DelayTextWatcher() {
+        itemBinding.priceEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
                 if (text.isNotEmpty()) {
                     productDTO.price = text.toInt()
                 } else {
-                    itemBinding.productPriceEditText.text = "0".toEditable()
+                    itemBinding.priceEditText.text = "0".toEditable()
                     productDTO.price = 0
                 }
                 calcTotalPrice()
             }
         })
 
-        itemBinding.calculationItemNameEditText.addTextChangedListener(object : DelayTextWatcher() {
+        itemBinding.nameEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
                 if (text.isNotEmpty()) {
                     productDTO.name = text
                 } else {
-                    itemBinding.calculationItemNameEditText.text = "".toEditable()
+                    itemBinding.nameEditText.text = "".toEditable()
                     productDTO.name = ""
                 }
+            }
+        })
+
+        itemBinding.countEditText.addTextChangedListener(object : DelayTextWatcher() {
+            override fun onFinalText(text: String) {
+                if (text.isNotEmpty()) {
+                    productDTO.count = text.toInt()
+                } else {
+                    itemBinding.countEditText.text = "1".toEditable()
+                    productDTO.count = 1
+                }
+                calcTotalPrice()
             }
         })
 
@@ -207,7 +218,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
                 binding.productsList.removeViewAt(position)
                 calcTotalPrice()
             } catch (e: Exception) {
-
+                e.printStackTrace()
             }
         }
 

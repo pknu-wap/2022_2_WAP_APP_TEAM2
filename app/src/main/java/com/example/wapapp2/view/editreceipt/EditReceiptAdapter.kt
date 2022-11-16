@@ -41,19 +41,29 @@ class EditReceiptAdapter(
     ) :
             RecyclerView.ViewHolder(binding.root) {
         private var nameTextWatcher: DelayTextWatcher? = null
+        private var countTextWatcher: DelayTextWatcher? = null
         private var priceTextWatcher: DelayTextWatcher? = null
 
         fun bind(receiptProductDTO: ReceiptProductDTO) {
             nameTextWatcher?.run {
-                binding.calculationItemNameEditText.removeTextChangedListener(this)
+                binding.nameEditText.removeTextChangedListener(this)
+                null
+            }
+            countTextWatcher?.run {
+                binding.countEditText.removeTextChangedListener(this)
                 null
             }
             priceTextWatcher?.run {
-                binding.productPriceEditText.removeTextChangedListener(this)
+                binding.priceEditText.removeTextChangedListener(this)
                 null
             }
 
             nameTextWatcher = object : DelayTextWatcher() {
+                override fun onFinalText(text: String) {
+                    receiptProductDTO.name = text
+                }
+            }
+            countTextWatcher = object : DelayTextWatcher() {
                 override fun onFinalText(text: String) {
                     receiptProductDTO.name = text
                 }
@@ -65,11 +75,13 @@ class EditReceiptAdapter(
                 }
             }
 
-            binding.productPriceEditText.addTextChangedListener(priceTextWatcher)
-            binding.calculationItemNameEditText.addTextChangedListener(nameTextWatcher)
+            binding.priceEditText.addTextChangedListener(priceTextWatcher)
+            binding.countEditText.addTextChangedListener(priceTextWatcher)
+            binding.nameEditText.addTextChangedListener(nameTextWatcher)
 
-            binding.productPriceEditText.text = receiptProductDTO.price.toString().toEditable()
-            binding.calculationItemNameEditText.text = receiptProductDTO.name.toEditable()
+            binding.priceEditText.text = receiptProductDTO.price.toString().toEditable()
+            binding.countEditText.text = receiptProductDTO.count.toString().toEditable()
+            binding.nameEditText.text = receiptProductDTO.name.toEditable()
         }
 
         private fun String.toEditable(): Editable = Editable.Factory().newEditable(this)

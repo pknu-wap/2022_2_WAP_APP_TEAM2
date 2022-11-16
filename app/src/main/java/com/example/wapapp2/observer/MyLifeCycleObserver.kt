@@ -2,8 +2,11 @@ package com.example.wapapp2.observer
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -12,9 +15,20 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.FileProvider
+import androidx.core.content.PackageManagerCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.content.getSystemService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.example.wapapp2.utils.ImageUtils.createImageFile
+import com.example.wapapp2.utils.ImageUtils.currentPhotoPath
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.jar.Pack200
 
 
 class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
@@ -41,15 +55,6 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
         }
     }
 
-    override fun onStop(owner: LifecycleOwner) {
-        super.onStop(owner)
-    }
-
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-    }
-
     fun pickImage(activity: Activity, callback: ActivityResultCallback<Uri>) {
         pickImgCallback = callback
 
@@ -66,7 +71,23 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
         if (!checkCameraPermission(activity)) {
             Toast.makeText(activity, "권한이 필요합니다", Toast.LENGTH_SHORT).show()
         } else {
-            cameraLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                takePictureIntent.resolveActivity(activity.applicationContext.packageManager)?.also {
+                    val photoFile: File? = try {
+                        createImageFile(activity.applicationContext)
+                    } catch (ex: IOException) {
+                        null
+                    }
+                    photoFile?.also {
+                        val photoURI: Uri = FileProvider.getUriForFile(
+                                activity.applicationContext, "com.example.android.fileprovider", it
+                        )
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                        takePictureIntent.putExtra("fileName", it.name)
+                    }
+                }
+            }
+            cameraLauncher.launch(intent)
         }
     }
 
@@ -93,6 +114,19 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
             false
         } else {
             true
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(context: Context): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        ).apply {
+            currentPhotoPath = absolutePath
         }
     }
 }

@@ -34,7 +34,7 @@ class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDT
             binding.receiptAmount.text = receiptDTO.totalMoney.toString().toEditable()
 
             binding.root.setOnClickListener {
-                Toast.makeText(binding.root.context, "금액 : ${receiptDTO.totalMoney}\n타이틀 : ${receiptDTO.name})", Toast
+                Toast.makeText(binding.root.context, "총 금액 : ${receiptDTO.totalMoney}\n영수증 이름 : ${receiptDTO.name})", Toast
                         .LENGTH_SHORT
                 ).show()
 

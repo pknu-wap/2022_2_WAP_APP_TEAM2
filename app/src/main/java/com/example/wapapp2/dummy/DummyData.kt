@@ -28,10 +28,10 @@ class DummyData {
 
             // test data
             val testList = ArrayList<ChatDTO>()
-            testList.add(ChatDTO(peopleList[0].userName,  Date(), "안녕하세요", peopleList[0].userId))
+            testList.add(ChatDTO(peopleList[0].userName, Date(), "안녕하세요", peopleList[0].userId))
 
-            testList.add(ChatDTO(peopleList[1].userName,  Date(), "네!! 안녕하세요!", peopleList[1].userId))
-            testList.add(ChatDTO(peopleList[2].userName,  Date(), "네!! 안녕하세요.", peopleList[2].userId))
+            testList.add(ChatDTO(peopleList[1].userName, Date(), "네!! 안녕하세요!", peopleList[1].userId))
+            testList.add(ChatDTO(peopleList[2].userName, Date(), "네!! 안녕하세요.", peopleList[2].userId))
 
             return testList
         }
@@ -94,22 +94,20 @@ class DummyData {
         fun getReceipts(): ArrayList<ReceiptDTO> {
             val dummyReceipts = ArrayList<ReceiptDTO>()
 
-            val dummyReceipt1 = ReceiptDTO("1", Date(), "", null, "점심계산", "", false)
-            dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 36000, arrayListOf("1")))
-            dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 6000, arrayListOf("1")))
-            val dummyReceipt2 = ReceiptDTO("2", Date(), "", null, "저녁계산", "", false)
-            dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, arrayListOf("1")))
-            dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 25000, arrayListOf("1")))
+            val dummyReceipt1 = ReceiptDTO("1", null, "", null, "점심계산", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+            dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 3600, 0, arrayListOf("1"), 0))
+            dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 3000, 0, arrayListOf("1"), 0))
+            val dummyReceipt2 = ReceiptDTO("2", null, "", null, "저녁계산", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+            dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, 0, arrayListOf("1"), 0))
+            dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 20000, 0, arrayListOf("1"), 0))
 
             dummyReceipts.add(dummyReceipt1); dummyReceipts.add(dummyReceipt2)
             return dummyReceipts
         }
 
-        fun getReceipt(): ReceiptDTO = ReceiptDTO("0", Date(), "", null, "", "0", false)
-
+        fun getReceipt(): ReceiptDTO = ReceiptDTO("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
 
         val testCalcRoomId = "LvJY5fz6TjlTDaHHX53l"
-
     }
 
 }
