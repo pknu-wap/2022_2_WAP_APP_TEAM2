@@ -25,7 +25,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <ImageView
+    <com.ortiz.touchview.TouchImageView
         android:id="@+id/receipt_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -57,5 +57,13 @@
         android:src="@drawable/ic_baseline_remove_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/btn_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="zoom_in_btn, zoom_out_btn"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

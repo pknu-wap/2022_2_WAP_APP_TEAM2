@@ -72,7 +72,7 @@ class ReceiptImgFragment : Fragment() {
         }
 
         if (imgType == ImgType.SERVER) {
-            val storageReference = Firebase.storage.reference.getFile(Uri.parse(imgUrl!!))
+            val storageReference = Firebase.storage.getReferenceFromUrl(imgUrl!!)
             Glide.with(this).load(storageReference).into(binding.receiptImg)
         } else {
             Glide.with(this).load(Uri.parse(imgUrl)).into(binding.receiptImg)

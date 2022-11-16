@@ -1,6 +1,7 @@
 package com.example.wapapp2.view.editreceipt
 
 import android.graphics.Bitmap
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -129,7 +130,7 @@ class EditReceiptFragment : Fragment() {
                             binding.receiptImgBtn.text = getString(R.string.add_img)
                             modifyReceiptViewModel.receiptImgChanged = true
                         }
-                        .setPositiveButton(R.string.receipt_img) { dialog, which ->
+                        .setPositiveButton(R.string.replace_img) { dialog, which ->
                             dialog.dismiss()
                             pickImage()
                         }.create().show()
@@ -155,10 +156,10 @@ class EditReceiptFragment : Fragment() {
 
     private fun pickImage() {
         myLifeCycleObserver?.pickImage(requireActivity()) {
-            modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = it
+           // modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = it
             Glide.with(requireContext()).load(it).into(binding.receiptImage)
             binding.receiptImgBtn.text = getString(R.string.modify_img)
-            modifyReceiptViewModel.receiptImgChanged = true
+           // modifyReceiptViewModel.receiptImgChanged = true
         }
     }
 
