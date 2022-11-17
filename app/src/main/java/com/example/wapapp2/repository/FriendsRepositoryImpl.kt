@@ -87,7 +87,8 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
     }
 
     override fun addMyFriendsSnapshotListener(
-            snapShotListener: NewSnapshotListener<List<FriendDTO>>) = fireStore.collection(FireStoreNames.users
+            snapShotListener: NewSnapshotListener<List<FriendDTO>>,
+    ) = fireStore.collection(FireStoreNames.users
             .name).document(auth.currentUser?.uid!!)
             .collection(FireStoreNames.myFriends.name).addSnapshotListener { snapShot, error ->
                 //snapShotListener.onEvent(snapShot, error)

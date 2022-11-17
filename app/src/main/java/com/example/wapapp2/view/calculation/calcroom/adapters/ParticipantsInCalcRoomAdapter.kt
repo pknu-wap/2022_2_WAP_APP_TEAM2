@@ -1,20 +1,18 @@
 package com.example.wapapp2.view.calculation.calcroom.adapters
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.ChatFriendsItemBinding
-import com.example.wapapp2.model.UserDTO
+import com.example.wapapp2.model.CalcRoomParticipantDTO
 
-class ParticipantsInCalcRoomAdapter(private val listOnClickListener: ListOnClickListener<UserDTO>)
+
+class ParticipantsInCalcRoomAdapter(private val listOnClickListener: ListOnClickListener<CalcRoomParticipantDTO>)
     : RecyclerView.Adapter<ParticipantsInCalcRoomAdapter.ViewHolder>() {
 
-    private val _participants = mutableListOf<UserDTO>()
+    private val _participants = mutableListOf<CalcRoomParticipantDTO>()
     var participants = _participants
         @SuppressLint("NotifyDataSetChanged")
         set(value) {
@@ -23,12 +21,15 @@ class ParticipantsInCalcRoomAdapter(private val listOnClickListener: ListOnClick
             notifyDataSetChanged()
         }
 
-    class ViewHolder(private val binding: ChatFriendsItemBinding, private val listOnClickListener: ListOnClickListener<UserDTO>) :
+    class ViewHolder(
+            private val binding: ChatFriendsItemBinding,
+            private val listOnClickListener: ListOnClickListener<CalcRoomParticipantDTO>,
+    ) :
             RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: UserDTO) {
-            binding.friendName.text = item.name
+        fun bind(item: CalcRoomParticipantDTO) {
+            binding.friendName.text = item.userName
             binding.root.setOnClickListener {
-                listOnClickListener.onClicked(item, adapterPosition)
+                listOnClickListener.onClicked(item, bindingAdapterPosition)
             }
         }
     }

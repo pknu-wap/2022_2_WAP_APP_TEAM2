@@ -5,8 +5,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -50,7 +49,8 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
-    override suspend fun addProducts(documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String
+    override suspend fun addProducts(
+            documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val writeBatch = fireStore.batch()
 
@@ -95,8 +95,10 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
-    override suspend fun modifyProducts(productMapList: ArrayList<HashMap<String, Any?>>,
-                                        calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+    override suspend fun modifyProducts(
+            productMapList: ArrayList<HashMap<String, Any?>>,
+            calcRoomId: String,
+    ) = suspendCoroutine<Boolean> { continuation ->
         val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
 
@@ -131,8 +133,15 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
-    override suspend fun getProducts(receiptId: String,
-                                     calcRoomId: String) = suspendCoroutine<MutableList<ReceiptProductDTO>> { continuation ->
+    override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+            fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
+
+
+    override suspend fun getProducts(
+            receiptId: String,
+            calcRoomId: String,
+    ) = suspendCoroutine<MutableList<ReceiptProductDTO>> { continuation ->
         val productsCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).collection(FireStoreNames.products.name)
         productsCollection.get().addOnCompleteListener {
