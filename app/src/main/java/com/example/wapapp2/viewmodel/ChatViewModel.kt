@@ -73,5 +73,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun getQueryForOption(calcRoomDTO: CalcRoomDTO) : Query {
+        val query = Firebase.firestore
+            .collection("calc_rooms")
+            .document(calcRoomDTO.id!!)
+            .collection("chats")
+            .orderBy("sendedTime")
+
+        return query
+    }
+
 
 }
