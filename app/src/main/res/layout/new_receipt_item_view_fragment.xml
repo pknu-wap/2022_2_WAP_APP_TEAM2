@@ -83,6 +83,8 @@
             android:layout_width="130dp"
             android:layout_height="130dp"
             android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
             android:src="@drawable/receipt_sample"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/receipt_img_btn"

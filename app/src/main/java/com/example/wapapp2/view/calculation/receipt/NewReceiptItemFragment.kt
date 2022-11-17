@@ -1,6 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
-import android.graphics.Bitmap
+import android.os.Build.VERSION_CODES.N
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -15,6 +15,8 @@ import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.NewReceiptItemViewFragmentBinding
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.observer.MyLifeCycleObserver
+import com.example.wapapp2.view.editreceipt.ReceiptImgFragment
+import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -30,7 +32,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry)
+        myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry, requireContext().applicationContext)
         lifecycle.addObserver(myLifeCycleObserver!!)
 
         bundle = arguments ?: savedInstanceState
@@ -41,7 +43,6 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = NewReceiptItemViewFragmentBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -104,6 +105,20 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             }
         }
 
+        binding.receiptImage.setOnClickListener {
+            newReceiptViewModel
+                    .getReceiptDTO(receiptId!!)?.imgUriInMyPhone?.apply {
+                        val receiptImgFragment = ReceiptImgFragment.newInstance(this.toString(),
+                                ReceiptImgFragment.ImgType.LOCAL)
+
+                        val fragmentManager = requireParentFragment().parentFragmentManager
+                        fragmentManager.beginTransaction()
+                                .hide(fragmentManager.findFragmentByTag(NewReceiptFragment.TAG) as Fragment)
+                                .add(R.id.fragment_container_view, receiptImgFragment, ReceiptImgFragment.TAG)
+                                .addToBackStack(ReceiptImgFragment.TAG).commit()
+                    }
+
+        }
 
         binding.receiptImgBtn.setOnClickListener {
             if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone == null) {
@@ -115,11 +130,10 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
                         .setNegativeButton(R.string.shoot_camera) { dialog, which ->
                             dialog.dismiss()
                             myLifeCycleObserver?.camera(requireActivity()) {
-                                it.data?.extras?.apply {
-                                    val bitmap = get("data") as Bitmap
-                                    Glide.with(requireContext()).load(bitmap).into(binding.receiptImage)
+                                it?.apply {
+                                    Glide.with(requireContext()).load(this).into(binding.receiptImage)
+                                    newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = this
                                 }
-
                             }
                         }
                         .setPositiveButton(R.string.pick_image) { dialog, which ->

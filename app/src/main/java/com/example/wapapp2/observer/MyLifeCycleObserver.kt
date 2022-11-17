@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
 import androidx.core.content.PackageManagerCompat
 import androidx.core.content.PermissionChecker
@@ -31,15 +32,15 @@ import java.util.*
 import java.util.jar.Pack200
 
 
-class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
+class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private val context: Context)
     : DefaultLifecycleObserver {
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private var pickImgCallback: ActivityResultCallback<Uri>? = null
-    private var cameraCallback: ActivityResultCallback<ActivityResult>? = null
     private var permissionsCallback: ActivityResultCallback<Map<String, Boolean>>? = null
+    private var onCameraCallback: OnCameraCallback? = null
 
     override fun onCreate(owner: LifecycleOwner) {
         pickImageLauncher = registry.register("image", owner, ActivityResultContracts.GetContent()) {
@@ -47,7 +48,14 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
         }
 
         cameraLauncher = registry.register("camera", owner, ActivityResultContracts.StartActivityForResult()) {
-            cameraCallback?.onActivityResult(it)
+            var uri: Uri? = null
+
+            it.data?.apply {
+                val file = File(Environment.getExternalStorageDirectory(), getStringExtra("fileName")!!)
+                uri = FileProvider.getUriForFile(context, context.packageName.toString() + ".provider", file)
+            }
+
+            onCameraCallback?.onResult(uri)
         }
 
         permissionsLauncher = registry.register("permissions", owner, ActivityResultContracts.RequestMultiplePermissions()) {
@@ -65,8 +73,8 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
         }
     }
 
-    fun camera(activity: Activity, callback: ActivityResultCallback<ActivityResult>) {
-        cameraCallback = callback
+    fun camera(activity: Activity, cameraCallback: OnCameraCallback) {
+        this.onCameraCallback = cameraCallback
 
         if (!checkCameraPermission(activity)) {
             Toast.makeText(activity, "권한이 필요합니다", Toast.LENGTH_SHORT).show()
@@ -128,5 +136,9 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
         ).apply {
             currentPhotoPath = absolutePath
         }
+    }
+
+    fun interface OnCameraCallback {
+        fun onResult(uri: Uri?)
     }
 }

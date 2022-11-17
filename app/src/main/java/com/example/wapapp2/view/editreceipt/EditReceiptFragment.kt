@@ -1,8 +1,5 @@
 package com.example.wapapp2.view.editreceipt
 
-import android.graphics.Bitmap
-import android.media.Image
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -15,7 +12,6 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentEditReceiptBinding
-import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment.OnUpdatedValueListener
 import com.example.wapapp2.viewmodel.ModifyReceiptViewModel
@@ -57,7 +53,7 @@ class EditReceiptFragment : Fragment() {
             calcRoomId = getString("calcRoomId")
             modifyReceiptViewModel.receiptDTO = getParcelable("receiptDTO")!!
         }
-        myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry)
+        myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry, requireContext().applicationContext)
         lifecycle.addObserver(myLifeCycleObserver!!)
     }
 
@@ -99,17 +95,11 @@ class EditReceiptFragment : Fragment() {
                         .setNegativeButton(R.string.shoot_camera) { dialog, which ->
                             dialog.dismiss()
                             myLifeCycleObserver?.camera(requireActivity()) {
-                                it.data?.extras?.apply {
-                                    val file = File(Environment.getExternalStorageDirectory(), it.data!!.getStringExtra("fileName")!!)
-                                    val uri =
-                                            FileProvider.getUriForFile(requireContext().applicationContext, requireContext().applicationContext
-                                                    .packageName.toString() + ".provider", file)
-
-                                    Glide.with(requireContext()).load(uri).into(binding.receiptImage)
-                                    modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = uri
+                                it?.apply {
+                                    Glide.with(requireContext()).load(this).into(binding.receiptImage)
+                                    modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = this
                                     modifyReceiptViewModel.receiptImgChanged = true
                                 }
-
                             }
                         }
                         .setPositiveButton(R.string.pick_image) { dialog, which ->
@@ -156,10 +146,10 @@ class EditReceiptFragment : Fragment() {
 
     private fun pickImage() {
         myLifeCycleObserver?.pickImage(requireActivity()) {
-           // modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = it
+            modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = it
             Glide.with(requireContext()).load(it).into(binding.receiptImage)
             binding.receiptImgBtn.text = getString(R.string.modify_img)
-           // modifyReceiptViewModel.receiptImgChanged = true
+            modifyReceiptViewModel.receiptImgChanged = true
         }
     }
 
