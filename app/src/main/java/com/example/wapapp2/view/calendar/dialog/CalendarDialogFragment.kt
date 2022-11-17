@@ -63,7 +63,6 @@ class CalendarDialogFragment : DialogFragment() {
 
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-
                     binding.viewPager.adapter!!.notifyItemChanged(lastPosition)
                     lastPosition = position
                 }

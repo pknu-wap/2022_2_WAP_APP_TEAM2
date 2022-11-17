@@ -10,8 +10,7 @@ class ReceiptListForADayAdapter(private val list: ArrayList<ReceiptDTO>) : Recyc
 
 
     inner class ViewHolder(private val binding: DialogCalculationItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind() {
-            val position = adapterPosition
+        fun bind(position: Int) {
         }
     }
 
@@ -20,7 +19,7 @@ class ReceiptListForADayAdapter(private val list: ArrayList<ReceiptDTO>) : Recyc
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind()
+        holder.bind(position)
     }
 
     override fun getItemCount(): Int = list.size

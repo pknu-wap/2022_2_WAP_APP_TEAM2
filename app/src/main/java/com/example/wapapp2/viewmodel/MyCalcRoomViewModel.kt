@@ -1,5 +1,6 @@
 package com.example.wapapp2.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
@@ -18,6 +19,8 @@ class MyCalcRoomViewModel : ViewModel() {
     private val myCalcRoomRepositoryImpl = MyCalcRoomRepositoryImpl.getINSTANCE()
     private val fireStore = FirebaseFirestore.getInstance()
     val myCalcRoomIds = MutableLiveData<MutableSet<String>>()
+
+    val myCalcRoomId_live get() = myCalcRoomIds as LiveData<Set<String>>
     private var myCalcRoomIdsListener: ListenerRegistration? = null
 
     fun getMyCalcRoomsOptions(): FirestoreRecyclerOptions<CalcRoomDTO> {
@@ -49,6 +52,7 @@ class MyCalcRoomViewModel : ViewModel() {
         myCalcRoomIdsListener?.remove()
     }
 
+
     fun loadMyCalcRoomIds() {
         if (myCalcRoomIdsListener == null) {
             myCalcRoomIdsListener = myCalcRoomRepositoryImpl.getMyCalcRoomIds { event, error ->
@@ -56,6 +60,7 @@ class MyCalcRoomViewModel : ViewModel() {
 
                 userDTO?.also {
                     val newIdSet = it.myCalcRoomIds.toMutableSet()
+
                     //id가 수정된 게 있는 지 확인
                     if (newIdSet != myCalcRoomIds.value) {
                         myCalcRoomIds.value = newIdSet

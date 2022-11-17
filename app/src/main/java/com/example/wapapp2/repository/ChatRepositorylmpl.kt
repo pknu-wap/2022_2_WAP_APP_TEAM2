@@ -4,7 +4,10 @@ import com.example.wapapp2.R
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.repository.interfaces.ChatRepository
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import org.json.JSONObject
 import java.io.OutputStream
 import java.net.HttpURLConnection
@@ -37,6 +40,7 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
                 TODO("전송실패")
             }
     }
+
 
 
     //  https://firebase.google.com/docs/cloud-messaging/http-server-ref
