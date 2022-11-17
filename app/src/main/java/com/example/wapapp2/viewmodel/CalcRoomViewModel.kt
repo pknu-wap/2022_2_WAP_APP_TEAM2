@@ -15,5 +15,4 @@ class CalcRoomViewModel : ViewModel() {
 
     val participants = MutableLiveData<MutableList<UserDTO>>()
 
-    
 }

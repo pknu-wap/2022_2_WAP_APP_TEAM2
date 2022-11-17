@@ -16,8 +16,7 @@ class NewReceiptViewModel : ViewModel() {
 
     val removeReceiptLiveData: MutableLiveData<String> = MutableLiveData<String>()
 
-    private val _addReceiptResult = MutableLiveData<Boolean>()
-    val addReceiptResult get() = _addReceiptResult
+    val addReceiptResult = MutableLiveData<Boolean>()
 
     var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
 
