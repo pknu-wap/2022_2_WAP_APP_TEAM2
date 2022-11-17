@@ -9,5 +9,4 @@ import com.google.firebase.firestore.ListenerRegistration
 
 interface ChatRepository {
     suspend fun sendMsg(calcRoomDTO: CalcRoomDTO, chatDTO: ChatDTO)
-    fun setSnapshotListener_chat(snapshotListener: EventListener<DocumentSnapshot>): ListenerRegistration
 }

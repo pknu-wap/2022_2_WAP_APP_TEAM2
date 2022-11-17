@@ -1,26 +1,29 @@
 package com.example.wapapp2.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wapapp2.model.UserDTO
-import com.google.firebase.firestore.ktx.toObject
+import com.example.wapapp2.model.CalcRoomDTO
+import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.repository.CalenderRepositoryImpl
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.*
 
 class CalenderViewModel : ViewModel() {
+    private val myCalenderRepositoryImpl = CalenderRepositoryImpl.getINSTANCE()
+    val myReceiptDTOs = MutableLiveData<MutableSet<ReceiptDTO>>()
+    private var myCalcRoomIdsListener: ListenerRegistration? = null
 
-/*
-    fun loadMyCalenderRecords() {
-        if (myCalcRoomIdsListener == null) {
-            myCalcRoomIdsListener = myCalcRoomRepositoryImpl.getMyCalcRoomIds { event, error ->
-                val userDTO = event?.toObject<UserDTO>()
-
-                userDTO?.also {
-                    val newIdSet = it.myCalcRoomIds.toMutableSet()
-                    //id가 수정된 게 있는 지 확인
-                    if (newIdSet != myCalcRoomIds.value) {
-                        myCalcRoomIds.value = newIdSet
+    fun getCalenderReceipts(myCalcRooms : LiveData<Set<CalcRoomDTO>>){
+        myCalcRooms.value?.let{
+            for(myCalcRoom in it)
+                CoroutineScope(Dispatchers.Default).launch {
+                    val tmpReceiptDTOs =  async { myCalenderRepositoryImpl.loadMyReceipts(myCalcRoom) }
+                    withContext(MainScope().coroutineContext){
+                        myReceiptDTOs.value!!.addAll(tmpReceiptDTOs.await())
                     }
                 }
-            }
         }
     }
-    */
+
 }
