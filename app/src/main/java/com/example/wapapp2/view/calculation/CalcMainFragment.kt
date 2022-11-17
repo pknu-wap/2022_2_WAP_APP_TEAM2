@@ -57,7 +57,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         if (arguments == null) {
             savedInstanceState?.getString("roomId")
         } else {
-            roomId = arguments!!.getString("roomId")!!
+            roomId = requireArguments().getString("roomId")!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(friendsViewModel.myFriendMap.toMutableMap())
@@ -77,9 +77,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
 
-        val chatFragment = ChatFragment(DummyData.getRoom())
-        chatFragment.arguments = arguments ?: savedInstanceState
-
+        val chatFragment = ChatFragment()
         chatFragment.setViewHeightCallback { height ->
             // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
             chatInputLayoutHeight = height + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
@@ -87,7 +85,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
 
         childFragmentManager.beginTransaction()
-                .replace(binding.chat.id, chatFragment, ChatFragment::class.simpleName).commit()
+                .replace(binding.chat.id, chatFragment, ChatFragment.TAG).commit()
 
         setOngoingFolderView()
 

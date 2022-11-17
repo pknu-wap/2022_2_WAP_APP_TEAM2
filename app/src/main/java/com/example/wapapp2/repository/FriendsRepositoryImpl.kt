@@ -10,13 +10,12 @@ import com.example.wapapp2.repository.interfaces.FriendsRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class FriendsRepositoryImpl private constructor() : FriendsRepository {
-    val searchResultFriendsLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>()
-    val dummyFriendsList = DummyData.getMyFriendsList()
     private val fireStore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -30,38 +29,21 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         fun getINSTANCE() = INSTANCE
     }
 
-    fun getFriendsList(word: String) {
-        if (word.isEmpty()) {
-            searchResultFriendsLiveData.value = dummyFriendsList
-        } else {
-            val list = ArrayList<FriendDTO>()
-            for (v in dummyFriendsList) {
-                if (v.friendName == word) {
-                    list.add(v)
+    override suspend fun loadMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->
+        fireStore.collection(FireStoreNames.users.name)
+                .document(auth.currentUser?.uid!!)
+                .collection(FireStoreNames.myFriends.name).orderBy("alias", Query.Direction.ASCENDING).get()
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        val list = mutableListOf<FriendDTO>()
+                        for (d in it.result.documents) {
+                            list.add(d.toObject<FriendDTO>()!!)
+                        }
+                        continuation.resume(list)
+                    } else {
+                        continuation.resume(mutableListOf())
+                    }
                 }
-            }
-
-            searchResultFriendsLiveData.value = list
-        }
-    }
-
-    override suspend fun getMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->
-        val collection = fireStore.collection(FireStoreNames.users.name).document(auth.currentUser?.uid!!)
-                .collection(FireStoreNames.myFriends.name)
-        collection.get().addOnCompleteListener {
-            if (it.isSuccessful) {
-                val list = it.result.documents.toMutableList()
-                val dtoList = mutableListOf<FriendDTO>()
-
-                for (v in list) {
-                    dtoList.add(v.toObject<FriendDTO>()!!)
-                }
-
-                continuation.resume(dtoList)
-            } else {
-                continuation.resume(mutableListOf())
-            }
-        }
     }
 
 
@@ -85,14 +67,6 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
             continuation.resume(it.isSuccessful)
         }
     }
-
-    override fun addMyFriendsSnapshotListener(
-            snapShotListener: NewSnapshotListener<List<FriendDTO>>,
-    ) = fireStore.collection(FireStoreNames.users
-            .name).document(auth.currentUser?.uid!!)
-            .collection(FireStoreNames.myFriends.name).addSnapshotListener { snapShot, error ->
-                //snapShotListener.onEvent(snapShot, error)
-            }
 
 
 }

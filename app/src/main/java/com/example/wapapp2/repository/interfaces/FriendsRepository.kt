@@ -8,9 +8,8 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
 
 interface FriendsRepository {
-    suspend fun getMyFriends(): MutableList<FriendDTO>
     suspend fun addToMyFriend(friendDTO: FriendDTO): Boolean
+    suspend fun loadMyFriends(): MutableList<FriendDTO>
     suspend fun removeMyFriend(friendId: String): Boolean
     suspend fun setAliasToMyFriend(alias: String, friendId: String): Boolean
-    fun addMyFriendsSnapshotListener(snapShotListener: NewSnapshotListener<List<FriendDTO>>): ListenerRegistration
 }

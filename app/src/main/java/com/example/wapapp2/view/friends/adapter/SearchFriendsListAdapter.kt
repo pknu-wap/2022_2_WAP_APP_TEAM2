@@ -10,7 +10,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 
 class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) :
         RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>() {
-    private val friendsList = ArrayList<FriendDTO>()
+    private val friendsList = mutableListOf<FriendDTO>()
     private val checkedSet = HashSet<String>()
     private val ignoreIdSet = mutableSetOf<String>()
     private var onCheckedStateChangedListener: MaterialCheckBox.OnCheckedStateChangedListener? = null
@@ -23,7 +23,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
             val position = bindingAdapterPosition
             val friendDTO = friendsList[position]
 
-            itemBinding.friendName.text = friendDTO.friendName
+            itemBinding.friendName.text = friendDTO.alias
 
             if (checkedSet.contains(friendDTO.friendUserId))
                 itemBinding.checkbox.checkedState = MaterialCheckBox.STATE_CHECKED
@@ -61,12 +61,12 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
     }
 
 
-    fun setList(list: ArrayList<FriendDTO>) {
+    fun setList(list: MutableList<FriendDTO>) {
         friendsList.clear()
         friendsList.addAll(list)
 
         if (ignoreIdSet.isNotEmpty()) {
-            val removeIdxs = ArrayList<Int>()
+            val removeIdxs = mutableListOf<Int>()
             for (idx in friendsList.size - 1 downTo 0) {
                 if (ignoreIdSet.contains(friendsList[idx].friendUserId)) {
                     removeIdxs.add(idx)

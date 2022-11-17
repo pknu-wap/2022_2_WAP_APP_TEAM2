@@ -1,10 +1,12 @@
 package com.example.wapapp2.view.friends
 
 import android.os.Bundle
+import android.text.Editable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DelayTextWatcher
@@ -26,7 +28,7 @@ class InviteFriendsFragment : Fragment() {
     }
 
     private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val friendsViewModel: FriendsViewModel by viewModels()
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
             OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
@@ -74,11 +76,6 @@ class InviteFriendsFragment : Fragment() {
         return binding.root
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putAll(arguments)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -97,14 +94,21 @@ class InviteFriendsFragment : Fragment() {
 
         binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
-                friendsViewModel.getFriends(text)
+                friendsViewModel.findFriend(text)
             }
         })
-        friendsViewModel.getFriends("")
+        friendsViewModel.findFriend("")
+    }
+
+    override fun onDestroy() {
+        friendsViewModel.searchResultFriendsLiveData.value?.clear()
+        super.onDestroy()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
 }

@@ -21,7 +21,7 @@ class MyAccountViewModel : ViewModel() {
     fun initMyProfile() {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
-                userRepositoryImpl?.getUser(auth.currentUser!!.uid)
+                userRepositoryImpl.getUser(auth.currentUser!!.uid)
             }
             result.await()
             withContext(Main) {

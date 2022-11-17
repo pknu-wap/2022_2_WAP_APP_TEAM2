@@ -50,7 +50,7 @@ class EditReceiptFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
-            calcRoomId = getString("calcRoomId")
+            calcRoomId = getString("roomId")
             modifyReceiptViewModel.receiptDTO = getParcelable("receiptDTO")!!
         }
         myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry, requireContext().applicationContext)

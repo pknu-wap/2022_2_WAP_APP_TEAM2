@@ -10,18 +10,20 @@ import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
-import com.example.wapapp2.repository.MyCalcRoomRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.repository.UserRepositoryImpl
+import com.example.wapapp2.repository.interfaces.CalcRoomRepository
+import com.example.wapapp2.repository.interfaces.ReceiptRepository
+import com.example.wapapp2.repository.interfaces.UserRepository
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 
 class CurrentCalcRoomViewModel : ViewModel() {
-    private val calcRoomRepositorylmpl = CalcRoomRepositorylmpl.getINSTANCE()
-    private val userRepository = UserRepositoryImpl.getINSTANCE()
-    private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
+    private val calcRoomRepository: CalcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
+    private val userRepository: UserRepository = UserRepositoryImpl.getINSTANCE()
+    private val receiptRepository: ReceiptRepository = ReceiptRepositoryImpl.INSTANCE
 
     var roomId: String? = null
     val myFriendMap = mutableMapOf<String, FriendDTO>()
@@ -97,7 +99,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     private fun addSnapshotCalcRoom() {
         calcRoomListenerRegistration?.remove()
-        calcRoomListenerRegistration = calcRoomRepositorylmpl.snapshotCalcRoom(roomId!!, EventListener<DocumentSnapshot> { value, error ->
+        calcRoomListenerRegistration = calcRoomRepository.snapshotCalcRoom(roomId!!, EventListener<DocumentSnapshot> { value, error ->
             if (value == null) {
                 return@EventListener
             }
