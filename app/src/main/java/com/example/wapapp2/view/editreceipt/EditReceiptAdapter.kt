@@ -9,8 +9,10 @@ import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptProductDTO
 
-class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
-                         private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) : RecyclerView
+class EditReceiptAdapter(
+        private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
+        private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+) : RecyclerView
 .Adapter<EditReceiptAdapter
 .CustomViewHolder>() {
 
@@ -30,31 +32,38 @@ class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = 
         holder.bind(itemList[position])
     }
 
-    override fun getItemCount(): Int {
-        return itemList.size
-    }
+    override fun getItemCount() = itemList.size
 
-    override fun onViewAttachedToWindow(holder: CustomViewHolder) {
-        super.onViewAttachedToWindow(holder)
-    }
 
-    class CustomViewHolder(private val binding: ProductItemLayoutInNewCalcBinding,
-                           private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener) :
+    class CustomViewHolder(
+            private val binding: ProductItemLayoutInNewCalcBinding,
+            private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+    ) :
             RecyclerView.ViewHolder(binding.root) {
         private var nameTextWatcher: DelayTextWatcher? = null
+        private var countTextWatcher: DelayTextWatcher? = null
         private var priceTextWatcher: DelayTextWatcher? = null
 
         fun bind(receiptProductDTO: ReceiptProductDTO) {
             nameTextWatcher?.run {
-                binding.calculationItemNameEditText.removeTextChangedListener(this)
+                binding.nameEditText.removeTextChangedListener(this)
+                null
+            }
+            countTextWatcher?.run {
+                binding.countEditText.removeTextChangedListener(this)
                 null
             }
             priceTextWatcher?.run {
-                binding.productPriceEditText.removeTextChangedListener(this)
+                binding.priceEditText.removeTextChangedListener(this)
                 null
             }
 
             nameTextWatcher = object : DelayTextWatcher() {
+                override fun onFinalText(text: String) {
+                    receiptProductDTO.name = text
+                }
+            }
+            countTextWatcher = object : DelayTextWatcher() {
                 override fun onFinalText(text: String) {
                     receiptProductDTO.name = text
                 }
@@ -66,11 +75,13 @@ class EditReceiptAdapter(private val itemList: MutableList<ReceiptProductDTO> = 
                 }
             }
 
-            binding.productPriceEditText.addTextChangedListener(priceTextWatcher)
-            binding.calculationItemNameEditText.addTextChangedListener(nameTextWatcher)
+            binding.priceEditText.addTextChangedListener(priceTextWatcher)
+            binding.countEditText.addTextChangedListener(priceTextWatcher)
+            binding.nameEditText.addTextChangedListener(nameTextWatcher)
 
-            binding.productPriceEditText.text = receiptProductDTO.price.toString().toEditable()
-            binding.calculationItemNameEditText.text = receiptProductDTO.name.toEditable()
+            binding.priceEditText.text = receiptProductDTO.price.toString().toEditable()
+            binding.countEditText.text = receiptProductDTO.count.toString().toEditable()
+            binding.nameEditText.text = receiptProductDTO.name.toEditable()
         }
 
         private fun String.toEditable(): Editable = Editable.Factory().newEditable(this)

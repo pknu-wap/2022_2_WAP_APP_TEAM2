@@ -15,7 +15,6 @@ class TestLogics private constructor() {
     companion object {
         fun notifyCalcNotification(context: Context) {
             val helper = CalcNotificationHelper.getINSTANCE(context)
-            helper.notifyNotification(context, ReceiptDTO("0", null, "", null, "정산 참여 부탁해요", "0", false), FriendDTO("0", "옥수환", "옥수환", "test@gmail.com"))
         }
 
 

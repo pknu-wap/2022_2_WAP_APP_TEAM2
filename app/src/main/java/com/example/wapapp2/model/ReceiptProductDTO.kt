@@ -18,10 +18,12 @@ data class ReceiptProductDTO(
         var name: String,
         @PropertyName("price")
         var price: Int,
+        @PropertyName("count")
+        var count: Int,
         @PropertyName("checkedUserIds")
         var checkedUserIds: ArrayList<String> = ArrayList<String>(),
         @get:Exclude
-        var personCount: Int = 0
+        var personCount: Int = 0,
 ) : Parcelable {
-    constructor() : this("", "", 0, arrayListOf(), 0)
+    constructor() : this("", "", 0, 0, arrayListOf(), 0)
 }

@@ -29,7 +29,7 @@ data class CalcRoomDTO(
         @PropertyName("name")
         var name: String,
         @get:Exclude
-        val people: ArrayList<CalcRoomMemberData>
+        val people: ArrayList<CalcRoomParticipantDTO>
 ) : Parcelable {
     constructor() : this(null, null, "", arrayListOf(), arrayListOf(), arrayListOf(), RecentMsg(msg = "", msgId = "", sendedTime = null,
             senderId = ""), "", arrayListOf())
