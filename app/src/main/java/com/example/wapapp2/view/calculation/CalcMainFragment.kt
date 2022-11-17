@@ -36,21 +36,19 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         ParticipantsInCalcRoomFragment.OnNavDrawerListener {
     private var _binding: FragmentCalcMainBinding? = null
     private val binding get() = _binding!!
-    private lateinit var bundle: Bundle
+    private var roomId: String? = null
 
     companion object {
         const val TAG = "CalcMainFragment"
     }
 
-    private val calcRoomViewModel: CalcRoomViewModel by viewModels()
+    private val calcRoomViewModel by viewModels<CalcRoomViewModel>()
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
     private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
 
     /** summary of FixedPay **/
     private var paymoney = 0
-    private var calcRoomId: String = DummyData.testCalcRoomId
-
     private var chatInputLayoutHeight = 0
 
 
@@ -65,14 +63,18 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         super.onCreate(savedInstanceState)
         childFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
 
+        arguments?.apply {
+            roomId = getString("roomId")
+        }
+
         calcRoomViewModel.currentFriendsList.clear()
         calcRoomViewModel.currentFriendsList.addAll(DummyData.getFriendsInRoomList())
-
-        bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         _binding = FragmentCalcMainBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -80,13 +82,17 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        roomId?.run {
+            savedInstanceState?.getString("roomId")
+        }
+
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
         setSideMenu()
 
         val chatFragment = ChatFragment(DummyData.getRoom())
-        chatFragment.arguments = bundle
+        chatFragment.arguments = arguments ?: savedInstanceState
 
         chatFragment.setViewHeightCallback { height ->
             // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
@@ -128,7 +134,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putAll(bundle)
+        outState.putString("calcRoomId", roomId)
     }
 
     private fun setOngoingFolderView() {
@@ -184,7 +190,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         binding.receiptsList.setOnClickListener {
             val fragment = ReceiptsFragment()
             fragment.arguments = Bundle().apply {
-                putString("calcRoomId", calcRoomId)
+                putString("calcRoomId", roomId)
             }
             val fragmentManager = parentFragmentManager
             fragmentManager
