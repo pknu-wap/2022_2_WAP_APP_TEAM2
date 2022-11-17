@@ -75,7 +75,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
     }
 
     private fun onChangedReceipts() {
-        
+
     }
 
     private fun addSnapshotToCalcRoom() {
@@ -95,10 +95,13 @@ class CurrentCalcRoomViewModel : ViewModel() {
                 }
 
                 // 영수증 목록 변화 확인
+                /*
                 val receipts = async {
                     receiptRepository.getReceipts(roomId)
                 }
                 receipts.await()
+
+                 */
             } else {
 
             }
