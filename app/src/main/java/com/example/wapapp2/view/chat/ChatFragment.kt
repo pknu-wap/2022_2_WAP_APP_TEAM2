@@ -23,7 +23,6 @@ import java.util.*
 class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
     private lateinit var binding: FragmentChatBinding
-
     private lateinit var chatAdapter_: ChatAdapter
     private lateinit var bundle: Bundle
 
@@ -44,8 +43,10 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         binding = FragmentChatBinding.inflate(inflater, container, false)
 
         binding.chatList.apply {

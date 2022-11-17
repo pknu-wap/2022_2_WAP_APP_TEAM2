@@ -1,9 +1,11 @@
 package com.example.wapapp2.viewmodel
 
+import androidx.collection.arrayMapOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
+import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.FriendsRepositoryImpl
@@ -20,12 +22,12 @@ class FriendsViewModel : ViewModel() {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val fireStore = FirebaseFirestore.getInstance()
 
-    val friendsListLiveData: MutableLiveData<ArrayList<FriendDTO>> = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
-    val friendCheckedLiveData: MutableLiveData<FriendCheckDTO> = MutableLiveData<FriendCheckDTO>()
-    val searchResultFriendsLiveData: LiveData<ArrayList<FriendDTO>> = friendsRepositoryImpl.searchResultFriendsLiveData
-    val currentRoomFriendsSet = HashSet<String>()
+    val friendsListLiveData = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
+    val friendCheckedLiveData = MutableLiveData<FriendCheckDTO>()
+    val searchResultFriendsLiveData = friendsRepositoryImpl.searchResultFriendsLiveData
+    val participantsInCalcRoom = mutableListOf<CalcRoomParticipantDTO>()
 
-    val myFriendsIdSet = hashSetOf<String>()
+    val myFriendMap = mutableMapOf<String, FriendDTO>()
 
     fun checkedFriend(friendDTO: FriendDTO, isChecked: Boolean) {
         val list = friendsListLiveData.value!!
@@ -72,7 +74,7 @@ class FriendsViewModel : ViewModel() {
     fun removeMyFriend(friendId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             //myFriendsIdSet에서 삭제
-            myFriendsIdSet.remove(friendId)
+            myFriendMap.remove(friendId)
 
             val result = async {
                 friendsRepositoryImpl.removeMyFriend(friendId)
@@ -80,7 +82,6 @@ class FriendsViewModel : ViewModel() {
             result.await()
         }
     }
-
 
 
     fun getMyFriendsOptions(): FirestoreRecyclerOptions<FriendDTO> {
@@ -92,7 +93,7 @@ class FriendsViewModel : ViewModel() {
         val option = FirestoreRecyclerOptions.Builder<FriendDTO>()
                 .setQuery(query, MetadataChanges.INCLUDE) {
                     val dto = it.toObject<FriendDTO>()!!
-                    myFriendsIdSet.add(dto.friendUserId)
+                    myFriendMap[dto.friendUserId] = dto
                     dto
                 }
                 .build()

@@ -1,8 +1,6 @@
 package com.example.wapapp2.view.friends
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.FragmentInviteFriendsBinding
-import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
+import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import org.checkerframework.checker.units.qual.s
-import kotlin.collections.HashSet
 
 
 class InviteFriendsFragment : Fragment() {
@@ -29,6 +25,7 @@ class InviteFriendsFragment : Fragment() {
         const val TAG = "InviteFriendsFragment"
     }
 
+    private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
     private val friendsViewModel: FriendsViewModel by viewModels()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
@@ -60,15 +57,15 @@ class InviteFriendsFragment : Fragment() {
             }
         })
 
-        val bundle = arguments ?: savedInstanceState
-        val currentFriendsInRoomSet: HashSet<String> = bundle!!.getStringArrayList("currentFriendsInRoomList")!!.toHashSet()
-        friendsViewModel.currentRoomFriendsSet.addAll(currentFriendsInRoomSet)
-        searchFriendsListAdapter.ignoreIds(currentFriendsInRoomSet)
+        friendsViewModel.participantsInCalcRoom.addAll(calcRoomViewModel.participants.value!!.toMutableList())
+        searchFriendsListAdapter.ignoreIds(calcRoomViewModel.participantIds.toMutableSet())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        _binding = FragmentInviteFriendsBinding.inflate(inflater)
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
+        _binding = FragmentInviteFriendsBinding.inflate(inflater, container, false)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter

@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat.getColor
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
@@ -42,10 +43,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         const val TAG = "CalcMainFragment"
     }
 
-    private val calcRoomViewModel by viewModels<CalcRoomViewModel>()
-    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
-    private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
-    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
 
     /** summary of FixedPay **/
@@ -56,32 +54,27 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.apply {
-            roomId = getString("roomId")
+        if (arguments == null) {
+            savedInstanceState?.getString("roomId")
+        } else {
+            roomId = arguments!!.getString("roomId")!!
         }
 
-        calcRoomViewModel.currentFriendsList.clear()
-        calcRoomViewModel.currentFriendsList.addAll(DummyData.getFriendsInRoomList())
+        currentCalcRoomViewModel.myFriendMap.putAll(friendsViewModel.myFriendMap.toMutableMap())
+        currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentCalcMainBinding.inflate(inflater, container, false)
+
+        binding.topAppBar.setNavigationOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        roomId?.run {
-            savedInstanceState?.getString("roomId")
-        }
-
-        binding.topAppBar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
         setSideMenu()
 
         val chatFragment = ChatFragment(DummyData.getRoom())
@@ -193,33 +186,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
         binding.exitRoom.setOnClickListener {
 
-            /*
-            }
-            binding.addFriend.profileImg.setImageDrawable(getDrawable(requireContext(), R.drawable.ic_baseline_group_add_24))
-            binding.addFriend.friendName.text = "친구 초대"
-            binding.friends.adapter = CalcUserAdapter(context, DummyData.getProfiles())
-
-
-            binding.addFriend.root.setOnClickListener {
-                binding.root.closeDrawers()
-                val inviteFriendsFragment = InviteFriendsFragment()
-                inviteFriendsFragment.arguments = Bundle().apply {
-                    //현재 정산방 친구 목록 ID set생성
-                    val currentFriendsListInRoom = ArrayList<String>()
-                    val currentFriendDTOList = calcRoomViewModel.currentFriendsList
-
-                    for (dto in currentFriendDTOList) {
-                        currentFriendsListInRoom.add(dto.friendUserId)
-                    }
-
-                    putStringArrayList("currentFriendsInRoomList", currentFriendsListInRoom)
-                }
-                val tag = "inviteFriends"
-                val fragmentManager = parentFragmentManager
-
-                fragmentManager.beginTransaction().hide(this@CalcMainFragment as Fragment).add(R.id.fragment_container_view, inviteFriendsFragment, tag)
-                        .addToBackStack(tag).commit()
-    */
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()

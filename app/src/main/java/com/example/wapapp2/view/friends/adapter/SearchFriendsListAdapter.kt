@@ -8,10 +8,11 @@ import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.google.android.material.checkbox.MaterialCheckBox
 
-class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) : RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>() {
+class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) :
+        RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>() {
     private val friendsList = ArrayList<FriendDTO>()
     private val checkedSet = HashSet<String>()
-    private val ignoreIdSet: HashSet<String> = HashSet<String>()
+    private val ignoreIdSet = mutableSetOf<String>()
     private var onCheckedStateChangedListener: MaterialCheckBox.OnCheckedStateChangedListener? = null
 
     inner class ViewHolder(private val itemBinding: SearchFriendItemViewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
@@ -19,7 +20,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
         fun bind() {
             reset()
 
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             val friendDTO = friendsList[position]
 
             itemBinding.friendName.text = friendDTO.friendName
@@ -86,7 +87,7 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
     }
 
 
-    fun ignoreIds(set: HashSet<String>) {
+    fun ignoreIds(set: MutableSet<String>) {
         ignoreIdSet.clear()
         ignoreIdSet.addAll(set)
     }
