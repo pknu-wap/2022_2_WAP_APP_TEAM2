@@ -43,7 +43,7 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
         val options = FirestorePagingOptions.Builder<ChatDTO>()
             .setLifecycleOwner(this)
-            .setQuery(chatViewModel.getQueryForOption(calcRoomDTO),
+            .setQuery(chatViewModel.getQueryForOption(calcRoomDTO) { _, _ -> ScrollToBottom() },
                 PagingConfig( 20,  10, false),
                 ChatDTO::class.java)
             .build()
