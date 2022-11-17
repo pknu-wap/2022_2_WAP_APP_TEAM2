@@ -9,35 +9,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceiptsAdapter(private val receiptList: MutableList<ReceiptDTO> = mutableListOf(), private val onClickListener:
-ListOnClickListener<ReceiptDTO>) :
-        RecyclerView.Adapter<ReceiptsAdapter.CustomViewHolder>() {
-
-    var receipts = receiptList
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field.clear()
-            field.addAll(value)
-            notifyDataSetChanged()
-        }
+class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDTO>, options: FirestoreRecyclerOptions<ReceiptDTO>) :
+        FirestoreRecyclerAdapter<ReceiptDTO, ReceiptsAdapter.CustomViewHolder>(options) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             CustomViewHolder(CheckReceiptBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener)
 
 
-    override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-        holder.bind(receiptList[position])
-    }
-
-    override fun getItemCount(): Int {
-        return receiptList.size
-    }
-
-    class CustomViewHolder(private val binding: CheckReceiptBinding, private val onClickListener:
-    ListOnClickListener<ReceiptDTO>) : RecyclerView.ViewHolder(binding.root) {
+    class CustomViewHolder(
+            private val binding: CheckReceiptBinding,
+            private val onClickListener:
+            ListOnClickListener<ReceiptDTO>,
+    ) : RecyclerView.ViewHolder(binding.root) {
         private val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd E a hh:mm", Locale.getDefault())
 
         fun bind(receiptDTO: ReceiptDTO) {
@@ -46,15 +34,19 @@ ListOnClickListener<ReceiptDTO>) :
             binding.receiptAmount.text = receiptDTO.totalMoney.toString().toEditable()
 
             binding.root.setOnClickListener {
-                Toast.makeText(binding.root.context, "금액 : ${receiptDTO.totalMoney}\n타이틀 : ${receiptDTO.name})", Toast
+                Toast.makeText(binding.root.context, "총 금액 : ${receiptDTO.totalMoney}\n영수증 이름 : ${receiptDTO.name})", Toast
                         .LENGTH_SHORT
                 ).show()
 
-                onClickListener.onClicked(receiptDTO, adapterPosition)
+                onClickListener.onClicked(receiptDTO, bindingAdapterPosition)
             }
 
         }
 
         private fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
+    }
+
+    override fun onBindViewHolder(holder: CustomViewHolder, position: Int, model: ReceiptDTO) {
+        holder.bind(model)
     }
 }

@@ -22,7 +22,7 @@ data class ReceiptDTO(
         @PropertyName("createdTime")
         var createdTime: Date? = null,
         @PropertyName("imgUrl")
-        var imgUrl: String,
+        var imgUrl: String?,
         @get:Exclude
         var imgUriInMyPhone: Uri?,
         @PropertyName("name")
@@ -36,13 +36,13 @@ data class ReceiptDTO(
         public var totalMoney: Int = 0,
 
         @get:Exclude
-        private val productList: ArrayList<ReceiptProductDTO> = ArrayList<ReceiptProductDTO>(),
+        private val productList: ArrayList<ReceiptProductDTO>,
 
         @get:Exclude
         public var myMoney: Int = 0,
 
         @get:Exclude
-        public val date: String = DateTime.now().toString()
+        public val date: String = DateTime.now().toString(),
 ) : Parcelable {
     constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
 

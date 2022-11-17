@@ -23,6 +23,7 @@ import com.example.wapapp2.databinding.SummaryReceiptViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class NewReceiptFragment : Fragment() {
@@ -42,8 +43,10 @@ class NewReceiptFragment : Fragment() {
         adapter = NewReceiptViewPagerAdapter(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         _binding = FragmentNewReceiptBinding.inflate(inflater)
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
@@ -60,7 +63,6 @@ class NewReceiptFragment : Fragment() {
             val confirmReceiptsDialogFragment = ConfirmReceiptsDialogFragment()
             confirmReceiptsDialogFragment.show(childFragmentManager, "confirm")
         }
-
 
         return binding.root
     }
@@ -145,11 +147,11 @@ class NewReceiptFragment : Fragment() {
             setWidthPercent(90, 75)
 
             newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner, object : Observer<Boolean> {
-                var count = 0
-                val totalCount = newReceiptViewModel.getReceiptCount()
+                private val count = AtomicInteger(0)
+                private val totalCount = newReceiptViewModel.getReceiptCount()
 
                 override fun onChanged(t: Boolean?) {
-                    if (++count == totalCount) {
+                    if (count.incrementAndGet() == totalCount) {
                         //추가 종료
                     }
                 }
@@ -159,6 +161,7 @@ class NewReceiptFragment : Fragment() {
                 //파이어베이스 서버에 등록하는 로직
                 newReceiptViewModel.addAllReceipts()
                 dismiss()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
 

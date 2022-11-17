@@ -5,10 +5,9 @@ import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.interfaces.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -23,7 +22,7 @@ class UserRepositoryImpl : UserRepository {
             INSTANCE = UserRepositoryImpl()
         }
 
-        fun getINSTANCE() = INSTANCE
+        fun getINSTANCE() = INSTANCE!!
     }
 
     override suspend fun findUsers(email: String) = suspendCoroutine<MutableSet<UserDTO>> { continuation ->
@@ -31,7 +30,15 @@ class UserRepositoryImpl : UserRepository {
         collection.whereGreaterThanOrEqualTo("email", email)
                 .whereLessThan("email", "${email}z")
                 .get().addOnCompleteListener {
-                    continuation.resume(convertToUserDTOSet(it.result.documents))
+                    continuation.resume(convertToUserDTOSet(it.result.documents, true))
+                }
+    }
+
+    override suspend fun getUsers(ids: MutableList<String>) = suspendCoroutine<MutableList<UserDTO>> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.users.name)
+        collection.whereEqualTo(FieldPath.documentId(), ids)
+                .get().addOnCompleteListener {
+                    continuation.resume(convertToUserDTOSet(it.result.documents, false).toMutableList())
                 }
     }
 
@@ -47,17 +54,24 @@ class UserRepositoryImpl : UserRepository {
     }
 
 
-    private fun convertToUserDTOSet(documents: List<DocumentSnapshot>): MutableSet<UserDTO> {
+    private fun convertToUserDTOSet(documents: List<DocumentSnapshot>, ignoreMyId: Boolean): MutableSet<UserDTO> {
         val dtoSet = mutableSetOf<UserDTO>()
         var dto: UserDTO? = null
         val myId = auth.currentUser?.uid
 
         for (v in documents) {
-            if (myId != v.id) {
+            if (ignoreMyId) {
+                if (myId != v.id) {
+                    dto = v.toObject<UserDTO>()!!
+                    dto.id = v.id
+                    dtoSet.add(dto)
+                }
+            } else {
                 dto = v.toObject<UserDTO>()!!
                 dto.id = v.id
                 dtoSet.add(dto)
             }
+
         }
         return dtoSet
     }

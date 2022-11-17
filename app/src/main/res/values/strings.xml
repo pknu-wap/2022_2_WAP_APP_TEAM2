@@ -103,8 +103,9 @@
     <string name="empty_alias">값을 입력해주세요</string>
     <string name="error_load_real_name_of_user">실제 이름 가져오기 실패</string>
 
-    
-    
+
     <string name="Firebase_ApiKey"></string>
+    <string name="input_calculation_item_unit_price">단가</string>
+    <string name="count">수량</string>
 
 </resources>

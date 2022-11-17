@@ -1,14 +1,14 @@
 package com.example.wapapp2.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
-import com.example.wapapp2.repository.interfaces.ReceiptRepository
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -17,18 +17,15 @@ import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class ReceiptViewModel : ViewModel() {
+    private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private var currentMySummary = 0
 
     val getCurrentSummary get() = currentMySummary
-    private val _receipts = MutableLiveData<MutableList<ReceiptDTO>>()
-    val receipts get() = _receipts
 
-    private val _products = MutableLiveData<MutableList<ReceiptProductDTO>>()
-    val products get() = _products
+    val products = MutableLiveData<MutableList<ReceiptProductDTO>>()
 
     fun updateSummary_forNewProduct(productDTO: ReceiptProductDTO) {
         currentMySummary += try {
@@ -57,16 +54,17 @@ class ReceiptViewModel : ViewModel() {
     }
 
 
-    fun getReceipts(calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                receiptRepository.getReceipts(calcRoomId)
-            }
-            result.await()
-            withContext(Main) {
-                receipts.value = result.await()
-            }
-        }
+    fun getReceiptsRecyclerOptions(calcRoomId: String): FirestoreRecyclerOptions<ReceiptDTO> {
+        val query = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name).orderBy("status")
+
+        val options = FirestoreRecyclerOptions.Builder<ReceiptDTO>()
+                .setQuery(query, MetadataChanges.INCLUDE) {
+                    val dto = it.toObject<ReceiptDTO>()!!
+                    dto.id = it.id
+                    dto
+                }.build()
+        return options
     }
 
     fun getProducts(receiptId: String, calcRoomId: String) {

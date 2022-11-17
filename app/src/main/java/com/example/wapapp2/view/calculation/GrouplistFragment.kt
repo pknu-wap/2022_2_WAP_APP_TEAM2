@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
@@ -27,8 +28,8 @@ class GrouplistFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var adapter: GroupAdapter? = null
-    private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
-    private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
+    private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -81,9 +82,11 @@ class GrouplistFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
