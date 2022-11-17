@@ -64,7 +64,6 @@ class NewReceiptFragment : Fragment() {
             confirmReceiptsDialogFragment.show(childFragmentManager, "confirm")
         }
 
-
         return binding.root
     }
 

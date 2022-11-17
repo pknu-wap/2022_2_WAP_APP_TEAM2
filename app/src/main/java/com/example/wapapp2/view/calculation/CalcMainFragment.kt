@@ -46,22 +46,15 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
     private val myCalcRoomViewModel by viewModels<MyCalcRoomViewModel>({ requireActivity() })
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
+    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
 
     /** summary of FixedPay **/
     private var paymoney = 0
     private var chatInputLayoutHeight = 0
 
 
-    private val fragmentLifecycleCallbacks = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentCreated(fm: FragmentManager, f: Fragment, savedInstanceState: Bundle?) {
-            super.onFragmentCreated(fm, f, savedInstanceState)
-        }
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        childFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
 
         arguments?.apply {
             roomId = getString("roomId")
@@ -134,15 +127,15 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("calcRoomId", roomId)
+        outState.putString("roomId", roomId)
     }
 
     private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt, this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
-                .commitAllowingStateLoss()
-
+                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt,
+                        this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
+                .commit()
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
             var expanded = true
@@ -168,6 +161,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         //default를 false로 수정할 필요.
         binding.calculationSimpleInfo.expandBtn.post(Runnable {
             binding.calculationSimpleInfo.expandBtn.callOnClick()
+
             binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     if (binding.calculationSimpleInfo.root.height > 0) {
@@ -175,7 +169,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                         //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
                         val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
                         chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
-
                         binding.chat.layoutParams = chatFragmentContainerLayoutParams
                     }
                 }
@@ -193,9 +186,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 putString("calcRoomId", roomId)
             }
             val fragmentManager = parentFragmentManager
-            fragmentManager
-                    .beginTransaction()
-                    .hide(this@CalcMainFragment)
+            fragmentManager.beginTransaction().hide(this@CalcMainFragment)
                     .add(R.id.fragment_container_view, fragment, "CheckReceiptFragment")
                     .addToBackStack("CheckReceiptFragment")
                     .commit()

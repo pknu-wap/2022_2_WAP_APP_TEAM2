@@ -8,6 +8,7 @@ import com.google.firebase.firestore.ListenerRegistration
 
 interface MyCalcRoomRepository {
     suspend fun getMyCalcRooms(): MutableMap<String, CalcRoomDTO>
+    suspend fun getCalcRoom(roomId: String): CalcRoomDTO
     fun getMyCalcRoomIds(listener: EventListener<DocumentSnapshot>): ListenerRegistration
     suspend fun exitFromCalcRoom(roomId: String): Boolean
 }

@@ -1,5 +1,6 @@
 package com.example.wapapp2.dummy
 
+import androidx.core.app.NotificationCompat.getPeople
 import com.example.wapapp2.R
 import com.example.wapapp2.model.*
 import com.example.wapapp2.view.login.Profiles
@@ -9,13 +10,7 @@ import kotlin.collections.ArrayList
 
 class DummyData {
     companion object {
-        fun getPeople(): ArrayList<CalcRoomMemberData> {
-            val testList = ArrayList<CalcRoomMemberData>()
-            testList.add(CalcRoomMemberData("0", "박준성"))
-            testList.add(CalcRoomMemberData("1", "김진우"))
-            testList.add(CalcRoomMemberData("2", "김성윤"))
-            return testList
-        }
+
 
         fun getRoom(): CalcRoomDTO {
             return CalcRoomDTO(
@@ -23,18 +18,6 @@ class DummyData {
                     CalcRoomDTO.RecentMsg("", "", Date(), ""), "정산방", getPeople())
         }
 
-        fun getChatList(): ArrayList<ChatDTO> {
-            val peopleList = getPeople()
-
-            // test data
-            val testList = ArrayList<ChatDTO>()
-            testList.add(ChatDTO(peopleList[0].userName, Date(), "안녕하세요", peopleList[0].userId))
-
-            testList.add(ChatDTO(peopleList[1].userName, Date(), "네!! 안녕하세요!", peopleList[1].userId))
-            testList.add(ChatDTO(peopleList[2].userName, Date(), "네!! 안녕하세요.", peopleList[2].userId))
-
-            return testList
-        }
 
         fun getMyFriendsList(): ArrayList<FriendDTO> {
             val list = ArrayList<FriendDTO>()

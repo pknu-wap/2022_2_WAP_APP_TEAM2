@@ -6,15 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment
 import com.example.wapapp2.viewmodel.ReceiptViewModel
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 
 class ReceiptsFragment : Fragment() {
     private var _binding: FragmentCheckReceiptBinding? = null
@@ -24,14 +21,14 @@ class ReceiptsFragment : Fragment() {
         const val TAG = "ReceiptsFragment"
     }
 
-    private var calcRoomId: String? = null
+    private var roomId: String? = null
     private val receiptViewModel by viewModels<ReceiptViewModel>()
 
     private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, _position ->
         val fragment = EditReceiptFragment()
         fragment.arguments = Bundle().apply {
             putParcelable("receiptDTO", item)
-            putString("calcRoomId", calcRoomId)
+            putString("roomId", roomId)
         }
 
         parentFragmentManager
@@ -46,7 +43,7 @@ class ReceiptsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
-            calcRoomId = getString("calcRoomId")
+            roomId = getString("calcRoomId")
         }
     }
 
@@ -59,7 +56,7 @@ class ReceiptsFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(calcRoomId!!))
+        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(roomId!!))
 
         binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter
@@ -74,7 +71,7 @@ class ReceiptsFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("calcRoomId", calcRoomId)
+        outState.putString("roomId", roomId)
     }
 
     override fun onDestroyView() {
