@@ -33,9 +33,7 @@ class DialogViewPagerAdapter(beginDateText: String, context: Context) : Recycler
             }
         }
 
-        fun bind() {
-            val position = adapterPosition
-
+        fun bind(position: Int) {
             val list = ArrayList<ReceiptDTO>()
             list.add(DummyData.getReceipt())
             receiptListAdapter = ReceiptListForADayAdapter(list)
@@ -47,6 +45,7 @@ class DialogViewPagerAdapter(beginDateText: String, context: Context) : Recycler
             binding.date.text = copiedDateTime.toString(dateFormat)
             binding.year.text = copiedDateTime.year.toString()
 
+            binding.fab.setOnClickListener {  }
         }
 
         fun clear() {
@@ -59,7 +58,7 @@ class DialogViewPagerAdapter(beginDateText: String, context: Context) : Recycler
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind()
+        holder.bind(position)
     }
 
     override fun onViewRecycled(holder: ViewHolder) {

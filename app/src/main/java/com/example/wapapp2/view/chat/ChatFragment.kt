@@ -1,7 +1,6 @@
 package com.example.wapapp2.view.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.model.CalcRoomDTO
@@ -17,13 +17,16 @@ import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import java.util.*
 
 
 class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
     private lateinit var binding: FragmentChatBinding
-    private lateinit var chatAdapter_: ChatAdapter
+
+    private lateinit var chatAdapter: ChatPagingAdapter
+
     private lateinit var bundle: Bundle
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
@@ -38,7 +41,14 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myAccountViewModel = ViewModelProvider(requireActivity())[MyAccountViewModel::class.java]
-        chatAdapter_ = ChatAdapter(myAccountViewModel.myProfileData.value!!.id, chatViewModel.getOptions(calcRoomDTO),
+
+        val options = FirestorePagingOptions.Builder<ChatDTO>()
+            .setLifecycleOwner(this)
+            .setQuery(chatViewModel.getQueryForOption(calcRoomDTO) { _, _ -> ScrollToBottom() },
+                PagingConfig( 20,  10, false),
+                ChatDTO::class.java)
+            .build()
+        chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options,
                 this@ChatFragment::ScrollToBottom)
         bundle = (arguments ?: savedInstanceState) as Bundle
     }
@@ -50,8 +60,10 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
         binding = FragmentChatBinding.inflate(inflater, container, false)
 
         binding.chatList.apply {
-            layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            this.adapter = chatAdapter_
+            val lm = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+            lm.stackFromEnd = true
+            layoutManager = lm
+            this.adapter = chatAdapter
         }
         setInputListener()
 
@@ -81,7 +93,7 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
                 binding.textInputLayout.editText!!.text.clear()
                 chatViewModel.sendMsg(newChat)
-                binding.chatList.smoothScrollToPosition(chatAdapter_.snapshots.size)
+                binding.chatList.smoothScrollToPosition(chatAdapter.snapshot().size)
                 // 전송
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
@@ -91,17 +103,17 @@ class ChatFragment(val calcRoomDTO: CalcRoomDTO) : Fragment(), ScrollListener {
 
     override fun onStart() {
         chatViewModel.attach(calcRoomDTO)
-        chatAdapter_.startListening()
+        chatAdapter.startListening()
         super.onStart()
     }
 
     override fun onStop() {
-        chatAdapter_.stopListening()
+        chatAdapter.stopListening()
         super.onStop()
     }
 
     override fun ScrollToBottom() {
-        binding.chatList.smoothScrollToPosition(chatAdapter_.snapshots.size)
+        binding.chatList.smoothScrollToPosition(chatAdapter.snapshot().size)
     }
 
 }
