@@ -18,6 +18,15 @@
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/text_input_layout"
         app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/chat_msg_item_sended"
+        />
+
+    <com.example.wapapp2.commons.view.NewLoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/text_input_layout"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <com.google.android.material.textfield.TextInputLayout

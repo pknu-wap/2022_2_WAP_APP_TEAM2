@@ -14,12 +14,16 @@ import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import java.util.*
 
-class GroupAdapter(options: FirestoreRecyclerOptions<CalcRoomDTO>,
-                   private val onItemClickListener: ListOnClickListener<CalcRoomDTO>) :
+class GroupAdapter(
+        options: FirestoreRecyclerOptions<CalcRoomDTO>,
+        private val onItemClickListener: ListOnClickListener<CalcRoomDTO>,
+) :
         FirestoreRecyclerAdapter<CalcRoomDTO, GroupAdapter.GroupVH>(options) {
 
-    class GroupVH(private val binding: GroupItemBinding,
-                  private val onItemClickListener: ListOnClickListener<CalcRoomDTO>) : RecyclerView.ViewHolder(binding.root) {
+    class GroupVH(
+            private val binding: GroupItemBinding,
+            private val onItemClickListener: ListOnClickListener<CalcRoomDTO>,
+    ) : RecyclerView.ViewHolder(binding.root) {
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd E", Locale.getDefault())
 
         fun bind(calcRoomDTO: CalcRoomDTO) {
@@ -59,11 +63,5 @@ class GroupAdapter(options: FirestoreRecyclerOptions<CalcRoomDTO>,
         holder.bind(model)
     }
 
-    override fun onDataChanged() {
-        super.onDataChanged()
-    }
 
-    override fun onChildChanged(type: ChangeEventType, snapshot: DocumentSnapshot, newIndex: Int, oldIndex: Int) {
-        super.onChildChanged(type, snapshot, newIndex, oldIndex)
-    }
 }

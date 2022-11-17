@@ -29,7 +29,6 @@ class GrouplistFragment : Fragment() {
 
     private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
-    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -41,8 +40,7 @@ class GrouplistFragment : Fragment() {
         }
 
         fragmentManager.beginTransaction()
-                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
-                        Fragment)
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
                 .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
                 .addToBackStack(CalcMainFragment.TAG).commit()
     }
@@ -108,17 +106,18 @@ class GrouplistFragment : Fragment() {
         myCalcRoomViewModel.myCalcRoomIds.observe(viewLifecycleOwner) {
             adapter?.stopListening()
 
-            if (adapter == null) {
-                adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
-                binding.groupRV.adapter = adapter
-            } else {
-                adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
+            if (it.isNotEmpty()) {
+                if (adapter == null) {
+                    adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
+                    binding.groupRV.adapter = adapter
+                } else {
+                    adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
+                }
+                adapter!!.startListening()
             }
-            adapter!!.startListening()
         }
         myCalcRoomViewModel.loadMyCalcRoomIds()
 
-        //CalenderViewModel.
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 

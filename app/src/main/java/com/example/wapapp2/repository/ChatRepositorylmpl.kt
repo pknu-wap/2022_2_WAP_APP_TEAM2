@@ -4,6 +4,7 @@ import com.example.wapapp2.R
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.repository.interfaces.ChatRepository
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.json.JSONObject
 import java.io.OutputStream
@@ -13,6 +14,7 @@ import java.net.URL
 
 class ChatRepositorylmpl private constructor() : ChatRepository {
     private val fireStore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
 
     companion object {
@@ -27,6 +29,7 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
     }
 
     override suspend fun sendMsg(roomId: String, chatDTO: ChatDTO) {
+        chatDTO.senderId = auth.currentUser!!.uid
         fireStore
                 .collection("calc_rooms")
                 .document(roomId)

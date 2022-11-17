@@ -19,15 +19,13 @@ import kotlinx.coroutines.launch
 class MyCalcRoomViewModel : ViewModel() {
     private val myCalcRoomRepositoryImpl = MyCalcRoomRepositoryImpl.getINSTANCE()
     private val fireStore = FirebaseFirestore.getInstance()
-    val myCalcRoomIds = MutableLiveData<MutableSet<String>>()
+    val myCalcRoomIds = MutableLiveData<MutableSet<String>>(mutableSetOf())
 
-    val myCalcRoomId_live get() = myCalcRoomIds as LiveData<Set<String>>
     private var myCalcRoomIdsListener: ListenerRegistration? = null
 
     fun getMyCalcRoomsOptions(): FirestoreRecyclerOptions<CalcRoomDTO> {
         val query = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .whereIn(FieldPath.documentId(), myCalcRoomIds.value!!.toMutableList())
-                .orderBy("lastModifiedTime", Query.Direction.DESCENDING)
 
         val options = FirestoreRecyclerOptions.Builder<CalcRoomDTO>()
                 .setQuery(query, MetadataChanges.INCLUDE) { snapshot ->
@@ -57,16 +55,18 @@ class MyCalcRoomViewModel : ViewModel() {
     fun loadMyCalcRoomIds() {
         if (myCalcRoomIdsListener == null) {
             myCalcRoomIdsListener = myCalcRoomRepositoryImpl.getMyCalcRoomIds { event, error ->
-                val userDTO = event?.toObject<UserDTO>()
+                if (event != null) {
+                    val userDTO = event!!.toObject<UserDTO>()
+                    userDTO?.also {
+                        val newIdSet = it.myCalcRoomIds.toMutableSet()
 
-                userDTO?.also {
-                    val newIdSet = it.myCalcRoomIds.toMutableSet()
-
-                    //id가 수정된 게 있는 지 확인
-                    if (newIdSet != myCalcRoomIds.value) {
-                        myCalcRoomIds.value = newIdSet
+                        //id가 수정된 게 있는 지 확인
+                        if (newIdSet != myCalcRoomIds.value) {
+                            myCalcRoomIds.value = newIdSet
+                        }
                     }
                 }
+
             }
         }
     }

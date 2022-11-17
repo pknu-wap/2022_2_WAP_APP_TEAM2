@@ -3,6 +3,8 @@ package com.example.wapapp2.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.repository.ChatRepositorylmpl
@@ -16,10 +18,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ChatViewModel(application: Application) : AndroidViewModel(application) {
+class ChatViewModel : ViewModel() {
     private lateinit var EnableChatRoom: CalcRoomDTO
     private val chatRepository: ChatRepository = ChatRepositorylmpl.getINSTANCE()
+    private var listenerRegistration: ListenerRegistration? = null
 
+    override fun onCleared() {
+        super.onCleared()
+        listenerRegistration?.remove()
+    }
 
     fun attach(calcRoomDTO: CalcRoomDTO) {
         EnableChatRoom = calcRoomDTO
@@ -72,15 +79,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getQueryForOption(calcRoomDTO: CalcRoomDTO, snapshotListener: EventListener<QuerySnapshot>): Query {
+    fun getQueryForOption(calcRoomDTO: CalcRoomDTO): Query {
         val query = Firebase.firestore
-                .collection("calc_rooms")
+                .collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomDTO.id!!)
-                .collection("chats")
+                .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime")
 
+        /*
         query.addSnapshotListener(snapshotListener)
         //scroll 관련 구현 필요 snapshotlistener ??
+
+         */
         return query
     }
 }

@@ -5,23 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DateConverter
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.databinding.ChatMsgItemReceivedBinding
 import com.example.wapapp2.databinding.ChatMsgItemSendedBinding
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ChatDTO
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.ListenerRegistration
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 
-class ChatPagingAdapter (val myId: String, option : FirestorePagingOptions<ChatDTO>, val scrollListener: ScrollListener)
-    : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option) {
-
-
+class ChatPagingAdapter(
+        private val myId: String, option: FirestorePagingOptions<ChatDTO>,
+) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
@@ -29,6 +25,7 @@ class ChatPagingAdapter (val myId: String, option : FirestorePagingOptions<ChatD
     private enum class ItemViewType {
         SENDED, RECEVEIED
     }
+
 
     inner class ChatHolder_sended(val binding: ChatMsgItemSendedBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder {
         var time = DateTime()
@@ -68,11 +65,14 @@ class ChatPagingAdapter (val myId: String, option : FirestorePagingOptions<ChatD
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == ItemViewType.RECEVEIED.ordinal) ChatHolder_received(ChatMsgItemReceivedBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+                LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {
         (holder as ChatHolder).bind(position, model)
     }
+
+
+    override fun getAdapterItemCount(): Int = itemCount
 
 }

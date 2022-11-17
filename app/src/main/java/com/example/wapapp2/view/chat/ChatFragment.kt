@@ -6,22 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.databinding.FragmentChatBinding
-import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
-import java.util.*
 
 
 class ChatFragment : Fragment(), ScrollListener {
@@ -55,9 +53,11 @@ class ChatFragment : Fragment(), ScrollListener {
     ): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
 
+        binding.loadingView.setContentView(binding.chatList)
+
         binding.chatList.apply {
             val lm = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            lm.stackFromEnd = true
+            //lm.stackFromEnd = true
             layoutManager = lm
         }
         setInputListener()
@@ -78,17 +78,25 @@ class ChatFragment : Fragment(), ScrollListener {
         super.onViewCreated(view, savedInstanceState)
         currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
             if (chatAdapter == null) {
+                chatViewModel.attach(it)
+
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
-                        .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
-                        .setQuery(chatViewModel.getQueryForOption(it) { _, _ -> ScrollToBottom() },
-                                PagingConfig(20, 10, false),
+                        .setLifecycleOwner(this@ChatFragment)
+                        .setQuery(chatViewModel.getQueryForOption(it),
+                                PagingConfig(20, 2, false),
                                 ChatDTO::class.java)
                         .build()
-                chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options,
-                        this@ChatFragment::ScrollToBottom)
-                chatViewModel.attach(it)
-                binding.chatList.adapter = chatAdapter
-                chatAdapter!!.startListening()
+
+                chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
+
+                chatAdapter?.apply {
+                    val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
+                            this)
+                    adapterObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_chats))
+                    registerAdapterDataObserver(adapterObserver)
+                    binding.chatList.adapter = chatAdapter
+                }
+
             }
         }
     }
@@ -102,22 +110,24 @@ class ChatFragment : Fragment(), ScrollListener {
                         .toString(), myAccountViewModel.myProfileData.value!!.id)
 
                 binding.textInputLayout.editText!!.text.clear()
-                chatViewModel.sendMsg(newChat)
-                binding.chatList.smoothScrollToPosition(chatAdapter!!.snapshot().size)
                 // 전송
+                chatViewModel.sendMsg(newChat)
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+    }
+
     override fun onStop() {
-        chatAdapter?.stopListening()
         super.onStop()
     }
 
-    override fun ScrollToBottom() {
-        binding.chatList.smoothScrollToPosition(chatAdapter!!.snapshot().size)
+    override fun scrollToBottom() {
+        binding.chatList.scrollBy(0, 100)
     }
 
     override fun onDestroyView() {
