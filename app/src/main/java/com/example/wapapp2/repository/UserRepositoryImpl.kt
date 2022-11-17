@@ -36,7 +36,7 @@ class UserRepositoryImpl : UserRepository {
 
     override suspend fun getUsers(ids: MutableList<String>) = suspendCoroutine<MutableList<UserDTO>> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
-        collection.whereEqualTo(FieldPath.documentId(), ids)
+        collection.whereIn(FieldPath.documentId(), ids)
                 .get().addOnCompleteListener {
                     continuation.resume(convertToUserDTOSet(it.result.documents, false).toMutableList())
                 }
@@ -44,7 +44,7 @@ class UserRepositoryImpl : UserRepository {
 
     override suspend fun getUser(userId: String) = suspendCoroutine<UserDTO?> { continuation ->
         val collection = fireStore.collection(FireStoreNames.users.name)
-        val data = collection.document(userId).get().addOnCompleteListener {
+        collection.document(userId).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 continuation.resume(it.result.toObject<UserDTO>())
             } else {

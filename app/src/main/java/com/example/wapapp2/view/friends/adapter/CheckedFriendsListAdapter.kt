@@ -7,16 +7,17 @@ import com.example.wapapp2.databinding.CheckedFriendItemviewBinding
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
 
-class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFriendListener) : RecyclerView.Adapter<CheckedFriendsListAdapter.ViewHolder>() {
+class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFriendListener) :
+        RecyclerView.Adapter<CheckedFriendsListAdapter.ViewHolder>() {
     private val list = ArrayList<FriendDTO>()
 
     inner class ViewHolder(private val itemBinding: CheckedFriendItemviewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
         fun bind() {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
 
             val friendDTO = list[position]
-            itemBinding.friendName.text = friendDTO.friendName
+            itemBinding.friendName.text = friendDTO.alias
             itemBinding.removeBtn.setOnClickListener {
                 onRemovedFriendListener.onRemoved(friendDTO)
             }

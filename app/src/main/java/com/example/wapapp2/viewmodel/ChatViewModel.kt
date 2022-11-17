@@ -17,41 +17,40 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
-    private lateinit var EnableChatRoom : CalcRoomDTO
-    private val chatRepository : ChatRepository = ChatRepositorylmpl.getINSTANCE()
+    private lateinit var EnableChatRoom: CalcRoomDTO
+    private val chatRepository: ChatRepository = ChatRepositorylmpl.getINSTANCE()
 
 
-    fun attach(calcRoomDTO: CalcRoomDTO){
+    fun attach(calcRoomDTO: CalcRoomDTO) {
         EnableChatRoom = calcRoomDTO
     }
 
 
-    fun sendMsg(chatDTO: ChatDTO){
-        CoroutineScope(Dispatchers.Default).launch{
-            chatRepository.sendMsg(EnableChatRoom!!, chatDTO)
+    fun sendMsg(chatDTO: ChatDTO) {
+        CoroutineScope(Dispatchers.Default).launch {
+            chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO)
         }
     }
 
-    fun getOptions(calcRoomDTO: CalcRoomDTO) : FirestoreRecyclerOptions<ChatDTO> {
+    fun getOptions(calcRoomDTO: CalcRoomDTO): FirestoreRecyclerOptions<ChatDTO> {
         val query = Firebase.firestore
-            .collection("calc_rooms")
-            .document(calcRoomDTO.id!!)
-            .collection("chats")
-            .orderBy("sendedTime")
+                .collection("calc_rooms")
+                .document(calcRoomDTO.id!!)
+                .collection("chats")
+                .orderBy("sendedTime")
 
         val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
-            .setQuery(query, SnapshotParser {
-                //id로부터 사람이름
-                ChatDTO(it.getString("userName").toString() , it.getTimestamp("sendedTime")?.toDate(),it.getString("msg").toString(),it.getString("senderId").toString())
-            })
-            .build()
+                .setQuery(query, SnapshotParser {
+                    //id로부터 사람이름
+                    ChatDTO(it.getString("userName").toString(), it.getTimestamp("sendedTime")?.toDate(), it.getString("msg").toString(), it.getString("senderId").toString())
+                })
+                .build()
 
         return recyclerOption
     }
 
 
-
-    inner class ChatLiveData(val documentReference: DocumentReference) : LiveData<ChatDTO>(), EventListener<DocumentSnapshot>{
+    inner class ChatLiveData(val documentReference: DocumentReference) : LiveData<ChatDTO>(), EventListener<DocumentSnapshot> {
         private var snapshotListener: ListenerRegistration? = null
 
         override fun onActive() {
@@ -73,12 +72,12 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getQueryForOption(calcRoomDTO: CalcRoomDTO, snapshotListener: EventListener<QuerySnapshot>) : Query {
+    fun getQueryForOption(calcRoomDTO: CalcRoomDTO, snapshotListener: EventListener<QuerySnapshot>): Query {
         val query = Firebase.firestore
-            .collection("calc_rooms")
-            .document(calcRoomDTO.id!!)
-            .collection("chats")
-            .orderBy("sendedTime")
+                .collection("calc_rooms")
+                .document(calcRoomDTO.id!!)
+                .collection("chats")
+                .orderBy("sendedTime")
 
         query.addSnapshotListener(snapshotListener)
         //scroll 관련 구현 필요 snapshotlistener ??

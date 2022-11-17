@@ -80,6 +80,7 @@ class LoginFragment : Fragment() {
             UserRepositoryImpl.initialize()
             MyBankAccountRepositoryImpl.initialize()
             MyCalcRoomRepositoryImpl.initialize()
+            CalcRoomRepositorylmpl.initialize()
 
             myAccountViewModel.initMyProfile()
 
@@ -102,8 +103,10 @@ class LoginFragment : Fragment() {
                 .commitAllowingStateLoss()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         binding = FragmentLoginBinding.inflate(inflater)
 
         binding.btnLogin.setOnClickListener { emailLogin() }

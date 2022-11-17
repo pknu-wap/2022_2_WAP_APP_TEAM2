@@ -118,9 +118,6 @@ class GrouplistFragment : Fragment() {
         }
         myCalcRoomViewModel.loadMyCalcRoomIds()
 
-
-
-
         //CalenderViewModel.
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }

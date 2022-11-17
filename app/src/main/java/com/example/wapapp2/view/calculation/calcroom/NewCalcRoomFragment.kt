@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
@@ -24,7 +24,7 @@ class NewCalcRoomFragment : Fragment() {
         const val TAG = "NewCalcRoomFragment"
     }
 
-    private val calcRoomViewModel: FriendsViewModel by viewModels()
+    private val calcRoomViewModel: FriendsViewModel by activityViewModels()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
             OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
@@ -59,8 +59,10 @@ class NewCalcRoomFragment : Fragment() {
         })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         binding = FragmentNewCalcRoomBinding.inflate(inflater)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
@@ -97,10 +99,10 @@ class NewCalcRoomFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                s?.apply { calcRoomViewModel.getFriends(toString()) }
+                s?.apply { calcRoomViewModel.findFriend(toString()) }
             }
         })
-        calcRoomViewModel.getFriends("")
+        calcRoomViewModel.findFriend("")
     }
 
 }

@@ -8,6 +8,7 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.MyCalcRoomRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.firestore.SnapshotParser
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.CoroutineScope
@@ -29,9 +30,9 @@ class MyCalcRoomViewModel : ViewModel() {
                 .orderBy("lastModifiedTime", Query.Direction.DESCENDING)
 
         val options = FirestoreRecyclerOptions.Builder<CalcRoomDTO>()
-                .setQuery(query, MetadataChanges.INCLUDE) {
-                    val dto = it.toObject<CalcRoomDTO>()!!
-                    dto.id = it.id
+                .setQuery(query, MetadataChanges.INCLUDE) { snapshot ->
+                    val dto = snapshot.toObject<CalcRoomDTO>()!!
+                    dto.id = snapshot.id
                     dto
                 }.build()
         return options

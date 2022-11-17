@@ -38,7 +38,7 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                 .addOnSuccessListener { }
     }
 
-    fun snapshotCalcRoom(
+    override fun snapshotCalcRoom(
             roomId: String,
             listener: EventListener<DocumentSnapshot>,
     ): ListenerRegistration = firestore.collection(FireStoreNames.calc_rooms
