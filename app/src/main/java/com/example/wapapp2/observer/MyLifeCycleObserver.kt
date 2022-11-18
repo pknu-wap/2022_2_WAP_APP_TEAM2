@@ -42,20 +42,21 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private 
     private var permissionsCallback: ActivityResultCallback<Map<String, Boolean>>? = null
     private var onCameraCallback: OnCameraCallback? = null
 
+    private var cameraUri: Uri? = null
+
     override fun onCreate(owner: LifecycleOwner) {
         pickImageLauncher = registry.register("image", owner, ActivityResultContracts.GetContent()) {
             pickImgCallback?.onActivityResult(it)
         }
 
         cameraLauncher = registry.register("camera", owner, ActivityResultContracts.StartActivityForResult()) {
-            var uri: Uri? = null
+            //data RESULT_OK, RESULT_CANCELED로 구분
+            if (it.resultCode == Activity.RESULT_OK)
+                onCameraCallback?.onResult(Uri.parse(cameraUri.toString()))
+            else
+                onCameraCallback?.onResult(null)
 
-            it.data?.apply {
-                val file = File(Environment.getExternalStorageDirectory(), getStringExtra("fileName")!!)
-                uri = FileProvider.getUriForFile(context, context.packageName.toString() + ".provider", file)
-            }
-
-            onCameraCallback?.onResult(uri)
+            cameraUri = null
         }
 
         permissionsLauncher = registry.register("permissions", owner, ActivityResultContracts.RequestMultiplePermissions()) {
@@ -90,6 +91,7 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private 
                         val photoURI: Uri = FileProvider.getUriForFile(
                                 activity.applicationContext, "com.example.wapapp2.provider", it
                         )
+                        cameraUri = photoURI
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                         takePictureIntent.putExtra("fileName", it.name)
                     }
@@ -130,7 +132,7 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private 
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
+                "receipt_${timeStamp}_", /* prefix */
                 ".jpg", /* suffix */
                 storageDir /* directory */
         ).apply {

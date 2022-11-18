@@ -66,7 +66,6 @@ class FriendsFragment : Fragment() {
         myFriendsAdapter.registerAdapterDataObserver(dataObserver)
 
         binding.myFriendsList.adapter = myFriendsAdapter
-        myFriendsAdapter.startListening()
 
         return binding.root
     }
@@ -76,14 +75,23 @@ class FriendsFragment : Fragment() {
         setMyProfile()
     }
 
+    override fun onStart() {
+        super.onStart()
+        myFriendsAdapter.startListening()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    override fun onStop() {
+        super.onStop()
+        myFriendsAdapter.stopListening()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        myFriendsAdapter.stopListening()
     }
 
     private fun setMyProfile() {
@@ -103,5 +111,14 @@ class FriendsFragment : Fragment() {
             binding.myAccountId.text = it.email
         }
 
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            myFriendsAdapter.stopListening()
+        } else {
+            myFriendsAdapter.startListening()
+        }
     }
 }

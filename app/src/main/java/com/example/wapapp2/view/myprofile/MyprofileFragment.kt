@@ -67,8 +67,10 @@ class MyprofileFragment : Fragment() {
         adapter = MyBankAccountsAdapter(myBankAccountsViewModel.getMyBankAccountsOptions(), onClickedPopupMenuListener)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         _binding = FragmentMyprofileBinding.inflate(inflater, container, false)
 
         binding.loadingView.setContentView(binding.bankList)
@@ -79,7 +81,6 @@ class MyprofileFragment : Fragment() {
         }
 
         binding.bankList.adapter = adapter
-        adapter.startListening()
 
         binding.btnEdit.setOnClickListener {
             val dialog = DialogEditDetailFragment()
@@ -116,6 +117,10 @@ class MyprofileFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -124,7 +129,20 @@ class MyprofileFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    override fun onStop() {
+        super.onStop()
         adapter.stopListening()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            adapter.stopListening()
+        } else {
+            adapter.startListening()
+        }
     }
 
     interface OnClickedPopupMenuListener {

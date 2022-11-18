@@ -45,8 +45,12 @@ class ReceiptsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
-            roomId = getString("calcRoomId")
+            roomId = getString("roomId")
         }
+        roomId?.run {
+            savedInstanceState?.getString("roomId")
+        }
+        receiptViewModel.roomId = roomId
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -96,6 +100,15 @@ class ReceiptsFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            adapter.stopListening()
+        } else {
+            adapter.startListening()
+        }
     }
 
 

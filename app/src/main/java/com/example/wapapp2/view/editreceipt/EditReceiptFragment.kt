@@ -99,6 +99,7 @@ class EditReceiptFragment : Fragment() {
                                     Glide.with(requireContext()).load(this).into(binding.receiptImage)
                                     modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = this
                                     modifyReceiptViewModel.receiptImgChanged = true
+                                    modifyReceiptViewModel.hasReceiptImg = true
                                 }
                             }
                         }
@@ -119,6 +120,7 @@ class EditReceiptFragment : Fragment() {
                             modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = null
                             binding.receiptImgBtn.text = getString(R.string.add_img)
                             modifyReceiptViewModel.receiptImgChanged = true
+                            modifyReceiptViewModel.hasReceiptImg = false
                         }
                         .setPositiveButton(R.string.replace_img) { dialog, which ->
                             dialog.dismiss()
@@ -127,29 +129,33 @@ class EditReceiptFragment : Fragment() {
             }
         }
 
+        binding.receiptImage.setOnClickListener {
+            val imgType = if (modifyReceiptViewModel.receiptImgChanged) ReceiptImgFragment.ImgType.LOCAL
+            else ReceiptImgFragment.ImgType.SERVER
+            val imgFragment = ReceiptImgFragment.newInstance(modifyReceiptViewModel.receiptDTO.imgUrl!!, imgType)
+
+            parentFragmentManager.beginTransaction().hide(this@EditReceiptFragment)
+                    .add(R.id.fragment_container_view, imgFragment, ReceiptImgFragment.TAG).addToBackStack(ReceiptImgFragment.TAG)
+                    .commit()
+        }
+
         modifyReceiptViewModel.receiptDTO.imgUrl?.apply {
+            modifyReceiptViewModel.hasReceiptImg = true
             val storageReference = Firebase.storage.getReferenceFromUrl(this)
             Glide.with(requireContext()).load(storageReference).into(binding.receiptImage)
-
-            binding.receiptImage.setOnClickListener {
-                val imgType = if (modifyReceiptViewModel.receiptImgChanged) ReceiptImgFragment.ImgType.LOCAL
-                else ReceiptImgFragment.ImgType.SERVER
-                val imgFragment = ReceiptImgFragment.newInstance(modifyReceiptViewModel.receiptDTO.imgUrl!!, imgType)
-
-                parentFragmentManager.beginTransaction().hide(this@EditReceiptFragment)
-                        .add(R.id.fragment_container_view, imgFragment, ReceiptImgFragment.TAG).addToBackStack(ReceiptImgFragment.TAG)
-                        .commit()
-            }
         }
     }
 
 
     private fun pickImage() {
         myLifeCycleObserver?.pickImage(requireActivity()) {
-            modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = it
-            Glide.with(requireContext()).load(it).into(binding.receiptImage)
-            binding.receiptImgBtn.text = getString(R.string.modify_img)
-            modifyReceiptViewModel.receiptImgChanged = true
+            it?.apply {
+                modifyReceiptViewModel.hasReceiptImg = true
+                modifyReceiptViewModel.receiptDTO.imgUriInMyPhone = this
+                Glide.with(requireContext()).load(this).into(binding.receiptImage)
+                binding.receiptImgBtn.text = getString(R.string.modify_img)
+                modifyReceiptViewModel.receiptImgChanged = true
+            }
         }
     }
 

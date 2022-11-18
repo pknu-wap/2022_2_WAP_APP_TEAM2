@@ -6,8 +6,11 @@
     <files-path
         name="images"
         path="." />
-    <external-files-path
-        name="receipt_imgs"
-        path="Android/data/com.example.wapapp2/files/Pictures" />
 
+    <external-files-path
+        name="external_files_path"
+        path="." />
+    <external-path
+        name="external_files"
+        path="." />
 </paths>

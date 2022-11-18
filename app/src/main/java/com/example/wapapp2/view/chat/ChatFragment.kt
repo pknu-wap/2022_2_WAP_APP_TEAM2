@@ -160,4 +160,13 @@ class ChatFragment : Fragment(), ScrollListener {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            chatAdapter?.stopListening()
+        } else {
+            chatAdapter?.startListening()
+        }
+    }
 }

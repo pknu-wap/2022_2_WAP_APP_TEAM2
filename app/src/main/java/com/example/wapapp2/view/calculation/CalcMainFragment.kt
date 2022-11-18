@@ -174,7 +174,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         binding.receiptsList.setOnClickListener {
             val fragment = ReceiptsFragment()
             fragment.arguments = Bundle().apply {
-                putString("calcRoomId", roomId)
+                putString("roomId", roomId)
             }
             val fragmentManager = parentFragmentManager
             fragmentManager.beginTransaction().hide(this@CalcMainFragment)
