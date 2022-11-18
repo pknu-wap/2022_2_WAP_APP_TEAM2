@@ -84,7 +84,7 @@ class ChatViewModel : ViewModel() {
                 .collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomDTO.id!!)
                 .collection(FireStoreNames.chats.name)
-                .orderBy("sendedTime")
+                .orderBy("sendedTime", Query.Direction.DESCENDING)
 
         /*
         query.addSnapshotListener(snapshotListener)
@@ -92,5 +92,14 @@ class ChatViewModel : ViewModel() {
 
          */
         return query
+    }
+
+    fun addSnapshot(roomId: String, listener: EventListener<QuerySnapshot>) {
+        listenerRegistration = Firebase.firestore
+                .collection(FireStoreNames.calc_rooms.name)
+                .document(roomId)
+                .collection(FireStoreNames.chats.name)
+                .orderBy("sendedTime", Query.Direction.DESCENDING)
+                .addSnapshotListener(listener)
     }
 }

@@ -20,10 +20,9 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.ISODateTimeFormat
 
 class ChatPagingAdapter(
-        private val scrollListener: ScrollListener,
         private val myId: String,
-        private val option: FirestoreRecyclerOptions<ChatDTO>,
-) : FirestoreRecyclerAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount {
+        private val option: FirestorePagingOptions<ChatDTO>,
+) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
@@ -64,7 +63,7 @@ class ChatPagingAdapter(
         }
 
         private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
-            return if (currentPosition - 1 < 0) false else getItem(currentPosition - 1).senderId == userId
+            return if (currentPosition - 1 < 0) false else getItem(currentPosition - 1)?.get("senderId") == userId
         }
     }
 
@@ -75,7 +74,8 @@ class ChatPagingAdapter(
     }
 
     override fun getItemViewType(position: Int): Int =
-            if (option.snapshots[position].senderId == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
+            if (getItem(position)?.get("senderId").toString() == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
+
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {
         (holder as ChatHolder).bind(position, model)
@@ -84,11 +84,4 @@ class ChatPagingAdapter(
 
     override fun getAdapterItemCount(): Int = itemCount
 
-    override fun onDataChanged() {
-        super.onDataChanged()
-    }
-
-    override fun onChildChanged(type: ChangeEventType, snapshot: DocumentSnapshot, newIndex: Int, oldIndex: Int) {
-        super.onChildChanged(type, snapshot, newIndex, oldIndex)
-    }
 }
