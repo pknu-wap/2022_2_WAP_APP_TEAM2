@@ -13,7 +13,12 @@ import com.example.wapapp2.databinding.FragmentRootTransactionBinding
 
 
 class RootTransactionFragment : Fragment() {
-    private lateinit var binding: FragmentRootTransactionBinding
+    private var _binding: FragmentRootTransactionBinding? = null
+    private val binding get() = _binding!!
+
+    companion object {
+        const val TAG = "RootTransactionFragment"
+    }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -36,16 +41,23 @@ class RootTransactionFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        binding = FragmentRootTransactionBinding.inflate(inflater)
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
+        _binding = FragmentRootTransactionBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        childFragmentManager.beginTransaction().add(binding.fragmentContainerView.id, MainHostFragment(), MainHostFragment::class.java.name)
+        childFragmentManager.beginTransaction().add(binding.fragmentContainerView.id, MainHostFragment(), MainHostFragment.TAG)
                 .commitAllowingStateLoss()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

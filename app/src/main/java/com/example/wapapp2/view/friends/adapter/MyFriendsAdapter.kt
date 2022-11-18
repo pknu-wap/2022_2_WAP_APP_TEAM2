@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.MyFriendItemViewBinding
 import com.example.wapapp2.model.FriendDTO
@@ -14,9 +15,11 @@ import com.firebase.ui.firestore.paging.FirestorePagingAdapter
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentSnapshot
 
-class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDTO>,
-                       options: FirestoreRecyclerOptions<FriendDTO>) :
-        FirestoreRecyclerAdapter<FriendDTO, MyFriendsAdapter.CustomViewHolder>(options) {
+class MyFriendsAdapter(
+        private val onClickListener: ListOnClickListener<FriendDTO>,
+        options: FirestoreRecyclerOptions<FriendDTO>,
+) :
+        FirestoreRecyclerAdapter<FriendDTO, MyFriendsAdapter.CustomViewHolder>(options), IAdapterItemCount {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
         return CustomViewHolder(MyFriendItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener)
@@ -34,8 +37,10 @@ class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDT
         super.onChildChanged(type, snapshot, newIndex, oldIndex)
     }
 
-    class CustomViewHolder(private val binding: MyFriendItemViewBinding,
-                           private val onClickListener: ListOnClickListener<FriendDTO>) :
+    class CustomViewHolder(
+            private val binding: MyFriendItemViewBinding,
+            private val onClickListener: ListOnClickListener<FriendDTO>,
+    ) :
             RecyclerView.ViewHolder(binding.root) {
 
         fun bind(friendDTO: FriendDTO) {
@@ -47,5 +52,9 @@ class MyFriendsAdapter(private val onClickListener: ListOnClickListener<FriendDT
             }
         }
 
+    }
+
+    override fun getAdapterItemCount(): Int {
+        return itemCount
     }
 }

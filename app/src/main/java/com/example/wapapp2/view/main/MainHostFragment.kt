@@ -6,27 +6,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.activityViewModels
 import com.example.wapapp2.view.calendar.CalenderFragment
 import com.example.wapapp2.view.calculation.GrouplistFragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentMainHostBinding
 import com.example.wapapp2.view.friends.FriendsFragment
+import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 
 
 class MainHostFragment : Fragment() {
-    private lateinit var binding: FragmentMainHostBinding
+    private var _binding: FragmentMainHostBinding? = null
+    private val binding get() = _binding!!
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     companion object {
-        val TAG = "MainHost"
+        const val TAG = "MainHostFragment"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        friendsViewModel.loadMyFriends()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        binding = FragmentMainHostBinding.inflate(inflater)
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View {
+        _binding = FragmentMainHostBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -76,5 +84,11 @@ class MainHostFragment : Fragment() {
 
 
         binding.bottomNavigationView.selectedItemId = R.id.calculation
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

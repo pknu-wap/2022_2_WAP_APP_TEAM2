@@ -88,7 +88,7 @@ class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private 
                     }
                     photoFile?.also {
                         val photoURI: Uri = FileProvider.getUriForFile(
-                                activity.applicationContext, "com.example.android.fileprovider", it
+                                activity.applicationContext, "com.example.wapapp2.provider", it
                         )
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                         takePictureIntent.putExtra("fileName", it.name)

@@ -60,7 +60,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             roomId = requireArguments().getString("roomId")!!
         }
 
-        currentCalcRoomViewModel.myFriendMap.putAll(friendsViewModel.myFriendMap.toMutableMap())
+        currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.myFriendMap.toMutableMap())
         currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
     }
 

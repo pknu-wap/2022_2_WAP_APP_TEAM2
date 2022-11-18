@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.wapapp2.R
@@ -25,7 +26,7 @@ class AddMyFriendFragment : Fragment() {
     private var _binding: FragmentAddMyFriendBinding? = null
     private val binding get() = _binding!!
 
-    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val userViewModel by viewModels<UserViewModel>()
 
     private val listOnClickListener = ListOnClickListener<UserDTO> { item, pos ->
@@ -48,11 +49,13 @@ class AddMyFriendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userViewModel.myFriendsIdSet.addAll(friendsViewModel.myFriendMap.keys)
+        userViewModel.myFriendsIdSet.addAll(FriendsViewModel.myFriendMap.keys)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
         _binding = FragmentAddMyFriendBinding.inflate(inflater, container, false)
         binding.searchUserList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         binding.searchUserList.adapter = adapter

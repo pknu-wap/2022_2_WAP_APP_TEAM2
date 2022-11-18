@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
@@ -15,7 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDTO>, options: FirestoreRecyclerOptions<ReceiptDTO>) :
-        FirestoreRecyclerAdapter<ReceiptDTO, ReceiptsAdapter.CustomViewHolder>(options) {
+        FirestoreRecyclerAdapter<ReceiptDTO, ReceiptsAdapter.CustomViewHolder>(options), IAdapterItemCount {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             CustomViewHolder(CheckReceiptBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener)
@@ -48,5 +49,9 @@ class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDT
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int, model: ReceiptDTO) {
         holder.bind(model)
+    }
+
+    override fun getAdapterItemCount(): Int {
+        return itemCount
     }
 }

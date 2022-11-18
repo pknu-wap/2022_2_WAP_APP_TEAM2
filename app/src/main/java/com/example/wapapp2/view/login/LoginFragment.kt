@@ -86,7 +86,7 @@ class LoginFragment : Fragment() {
 
             parentFragmentManager
                     .beginTransaction()
-                    .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment::class.java.name)
+                    .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment.TAG)
                     .commitAllowingStateLoss()
         }
     }

@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
@@ -50,7 +52,6 @@ class ReceiptsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCheckReceiptBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.rvEditreceipt)
-        binding.loadingView.onSuccessful()
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -58,15 +59,24 @@ class ReceiptsFragment : Fragment() {
 
         adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(roomId!!))
 
+        val dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
+                LinearLayoutManager, adapter)
+        dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
+        adapter.registerAdapterDataObserver(dataObserver)
+
         binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter
-        adapter.startListening()
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -79,9 +89,13 @@ class ReceiptsFragment : Fragment() {
         _binding = null
     }
 
+    override fun onStop() {
+        super.onStop()
+        adapter.stopListening()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        adapter.stopListening()
     }
 
 
