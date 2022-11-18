@@ -27,7 +27,8 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     var roomId: String? = null
     val myFriendMap = mutableMapOf<String, FriendDTO>()
-    val participants = MutableLiveData<MutableList<CalcRoomParticipantDTO>>(mutableListOf())
+    val participants = MutableLiveData<MutableList<CalcRoomParticipantDTO>>()
+    val participantMap = mutableMapOf<String, CalcRoomParticipantDTO>()
     val participantIds = mutableSetOf<String>()
     val receipts = MutableLiveData<ArrayMap<String, ReceiptDTO>>(arrayMapOf())
     val calcRoom = MutableLiveData<CalcRoomDTO>()
@@ -51,7 +52,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
         addSnapshotReceipts()
     }
 
-    private fun onChangedParticipants(calcRoomDTO: CalcRoomDTO) {
+    private fun onChangedParticipants() {
         // 정산방 참여자 목록 가져오기
         viewModelScope.launch {
             val downloadedParticipantList = async {
@@ -61,13 +62,16 @@ class CurrentCalcRoomViewModel : ViewModel() {
             val participantList = mutableListOf<CalcRoomParticipantDTO>()
             var name = ""
             var isMyFriend = false
+            var dto: CalcRoomParticipantDTO? = null
 
             for (v in downloadedParticipantList.await()) {
                 //내 친구인지 확인
                 isMyFriend = myFriendMap.containsKey(v.id)
-
                 name = if (isMyFriend) myFriendMap[v.id]!!.alias else v.name
-                participantList.add(CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email))
+
+                dto = CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email)
+                participantList.add(dto)
+                participantMap[v.id] = dto
             }
 
             withContext(Main) {
@@ -113,7 +117,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
                 //참여자 변화 생김
                 participantIds.clear()
                 participantIds.addAll(calcRoomDTO.participantIds.toMutableSet())
-                onChangedParticipants(calcRoomDTO)
+                onChangedParticipants()
             }
 
             calcRoom.value = calcRoomDTO

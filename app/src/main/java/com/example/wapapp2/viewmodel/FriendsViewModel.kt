@@ -26,22 +26,13 @@ class FriendsViewModel : ViewModel() {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val fireStore = FirebaseFirestore.getInstance()
 
-    val friendsListLiveData = MutableLiveData<ArrayList<FriendDTO>>(ArrayList<FriendDTO>())
+    val friendsListLiveData = MutableLiveData<ArrayList<FriendDTO>>(arrayListOf())
     val friendCheckedLiveData = MutableLiveData<FriendCheckDTO>()
     val searchResultFriendsLiveData = MutableLiveData<MutableList<FriendDTO>>()
     val participantsInCalcRoom = mutableListOf<CalcRoomParticipantDTO>()
 
-    val myFriendMap = mutableMapOf<String, FriendDTO>()
-
-    init {
-        viewModelScope.launch {
-            val myFriends = async {
-                friendsRepositoryImpl.loadMyFriends()
-            }
-            for (friend in myFriends.await()) {
-                myFriendMap[friend.friendUserId] = friend
-            }
-        }
+    companion object {
+        val myFriendMap = mutableMapOf<String, FriendDTO>()
     }
 
     fun checkedFriend(friendDTO: FriendDTO, isChecked: Boolean) {
@@ -130,6 +121,17 @@ class FriendsViewModel : ViewModel() {
                 }
                 .build()
         return option
+    }
+
+    fun loadMyFriends() {
+        viewModelScope.launch {
+            val myFriends = async {
+                friendsRepositoryImpl.loadMyFriends()
+            }
+            for (friend in myFriends.await()) {
+                myFriendMap[friend.friendUserId] = friend
+            }
+        }
     }
 
     data class FriendCheckDTO(val isChecked: Boolean, val friendDTO: FriendDTO)

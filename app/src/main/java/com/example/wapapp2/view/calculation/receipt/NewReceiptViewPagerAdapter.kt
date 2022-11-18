@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class NewReceiptViewPagerAdapter(parentFragment: Fragment, private val list: ArrayList<Holder> = ArrayList<Holder>()) :
+class NewReceiptViewPagerAdapter(parentFragment: Fragment, private val list: ArrayList<Holder> = arrayListOf<Holder>()) :
         FragmentStateAdapter(parentFragment) {
 
     private var receiptId = 0

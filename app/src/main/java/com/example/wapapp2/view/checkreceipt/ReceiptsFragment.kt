@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
@@ -23,6 +25,7 @@ class ReceiptsFragment : Fragment() {
 
     private var roomId: String? = null
     private val receiptViewModel by viewModels<ReceiptViewModel>()
+    private var dataObserver: ListAdapterDataObserver? = null
 
     private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, _position ->
         val fragment = EditReceiptFragment()
@@ -43,30 +46,41 @@ class ReceiptsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
-            roomId = getString("calcRoomId")
+            roomId = getString("roomId")
         }
+        roomId?.run {
+            savedInstanceState?.getString("roomId")
+        }
+
+        receiptViewModel.roomId = roomId
+        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(receiptViewModel.roomId!!))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCheckReceiptBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.rvEditreceipt)
-        binding.loadingView.onSuccessful()
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(roomId!!))
+        dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
+                LinearLayoutManager, adapter)
+        dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
+        adapter.registerAdapterDataObserver(dataObserver!!)
 
-        binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter
-        adapter.startListening()
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -81,7 +95,23 @@ class ReceiptsFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        dataObserver?.apply {
+            adapter.unregisterAdapterDataObserver(this)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
         adapter.stopListening()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            adapter.stopListening()
+        } else {
+            adapter.startListening()
+        }
     }
 
 

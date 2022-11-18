@@ -43,7 +43,7 @@ class NewLoadingView : FrameLayout, DefaultLifecycleObserver {
      */
     fun setContentView(vararg contentView: View) {
         this.contentViews.addAll(contentView.toMutableList())
-        onSuccessful()
+        onStarted()
     }
 
     /**

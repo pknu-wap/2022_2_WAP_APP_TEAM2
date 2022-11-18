@@ -79,10 +79,10 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun getQueryForOption(calcRoomDTO: CalcRoomDTO): Query {
+    fun getQueryForOption(roomId: String): Query {
         val query = Firebase.firestore
                 .collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomDTO.id!!)
+                .document(roomId)
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
 

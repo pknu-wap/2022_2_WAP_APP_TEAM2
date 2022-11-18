@@ -153,7 +153,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
                             newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = null
                             binding.receiptImgBtn.text = getString(R.string.add_img)
                         }
-                        .setPositiveButton(R.string.receipt_img) { dialog, which ->
+                        .setPositiveButton(R.string.replace_img) { dialog, which ->
                             dialog.dismiss()
                             pickImage()
                         }.create().show()
@@ -163,10 +163,11 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
     private fun pickImage() {
         myLifeCycleObserver?.pickImage(requireActivity()) {
-            newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = it
-            Glide.with(requireContext()).load(it).into(binding.receiptImage)
-
-            binding.receiptImgBtn.text = getString(R.string.modify_img)
+            it?.apply {
+                newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone = this
+                Glide.with(requireContext()).load(this).into(binding.receiptImage)
+                binding.receiptImgBtn.text = getString(R.string.modify_img)
+            }
         }
     }
 
