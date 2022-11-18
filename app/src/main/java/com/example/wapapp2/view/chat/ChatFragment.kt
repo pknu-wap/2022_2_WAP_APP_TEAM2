@@ -9,7 +9,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
@@ -21,7 +23,12 @@ import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -55,12 +62,10 @@ class ChatFragment : Fragment(), ScrollListener {
             savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
-
         binding.loadingView.setContentView(binding.chatList)
 
         binding.chatList.apply {
-            val lm = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            //lm.stackFromEnd = true
+            val lm = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
             layoutManager = lm
         }
         setInputListener()
@@ -83,23 +88,40 @@ class ChatFragment : Fragment(), ScrollListener {
             if (chatAdapter == null) {
                 chatViewModel.attach(it)
 
-                val options = FirestoreRecyclerOptions.Builder<ChatDTO>()
+                val config = PagingConfig(20, 10, false)
+                val options = FirestorePagingOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment)
-                        .setQuery(chatViewModel.getQueryForOption(it),
-                                MetadataChanges.INCLUDE) { snapshot ->
+                        .setQuery(chatViewModel.getQueryForOption(it), config) { snapshot ->
                             ChatDTO(snapshot.getString("userName").toString(), snapshot.getTimestamp("sendedTime")?.toDate(),
                                     snapshot.getString("msg").toString(), snapshot.getString("senderId").toString())
                         }
                         .build()
 
-                chatAdapter = ChatPagingAdapter(this@ChatFragment, myAccountViewModel.myProfileData.value!!.id, options)
-
+                chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
                 chatAdapter?.apply {
                     val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
                             this)
                     adapterObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_chats))
+                    adapterObserver.onChanged()
                     registerAdapterDataObserver(adapterObserver)
                     binding.chatList.adapter = chatAdapter
+                }
+
+                chatViewModel.addSnapshot(it.id!!) { value, error ->
+                    if (value != null) {
+                        for (dc in value.documentChanges) {
+                            if (dc.type == DocumentChange.Type.ADDED) {
+                                //chatAdapter!!.snapshot().toMutableList().add(dc.document)
+
+                                //chatAdapter!!.notifyItemInserted(chatAdapter!!.itemCount - 1)
+                                lifecycleScope.launch {
+                                    chatAdapter!!.submitData(PagingData.from(value.documents))
+                                }
+                                break
+                            }
+                        }
+                    }
+
                 }
 
             }
