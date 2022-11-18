@@ -46,7 +46,9 @@ class UserRepositoryImpl : UserRepository {
         val collection = fireStore.collection(FireStoreNames.users.name)
         collection.document(userId).get().addOnCompleteListener {
             if (it.isSuccessful) {
-                continuation.resume(it.result.toObject<UserDTO>())
+                val dto = it.result.toObject<UserDTO>()!!
+                dto.id = it.result.id
+                continuation.resume(dto)
             } else {
                 continuation.resume(null)
             }

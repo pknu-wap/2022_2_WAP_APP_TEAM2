@@ -19,7 +19,10 @@ import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
+import com.google.firebase.firestore.MetadataChanges
+import java.util.*
 
 
 class ChatFragment : Fragment(), ScrollListener {
@@ -80,14 +83,16 @@ class ChatFragment : Fragment(), ScrollListener {
             if (chatAdapter == null) {
                 chatViewModel.attach(it)
 
-                val options = FirestorePagingOptions.Builder<ChatDTO>()
+                val options = FirestoreRecyclerOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment)
                         .setQuery(chatViewModel.getQueryForOption(it),
-                                PagingConfig(20, 2, false),
-                                ChatDTO::class.java)
+                                MetadataChanges.INCLUDE) { snapshot ->
+                            ChatDTO(snapshot.getString("userName").toString(), snapshot.getTimestamp("sendedTime")?.toDate(),
+                                    snapshot.getString("msg").toString(), snapshot.getString("senderId").toString())
+                        }
                         .build()
 
-                chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
+                chatAdapter = ChatPagingAdapter(this@ChatFragment, myAccountViewModel.myProfileData.value!!.id, options)
 
                 chatAdapter?.apply {
                     val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
@@ -105,8 +110,7 @@ class ChatFragment : Fragment(), ScrollListener {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-
-                val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, null, binding.textInputLayout.editText!!.text
+                val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
                         .toString(), myAccountViewModel.myProfileData.value!!.id)
 
                 binding.textInputLayout.editText!!.text.clear()
@@ -127,7 +131,7 @@ class ChatFragment : Fragment(), ScrollListener {
     }
 
     override fun scrollToBottom() {
-        binding.chatList.scrollBy(0, 100)
+        binding.chatList.scrollToPosition(binding.chatList.adapter!!.itemCount - 1)
     }
 
     override fun onDestroyView() {
