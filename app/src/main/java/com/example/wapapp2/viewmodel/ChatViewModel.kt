@@ -79,18 +79,16 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun getQueryForOption(calcRoomDTO: CalcRoomDTO): Query {
+    fun getQueryForOption(calcRoomDTO: CalcRoomDTO, eventListener: EventListener<QuerySnapshot>): Query {
         val query = Firebase.firestore
                 .collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomDTO.id!!)
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime")
 
-        /*
-        query.addSnapshotListener(snapshotListener)
+        query.addSnapshotListener(eventListener)
         //scroll 관련 구현 필요 snapshotlistener ??
 
-         */
         return query
     }
 }

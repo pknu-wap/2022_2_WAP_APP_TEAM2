@@ -1,6 +1,7 @@
 package com.example.wapapp2.view.chat
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +10,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.PagingConfig
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.databinding.FragmentChatBinding
@@ -20,6 +25,9 @@ import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
+import com.google.firebase.firestore.EventListener
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class ChatFragment : Fragment(), ScrollListener {
@@ -82,13 +90,14 @@ class ChatFragment : Fragment(), ScrollListener {
 
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment)
-                        .setQuery(chatViewModel.getQueryForOption(it),
+                        .setQuery(chatViewModel.getQueryForOption(it, EventListener { value, error ->
+                            Log.d("update시에 호출됨 paging data??","ss")
+                        }),
                                 PagingConfig(20, 2, false),
                                 ChatDTO::class.java)
                         .build()
 
                 chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
-
                 chatAdapter?.apply {
                     val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
                             this)
@@ -98,6 +107,7 @@ class ChatFragment : Fragment(), ScrollListener {
                 }
 
             }
+
         }
     }
 
