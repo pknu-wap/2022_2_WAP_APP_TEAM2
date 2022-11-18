@@ -21,13 +21,8 @@ import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -84,16 +79,23 @@ class ChatFragment : Fragment(), ScrollListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
+
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) { it ->
             if (chatAdapter == null) {
                 chatViewModel.attach(it)
+            }
+        }
 
+        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+            if (chatAdapter == null) {
                 val config = PagingConfig(20, 10, false)
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
-                        .setLifecycleOwner(this@ChatFragment)
-                        .setQuery(chatViewModel.getQueryForOption(it), config) { snapshot ->
-                            ChatDTO(snapshot.getString("userName").toString(), snapshot.getTimestamp("sendedTime")?.toDate(),
-                                    snapshot.getString("msg").toString(), snapshot.getString("senderId").toString())
+                        .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
+                        .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
+                            val id = snapshot.getString("senderId").toString()
+                            val userName = currentCalcRoomViewModel.participantMap[id]!!.userName
+                            ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
+                                    snapshot.getString("msg").toString(), id)
                         }
                         .build()
 
@@ -107,13 +109,10 @@ class ChatFragment : Fragment(), ScrollListener {
                     binding.chatList.adapter = chatAdapter
                 }
 
-                chatViewModel.addSnapshot(it.id!!) { value, error ->
+                chatViewModel.addSnapshot(currentCalcRoomViewModel.roomId!!) { value, error ->
                     if (value != null) {
                         for (dc in value.documentChanges) {
                             if (dc.type == DocumentChange.Type.ADDED) {
-                                //chatAdapter!!.snapshot().toMutableList().add(dc.document)
-
-                                //chatAdapter!!.notifyItemInserted(chatAdapter!!.itemCount - 1)
                                 lifecycleScope.launch {
                                     chatAdapter!!.submitData(PagingData.from(value.documents))
                                 }
@@ -123,7 +122,8 @@ class ChatFragment : Fragment(), ScrollListener {
                     }
 
                 }
-
+            } else {
+                chatAdapter?.refresh()
             }
         }
     }

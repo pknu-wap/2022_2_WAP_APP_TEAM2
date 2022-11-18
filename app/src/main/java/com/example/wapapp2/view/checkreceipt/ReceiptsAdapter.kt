@@ -6,12 +6,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,6 +36,13 @@ class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDT
             binding.receiptDate.text = simpleDateFormat.format(receiptDTO.createdTime!!)
             binding.receiptTitle.text = receiptDTO.name
             binding.receiptAmount.text = receiptDTO.totalMoney.toString().toEditable()
+
+            if (receiptDTO.imgUrl.isNullOrEmpty()) {
+                Glide.with(binding.root).clear(binding.receiptImage)
+            } else {
+                val storageReference = Firebase.storage.getReferenceFromUrl(receiptDTO.imgUrl!!)
+                Glide.with(binding.root).load(storageReference).into(binding.receiptImage)
+            }
 
             binding.root.setOnClickListener {
                 Toast.makeText(binding.root.context, "총 금액 : ${receiptDTO.totalMoney}\n영수증 이름 : ${receiptDTO.name})", Toast

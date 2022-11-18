@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,6 +17,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.databinding.FinalConfirmationNewReceiptLayoutBinding
 import com.example.wapapp2.databinding.FragmentNewReceiptBinding
 import com.example.wapapp2.databinding.ReceiptProductViewBinding
@@ -30,7 +33,6 @@ class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
-
     companion object {
         const val TAG = "NewReceiptFragment"
     }
@@ -43,11 +45,9 @@ class NewReceiptFragment : Fragment() {
         adapter = NewReceiptViewPagerAdapter(this)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
-        _binding = FragmentNewReceiptBinding.inflate(inflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentNewReceiptBinding.inflate(inflater, container, false)
+
         binding.topAppBar.setNavigationOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -61,7 +61,7 @@ class NewReceiptFragment : Fragment() {
 
         binding.saveBtn.setOnClickListener {
             val confirmReceiptsDialogFragment = ConfirmReceiptsDialogFragment()
-            confirmReceiptsDialogFragment.show(childFragmentManager, "confirm")
+            confirmReceiptsDialogFragment.show(childFragmentManager, ConfirmReceiptsDialogFragment.TAG)
         }
 
         return binding.root
@@ -102,6 +102,10 @@ class NewReceiptFragment : Fragment() {
         private var adapter: ReceiptsAdapter? = null
         private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
 
+        companion object {
+            const val TAG = "ConfirmReceiptsDialogFragment"
+        }
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
         }
@@ -124,7 +128,7 @@ class NewReceiptFragment : Fragment() {
         }
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            _confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater)
+            _confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater, container, false)
 
             confirmBinding.receiptList.also {
                 it.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
@@ -153,6 +157,9 @@ class NewReceiptFragment : Fragment() {
                 override fun onChanged(t: Boolean?) {
                     if (count.incrementAndGet() == totalCount) {
                         //추가 종료
+                        LoadingDialogView.clearDialogs()
+                        Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }
                 }
             })
@@ -161,7 +168,7 @@ class NewReceiptFragment : Fragment() {
                 //파이어베이스 서버에 등록하는 로직
                 newReceiptViewModel.addAllReceipts()
                 dismiss()
-                requireActivity().onBackPressedDispatcher.onBackPressed()
+                LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_receipts))
             }
         }
 

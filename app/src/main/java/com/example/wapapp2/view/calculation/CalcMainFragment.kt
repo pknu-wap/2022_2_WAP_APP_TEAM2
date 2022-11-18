@@ -43,7 +43,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         const val TAG = "CalcMainFragment"
     }
 
-    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
 
     /** summary of FixedPay **/

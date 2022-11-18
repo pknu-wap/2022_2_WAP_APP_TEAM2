@@ -7,6 +7,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import org.joda.time.DateTime
 
 class NewReceiptViewModel : ViewModel() {
@@ -60,7 +61,7 @@ class NewReceiptViewModel : ViewModel() {
                     }
 
                     addProductsResult.await()
-                    withContext(MainScope().coroutineContext) {
+                    withContext(Main) {
                         this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
                     }
                 } else {

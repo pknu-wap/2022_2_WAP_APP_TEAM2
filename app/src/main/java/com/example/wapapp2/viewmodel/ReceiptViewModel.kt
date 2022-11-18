@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,6 +22,7 @@ import kotlin.coroutines.resume
 class ReceiptViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
+    private val imgRepository = ReceiptImgRepositoryImpl.INSTANCE
     private var currentMySummary = 0
     var roomId: String? = null
 

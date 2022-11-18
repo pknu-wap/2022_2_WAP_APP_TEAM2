@@ -25,6 +25,7 @@ class ReceiptsFragment : Fragment() {
 
     private var roomId: String? = null
     private val receiptViewModel by viewModels<ReceiptViewModel>()
+    private var dataObserver: ListAdapterDataObserver? = null
 
     private val receiptOnClickListener = ListOnClickListener<ReceiptDTO> { item, _position ->
         val fragment = EditReceiptFragment()
@@ -50,7 +51,9 @@ class ReceiptsFragment : Fragment() {
         roomId?.run {
             savedInstanceState?.getString("roomId")
         }
+
         receiptViewModel.roomId = roomId
+        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(receiptViewModel.roomId!!))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -61,14 +64,11 @@ class ReceiptsFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
-        adapter = ReceiptsAdapter(receiptOnClickListener, receiptViewModel.getReceiptsRecyclerOptions(roomId!!))
-
-        val dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
+        dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
                 LinearLayoutManager, adapter)
-        dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
-        adapter.registerAdapterDataObserver(dataObserver)
+        dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
+        adapter.registerAdapterDataObserver(dataObserver!!)
 
-        binding.rvEditreceipt.setHasFixedSize(true)
         binding.rvEditreceipt.adapter = adapter
 
         return binding.root
@@ -93,13 +93,16 @@ class ReceiptsFragment : Fragment() {
         _binding = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dataObserver?.apply {
+            adapter.unregisterAdapterDataObserver(this)
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         adapter.stopListening()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

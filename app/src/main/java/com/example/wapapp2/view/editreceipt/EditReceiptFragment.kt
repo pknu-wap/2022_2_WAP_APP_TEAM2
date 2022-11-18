@@ -44,7 +44,7 @@ class EditReceiptFragment : Fragment() {
         binding.totalMoney.text = modifyReceiptViewModel.receiptDTO.totalMoney.toString()
     }
 
-    private val adapter = EditReceiptAdapter(onUpdatedValueListener = onUpdatedValueListener)
+    private val adapter = EditReceiptAdapter(onUpdatedValueListener)
     private var myLifeCycleObserver: MyLifeCycleObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,11 +139,12 @@ class EditReceiptFragment : Fragment() {
                     .commit()
         }
 
-        modifyReceiptViewModel.receiptDTO.imgUrl?.apply {
+        if (modifyReceiptViewModel.receiptDTO.imgUrl!!.isNotEmpty()) {
             modifyReceiptViewModel.hasReceiptImg = true
-            val storageReference = Firebase.storage.getReferenceFromUrl(this)
+            val storageReference = Firebase.storage.getReferenceFromUrl(modifyReceiptViewModel.receiptDTO.imgUrl!!)
             Glide.with(requireContext()).load(storageReference).into(binding.receiptImage)
         }
+
     }
 
 
