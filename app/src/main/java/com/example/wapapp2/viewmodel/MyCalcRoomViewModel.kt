@@ -21,6 +21,7 @@ class MyCalcRoomViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     val myCalcRoomIds = MutableLiveData<MutableSet<String>>(mutableSetOf())
 
+    val
     private var myCalcRoomIdsListener: ListenerRegistration? = null
 
     fun getMyCalcRoomsOptions(): FirestoreRecyclerOptions<CalcRoomDTO> {

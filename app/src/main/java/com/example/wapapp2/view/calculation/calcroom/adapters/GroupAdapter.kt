@@ -64,9 +64,7 @@ class GroupAdapter(
         holder.bind(model)
     }
 
-    override fun getAdapterItemCount(): Int {
-        return itemCount
-    }
+    override fun getAdapterItemCount(): Int = itemCount
 
 
 }

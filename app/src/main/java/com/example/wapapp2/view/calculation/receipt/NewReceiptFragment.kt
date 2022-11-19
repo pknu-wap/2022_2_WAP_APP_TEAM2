@@ -120,10 +120,13 @@ class NewReceiptFragment : Fragment() {
         private fun setWidthPercent(widthPercentage: Int, heightPercentage: Int) {
             val widthPercent = widthPercentage.toFloat() / 100
             val heightPercent = heightPercentage.toFloat() / 100
+
             val dm = Resources.getSystem().displayMetrics
+
             val rect = dm.run { Rect(0, 0, widthPixels, heightPixels) }
             val percentWidth = rect.width() * widthPercent
             val percentHeight = rect.height() * heightPercent
+
             dialog?.window?.setLayout(percentWidth.toInt(), percentHeight.toInt())
         }
 
@@ -150,30 +153,18 @@ class NewReceiptFragment : Fragment() {
             super.onViewCreated(view, savedInstanceState)
             setWidthPercent(90, 75)
 
-            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner, object : Observer<Boolean> {
-                private val count = AtomicInteger(0)
-                private val totalCount = newReceiptViewModel.getReceiptCount()
-
-                override fun onChanged(t: Boolean?) {
-                    if (count.incrementAndGet() == totalCount) {
-                        //추가 종료
-                        LoadingDialogView.clearDialogs()
-                        Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            })
+            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
+                LoadingDialogView.clearDialogs()
+                Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
 
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
-                newReceiptViewModel.addAllReceipts()
-                dismiss()
                 LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_receipts))
+                dismiss()
+                newReceiptViewModel.addAllReceipts()
             }
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
         }
 
         override fun onDestroyView() {
@@ -185,12 +176,11 @@ class NewReceiptFragment : Fragment() {
                 RecyclerView.Adapter<ReceiptsAdapter.ViewHolder>() {
 
             private class ViewHolder(private val viewBinding: SummaryReceiptViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
-                private val layoutInflater = LayoutInflater.from(viewBinding.root.context)
 
                 fun bind(receiptDTO: ReceiptDTO) {
                     viewBinding.productsList.removeAllViews()
                     viewBinding.receiptName.text = receiptDTO.name
-
+                    val layoutInflater = LayoutInflater.from(viewBinding.root.context)
                     viewBinding.totalMoney.text = receiptDTO.totalMoney.toString()
                     var productItemBinding: ReceiptProductViewBinding? = null
 
@@ -205,9 +195,9 @@ class NewReceiptFragment : Fragment() {
 
             }
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                return ViewHolder(SummaryReceiptViewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(SummaryReceiptViewBinding.inflate(LayoutInflater
+                    .from(parent.context), parent, false))
+
 
             override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                 holder.bind(receiptList[position])

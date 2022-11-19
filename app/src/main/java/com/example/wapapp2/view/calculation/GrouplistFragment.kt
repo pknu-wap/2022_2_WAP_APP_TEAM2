@@ -32,7 +32,10 @@ class GrouplistFragment : Fragment() {
 
     private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
-    private val friendsViewModel by activityViewModels<FriendsViewModel>()
+
+    companion object {
+        const val TAG = "GrouplistFragment"
+    }
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -48,7 +51,6 @@ class GrouplistFragment : Fragment() {
                 .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
                 .addToBackStack(CalcMainFragment.TAG).commit()
     }
-
 
     /** Add Group **/
     private val addOnClickedItemListener = View.OnClickListener {
@@ -85,9 +87,7 @@ class GrouplistFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?,
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
         binding.loadingView.setContentView(binding.groupRV)
@@ -125,8 +125,8 @@ class GrouplistFragment : Fragment() {
                 adapter!!.startListening()
             }
         }
-        myCalcRoomViewModel.loadMyCalcRoomIds()
 
+        myCalcRoomViewModel.loadMyCalcRoomIds()
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 
