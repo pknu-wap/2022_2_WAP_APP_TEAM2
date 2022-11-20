@@ -13,7 +13,9 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.wapapp2.databinding.FragmentCalendarDialogBinding
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.viewmodel.CalendarDialogViewModel
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -21,7 +23,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 
 
-class CalendarDialogFragment : DialogFragment() {
+class CalendarDialogFragment(val hashMap : HashMap<String, List<ReceiptDTO>>) : DialogFragment() {
     private lateinit var binding: FragmentCalendarDialogBinding
     private val calendarDialogViewModel: CalendarDialogViewModel by viewModels()
     private val FIRST_VIEW_PAGER_POSITION = Int.MAX_VALUE / 2
@@ -37,7 +39,8 @@ class CalendarDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         calendarDialogViewModel.arguments = arguments ?: savedInstanceState
         calendarDialogViewModel.firstSelectedDay = calendarDialogViewModel.arguments!!.getString("selectedDayISO8601", "")
-        viewPagerAdapter = DialogViewPagerAdapter(calendarDialogViewModel.firstSelectedDay, requireContext())
+        val dstKey = DateTime.parse(calendarDialogViewModel.firstSelectedDay).toString("yyyyMMdd")
+        viewPagerAdapter = DialogViewPagerAdapter( hashMap, calendarDialogViewModel.firstSelectedDay , requireContext())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

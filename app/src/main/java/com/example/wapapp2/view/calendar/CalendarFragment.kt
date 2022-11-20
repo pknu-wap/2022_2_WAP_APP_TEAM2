@@ -31,7 +31,7 @@ class CalendarFragment : Fragment() {
     }
 
     private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, pos ->
-        val dialogFragment = CalendarDialogFragment()
+        val dialogFragment = CalendarDialogFragment( calendarViewModel.myReceiptMap.value ?: hashMapOf())
         dialogFragment.arguments = Bundle().apply {
             putString("selectedDayISO8601", dayISO8601)
         }

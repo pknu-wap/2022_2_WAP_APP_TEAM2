@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
@@ -77,15 +78,12 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
             fun bind(pos : Int){
                 Log.d("markingitems",markingItems.toString())
                 inner_item_binding.marking.text = markingItems!![pos].name
-                TODO("status에 따른 색 구현")
                 //inner_item_binding.marking.setBackgroundColor(if (markingItems!![pos].status) 0x333333 else 0x000000)
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayMarkingViewHolder {
-            inner_item_binding = CalendarDayMarkingBinding.inflate(LayoutInflater.from(parent.context))
-            TODO("width 조절 필요")
-            //inner_item_binding.root.minimumWidth = parent.measuredWidth
+            inner_item_binding = CalendarDayMarkingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return DayMarkingViewHolder(inner_item_binding.root)
         }
 
