@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentFriendProfileBinding
@@ -19,7 +20,7 @@ class FriendProfileFragment : DialogFragment() {
     private var _binding: FragmentFriendProfileBinding? = null
     private val binding get() = _binding!!
 
-    private val friendsViewModel by viewModels<FriendsViewModel>({ requireActivity() })
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val friendAliasViewModel by viewModels<FriendAliasViewModel>()
     private val userViewModel by viewModels<UserViewModel>()
     private var showModifyAliasLayout = false

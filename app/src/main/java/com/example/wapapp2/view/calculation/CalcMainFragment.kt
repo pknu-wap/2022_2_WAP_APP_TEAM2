@@ -43,7 +43,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         const val TAG = "CalcMainFragment"
     }
 
-    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
 
     /** summary of FixedPay **/
@@ -60,7 +59,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             roomId = requireArguments().getString("roomId")!!
         }
 
-        currentCalcRoomViewModel.myFriendMap.putAll(friendsViewModel.myFriendMap.toMutableMap())
+        currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.myFriendMap.toMutableMap())
         currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
     }
 
@@ -174,7 +173,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         binding.receiptsList.setOnClickListener {
             val fragment = ReceiptsFragment()
             fragment.arguments = Bundle().apply {
-                putString("calcRoomId", roomId)
+                putString("roomId", roomId)
             }
             val fragmentManager = parentFragmentManager
             fragmentManager.beginTransaction().hide(this@CalcMainFragment)

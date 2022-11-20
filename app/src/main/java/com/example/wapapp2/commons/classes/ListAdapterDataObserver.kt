@@ -38,17 +38,21 @@ class ListAdapterDataObserver(
 
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
         super.onItemRangeInserted(positionStart, itemCount)
-        onChangedList()
         val count = iAdapterItemCount.getAdapterItemCount()
-        val lastVisiblePosition = manager.findLastCompletelyVisibleItemPosition()
-        // If the recycler view is initially being loaded or the
-        // user is at the bottom of the list, scroll to the bottom
-        // of the list to show the newly added message.
-        val loading = lastVisiblePosition == -1
-        val atBottom = positionStart >= count - 1 && lastVisiblePosition == positionStart - 1
-        if (loading || atBottom) {
-            recycler.scrollToPosition(positionStart)
-        }
+        val lastVisiblePosition =
+                if (manager.reverseLayout) manager.findFirstCompletelyVisibleItemPosition()
+                else manager.findLastCompletelyVisibleItemPosition()
+        val loading = lastVisiblePosition == RecyclerView.NO_POSITION
+
+        val atBottom = if (manager.reverseLayout)
+            lastVisiblePosition == 0
+        else
+            positionStart >= count - 1 && lastVisiblePosition == positionStart - 1
+
+        if (loading || atBottom)
+            recycler.scrollToPosition(if (manager.reverseLayout) 0 else positionStart)
+
+        onChangedList()
     }
 
     override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
@@ -62,11 +66,10 @@ class ListAdapterDataObserver(
 
     private fun onChangedList() {
         loadingView?.apply {
-            if (iAdapterItemCount.getAdapterItemCount() > 0) {
+            if (iAdapterItemCount.getAdapterItemCount() > 0)
                 onSuccessful()
-            } else {
+            else
                 onFailed(emptyMsg!!)
-            }
         }
     }
 }

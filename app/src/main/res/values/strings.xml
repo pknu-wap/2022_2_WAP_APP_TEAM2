@@ -108,5 +108,8 @@
     <string name="input_calculation_item_unit_price">단가</string>
     <string name="count">수량</string>
     <string name="empty_chats">채팅 내역이 없습니다</string>
+    <string name="empty_calc_rooms">정산방이 없습니다</string>
+    <string name="adding_receipts">영수증 추가 중</string>
+    <string name="success_add_receipts">영수증 추가 완료</string>
 
 </resources>

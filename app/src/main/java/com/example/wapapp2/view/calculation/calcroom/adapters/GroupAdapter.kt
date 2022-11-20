@@ -3,6 +3,7 @@ package com.example.wapapp2.view.calculation.calcroom.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.GroupItemBinding
 import com.example.wapapp2.model.CalcRoomDTO
@@ -18,7 +19,7 @@ class GroupAdapter(
         options: FirestoreRecyclerOptions<CalcRoomDTO>,
         private val onItemClickListener: ListOnClickListener<CalcRoomDTO>,
 ) :
-        FirestoreRecyclerAdapter<CalcRoomDTO, GroupAdapter.GroupVH>(options) {
+        FirestoreRecyclerAdapter<CalcRoomDTO, GroupAdapter.GroupVH>(options), IAdapterItemCount {
 
     class GroupVH(
             private val binding: GroupItemBinding,
@@ -61,6 +62,10 @@ class GroupAdapter(
 
     override fun onBindViewHolder(holder: GroupVH, position: Int, model: CalcRoomDTO) {
         holder.bind(model)
+    }
+
+    override fun getAdapterItemCount(): Int {
+        return itemCount
     }
 
 

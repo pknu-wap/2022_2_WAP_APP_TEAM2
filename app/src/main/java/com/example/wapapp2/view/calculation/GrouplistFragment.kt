@@ -8,7 +8,9 @@ import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.commons.view.RecyclerViewItemDecoration
 import com.example.wapapp2.databinding.GroupFragmentBinding
@@ -18,6 +20,7 @@ import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.CalenderViewModel
+import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -29,6 +32,7 @@ class GrouplistFragment : Fragment() {
 
     private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -40,7 +44,7 @@ class GrouplistFragment : Fragment() {
         }
 
         fragmentManager.beginTransaction()
-                .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as Fragment)
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
                 .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
                 .addToBackStack(CalcMainFragment.TAG).commit()
     }
@@ -57,7 +61,7 @@ class GrouplistFragment : Fragment() {
                     dialog.dismiss()
 
                     fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
                                     Fragment)
                             .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
                             .addToBackStack(NewReceiptFragment.TAG).commit()
@@ -68,7 +72,7 @@ class GrouplistFragment : Fragment() {
                     dialog.dismiss()
 
                     fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
                                     Fragment)
                             .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
                             .addToBackStack(NewCalcRoomFragment.TAG).commit()
@@ -86,6 +90,7 @@ class GrouplistFragment : Fragment() {
             savedInstanceState: Bundle?,
     ): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
+        binding.loadingView.setContentView(binding.groupRV)
         return binding.root
     }
 
@@ -110,6 +115,10 @@ class GrouplistFragment : Fragment() {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
                     binding.groupRV.adapter = adapter
+                    val dataObserver = ListAdapterDataObserver(binding.groupRV, binding.groupRV.layoutManager as
+                            LinearLayoutManager, adapter!!)
+                    dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
+                    adapter!!.registerAdapterDataObserver(dataObserver)
                 } else {
                     adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
                 }

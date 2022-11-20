@@ -85,7 +85,6 @@
             android:layout_marginTop="12dp"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/receipt_sample"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/receipt_img_btn"
             app:layout_constraintTop_toBottomOf="@id/receipt_image_label"

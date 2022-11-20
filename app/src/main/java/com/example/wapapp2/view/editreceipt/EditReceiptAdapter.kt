@@ -10,12 +10,9 @@ import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
 import com.example.wapapp2.model.ReceiptProductDTO
 
 class EditReceiptAdapter(
-        private val itemList: MutableList<ReceiptProductDTO> = mutableListOf(),
         private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
-) : RecyclerView
-.Adapter<EditReceiptAdapter
-.CustomViewHolder>() {
-
+) : RecyclerView.Adapter<EditReceiptAdapter.CustomViewHolder>() {
+    private val itemList: MutableList<ReceiptProductDTO> = mutableListOf()
     var items = itemList
         @SuppressLint("NotifyDataSetChanged")
         set(value) {

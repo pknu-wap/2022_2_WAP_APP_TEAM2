@@ -15,6 +15,7 @@ class ModifyReceiptViewModel : ViewModel() {
 
     lateinit var receiptDTO: ReceiptDTO
     var receiptImgChanged = false
+    var hasReceiptImg = false
 
     fun modifyReceipt(originalReceiptDTO: ReceiptDTO, modifiedReceiptDTO: ReceiptDTO, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {

@@ -5,16 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalenderFragmentBinding
 import com.example.wapapp2.databinding.CalenderItemBinding
 import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
+import com.example.wapapp2.viewmodel.FriendsViewModel
 import org.joda.time.DateTime
 
 class CalenderFragment : Fragment() {
     private lateinit var dstDate: DateTime
     private lateinit var binding: CalenderFragmentBinding
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, pos ->
         val dialogFragment = CalendarDialogFragment()
@@ -33,7 +36,7 @@ class CalenderFragment : Fragment() {
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
 

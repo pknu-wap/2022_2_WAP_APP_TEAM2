@@ -1,7 +1,6 @@
 package com.example.wapapp2.view.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import androidx.paging.PagingConfig
-import androidx.paging.PagingDataAdapter
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.databinding.FragmentChatBinding
@@ -25,9 +22,9 @@ import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
-import com.google.firebase.firestore.EventListener
-import kotlinx.coroutines.flow.collectLatest
+import com.google.firebase.firestore.DocumentChange
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class ChatFragment : Fragment(), ScrollListener {
@@ -60,12 +57,10 @@ class ChatFragment : Fragment(), ScrollListener {
             savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
-
         binding.loadingView.setContentView(binding.chatList)
 
         binding.chatList.apply {
-            val lm = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-            //lm.stackFromEnd = true
+            val lm = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
             layoutManager = lm
         }
         setInputListener()
@@ -84,17 +79,24 @@ class ChatFragment : Fragment(), ScrollListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
+
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) { it ->
             if (chatAdapter == null) {
                 chatViewModel.attach(it)
+            }
+        }
 
+        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+            if (chatAdapter == null) {
+                val config = PagingConfig(20, 10, false)
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
-                        .setLifecycleOwner(this@ChatFragment)
-                        .setQuery(chatViewModel.getQueryForOption(it, EventListener { value, error ->
-                            Log.d("update시에 호출됨 paging data??","ss")
-                        }),
-                                PagingConfig(20, 2, false),
-                                ChatDTO::class.java)
+                        .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
+                        .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
+                            val id = snapshot.getString("senderId").toString()
+                            val userName = currentCalcRoomViewModel.participantMap[id]!!.userName
+                            ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
+                                    snapshot.getString("msg").toString(), id)
+                        }
                         .build()
 
                 chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
@@ -102,12 +104,27 @@ class ChatFragment : Fragment(), ScrollListener {
                     val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
                             this)
                     adapterObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_chats))
+                    adapterObserver.onChanged()
                     registerAdapterDataObserver(adapterObserver)
                     binding.chatList.adapter = chatAdapter
                 }
 
-            }
+                chatViewModel.addSnapshot(currentCalcRoomViewModel.roomId!!) { value, error ->
+                    if (value != null) {
+                        for (dc in value.documentChanges) {
+                            if (dc.type == DocumentChange.Type.ADDED) {
+                                lifecycleScope.launch {
+                                    chatAdapter!!.submitData(PagingData.from(value.documents))
+                                }
+                                break
+                            }
+                        }
+                    }
 
+                }
+            } else {
+                chatAdapter?.refresh()
+            }
         }
     }
 
@@ -115,8 +132,7 @@ class ChatFragment : Fragment(), ScrollListener {
     private fun setInputListener() {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
-
-                val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, null, binding.textInputLayout.editText!!.text
+                val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
                         .toString(), myAccountViewModel.myProfileData.value!!.id)
 
                 binding.textInputLayout.editText!!.text.clear()
@@ -137,11 +153,20 @@ class ChatFragment : Fragment(), ScrollListener {
     }
 
     override fun scrollToBottom() {
-        binding.chatList.scrollBy(0, 100)
+        binding.chatList.scrollToPosition(binding.chatList.adapter!!.itemCount - 1)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            chatAdapter?.stopListening()
+        } else {
+            chatAdapter?.startListening()
+        }
     }
 }

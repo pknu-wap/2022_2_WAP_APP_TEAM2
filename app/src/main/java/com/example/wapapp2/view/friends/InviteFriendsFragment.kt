@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.FragmentInviteFriendsBinding
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
@@ -27,7 +28,9 @@ class InviteFriendsFragment : Fragment() {
         const val TAG = "InviteFriendsFragment"
     }
 
-    private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({
+        parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
+    })
     private val friendsViewModel: FriendsViewModel by activityViewModels()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
