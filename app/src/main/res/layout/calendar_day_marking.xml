@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/marking"
         android:text="완료 description"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="2dp"
         android:lines="1"
         android:ellipsize="end"
         android:textSize="8sp"

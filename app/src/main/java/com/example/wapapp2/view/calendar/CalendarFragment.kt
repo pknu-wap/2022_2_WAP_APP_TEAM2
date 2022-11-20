@@ -14,6 +14,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyCalendarViewModel
+import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTime
 
 class CalendarFragment : Fragment() {
@@ -23,7 +24,7 @@ class CalendarFragment : Fragment() {
     private var calendarAdapter: CalendarAdapter? = null
 
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
-    private val calendarViewModel by viewModels<MyCalendarViewModel>()
+    private val calendarViewModel by activityViewModels<MyCalendarViewModel>()
 
     companion object{
         val TAG = "CalendarFragment"
@@ -74,9 +75,9 @@ class CalendarFragment : Fragment() {
 
 
     fun updateCal() {
-        val hashMap = calendarViewModel.myReceiptMap.value?: hashMapOf()
+        val hashMap = calendarViewModel.myReceiptMap.value ?: hashMapOf()
         Log.d("update HashMap", hashMap.toString())
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
-        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap ,dayItemOnClickListener,)
+        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener,)
     }
 }

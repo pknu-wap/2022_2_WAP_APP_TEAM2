@@ -13,6 +13,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.joda.time.DateTime
 
 class MyCalendarViewModel : ViewModel() {
     private val myCalendarRepositoryImpl = CalendarRepositoryImpl.getINSTANCE()
@@ -24,10 +25,8 @@ class MyCalendarViewModel : ViewModel() {
     fun loadCalendarReceipts(myCalcRooms : MutableSet<String>) {
         if (myCalcRooms.isNotEmpty()){
 
-            Log.e("my calc Rooms", myCalcRooms.toString())
             viewModelScope.launch {
                 val pairOf_map_rl = async {
-                    Log.d("viewModelScope", "Started")
                     myCalendarRepositoryImpl.getMyReceipts_with_addSnapshot(myCalcRooms, EventListener { value, error ->
                         value?.documentChanges.apply {
                             for ( dc in this!!){
@@ -40,12 +39,9 @@ class MyCalendarViewModel : ViewModel() {
                         }
                     })
                 }
-                withContext(MainScope().coroutineContext) {
-                    myReceiptMap.value = (pairOf_map_rl.await().first)
-                    myCalcRoomReceiptListeners = (pairOf_map_rl.await().second)
-
-                    Log.d("viewModelScope", "Ended")
-                    Log.e("myReceiptMap", myReceiptMap.value.toString())
+                pairOf_map_rl.await()?.let {
+                    myReceiptMap.value = (it.first)
+                    myCalcRoomReceiptListeners = (it.second)
                 }
             }
         }
@@ -63,15 +59,18 @@ class MyCalendarViewModel : ViewModel() {
 
     fun receiptAdded(newReceiptDTO: ReceiptDTO){
         if (myReceiptMap.value!= null){
+            val keyDateString = DateTime.parse(newReceiptDTO.date).toString("yyyyMMdd")
+
             if(myReceiptMap.value!!.containsKey(newReceiptDTO.date)){
-                myReceiptMap.value!![newReceiptDTO.date]!!.plus(newReceiptDTO)
+                myReceiptMap.value!![keyDateString]!!.plus(newReceiptDTO)
             }else
-                myReceiptMap.value!![newReceiptDTO.date] = listOf(newReceiptDTO)
+                myReceiptMap.value!![keyDateString] = listOf(newReceiptDTO)
         }
     }
 
     fun receiptRemoved(removedReceiptDTO: ReceiptDTO){
-        myReceiptMap.value!![removedReceiptDTO.date]?.let{
+        val keyDateString = DateTime.parse(removedReceiptDTO.date).toString("yyyyMMdd")
+        myReceiptMap.value!![keyDateString]?.let{
             it.minus(removedReceiptDTO)
         }
     }

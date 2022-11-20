@@ -1,11 +1,13 @@
 package com.example.wapapp2.view.calendar
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalendarDayBinding
@@ -32,21 +34,21 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
             item_binding.calendarDay.text = dstDate.dayOfMonth.toString()
             if(dstDate.monthOfYear != dstMonth){ item_binding.calendarDay.setTextColor(Color.LTGRAY) }
             item_binding.dayMarking.adapter = DayMarkingItemAdapter(dstDate)
+            if(pos == 1){
+                Log.d("hashmapofReceipt", hashMapOfReceipts.toString())
+                Log.d("date",dstDate.toString())
+            }
 
             item_binding.root.setOnClickListener {
                 dayItemOnClickListener.onClicked(dstDate.toString(), pos)
             }
         }
-
-
-
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         item_binding = CalendarDayBinding.inflate(LayoutInflater.from(parent.context))
-        val layoutParams = GridLayoutManager.LayoutParams(parent.measuredWidth / COL , parent.measuredHeight / ROW)
-        item_binding.root.layoutParams = layoutParams
+        item_binding.root.minimumHeight = parent.measuredHeight / ROW
         return ViewHolder(item_binding.root)
     }
 
@@ -69,17 +71,19 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
 
     inner class DayMarkingItemAdapter(val dstDate : DateTime) : RecyclerView.Adapter<DayMarkingItemAdapter.DayMarkingViewHolder>(){
         private lateinit var inner_item_binding: CalendarDayMarkingBinding
-        private val markingItems : List<ReceiptDTO>? = hashMapOfReceipts[dstDate.toString()]
+        private val markingItems : List<ReceiptDTO> = hashMapOfReceipts[dstDate.toString("yyyyMMdd")] ?: listOf()
 
         inner class DayMarkingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
             fun bind(pos : Int){
+                Log.d("markingitems",markingItems.toString())
                 inner_item_binding.marking.text = markingItems!![pos].name
-                inner_item_binding.marking.setBackgroundColor(if (markingItems!![pos].status) 0x333333 else 0x000000)
+                //inner_item_binding.marking.setBackgroundColor(if (markingItems!![pos].status) 0x333333 else 0x000000)
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayMarkingViewHolder {
             inner_item_binding = CalendarDayMarkingBinding.inflate(LayoutInflater.from(parent.context))
+            inner_item_binding.root.minimumWidth = parent.measuredWidth
             return DayMarkingViewHolder(inner_item_binding.root)
         }
 
@@ -88,7 +92,7 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
         }
 
         override fun getItemCount(): Int {
-            return markingItems?.size ?: 0
+            return markingItems.size
         }
 
     }
