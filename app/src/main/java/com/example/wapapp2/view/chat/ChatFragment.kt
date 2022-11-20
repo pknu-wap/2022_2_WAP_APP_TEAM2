@@ -21,6 +21,7 @@ import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentChange
 import kotlinx.coroutines.launch
@@ -38,6 +39,7 @@ class ChatFragment : Fragment(), ScrollListener {
     private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val fcmViewModel by viewModels<FcmViewModel>()
 
     companion object {
         const val TAG = "ChatFragment"
@@ -50,6 +52,7 @@ class ChatFragment : Fragment(), ScrollListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fcmViewModel.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onCreateView(
@@ -135,9 +138,10 @@ class ChatFragment : Fragment(), ScrollListener {
                 val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
                         .toString(), myAccountViewModel.myProfileData.value!!.id)
 
-                binding.textInputLayout.editText!!.text.clear()
+                binding.textInputEditText.text?.clear()
                 // 전송
                 chatViewModel.sendMsg(newChat)
+                fcmViewModel.sendMessage(newChat, currentCalcRoomViewModel.roomId!!)
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }

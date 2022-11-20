@@ -4,4 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class CalcRoomParticipantDTO(val userId: String, val userName: String, val myFriend: Boolean, val email: String) : Parcelable
+data class CalcRoomParticipantDTO(
+        val userId: String, val userName: String,
+        val myFriend: Boolean, val email: String,
+        val fcmToken: String,
+) : Parcelable

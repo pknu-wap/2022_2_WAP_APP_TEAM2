@@ -29,7 +29,7 @@ class SignupFragment : Fragment() {
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
     ): View? {
         _viewBinding = FragmentSignupBinding.inflate(inflater, container, false)
 
@@ -57,8 +57,9 @@ class SignupFragment : Fragment() {
                 }
             }
 
-            var userDTO = UserDTO("", viewBinding.userId.text.toString(), gender, "", viewBinding.userName.text.toString(), arrayListOf(),
-                    arrayListOf(), arrayListOf(), arrayListOf())
+            var userDTO =
+                    UserDTO("", viewBinding.userId.text.toString(), gender, "", "", viewBinding.userName.text.toString(), arrayListOf(),
+                            arrayListOf(), arrayListOf(), arrayListOf())
 
             db!!.collection("users").document()?.set(userDTO)
         }

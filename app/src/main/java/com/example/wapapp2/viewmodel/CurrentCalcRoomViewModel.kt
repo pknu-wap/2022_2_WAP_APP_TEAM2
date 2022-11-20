@@ -69,7 +69,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
                 isMyFriend = myFriendMap.containsKey(v.id)
                 name = if (isMyFriend) myFriendMap[v.id]!!.alias else v.name
 
-                dto = CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email)
+                dto = CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email, v.fcmToken)
                 participantList.add(dto)
                 participantMap[v.id] = dto
             }

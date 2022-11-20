@@ -1,11 +1,19 @@
 package com.example.wapapp2.model.notifications
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import com.google.gson.annotations.SerializedName
 
-@Parcelize
-data class PushNotificationDTO(val receiverIds: MutableList<String>, var data: Data) : Parcelable {
+data class PushNotificationDTO(
+        @SerializedName("to")
+        val to: String,
+        @SerializedName("notification")
+        val notification: Notification,
+) {
+    data class Notification(
+            @SerializedName("title")
+            val title: String,
+            @SerializedName("body")
+            val body: String,
+    )
 
-    @Parcelize
-    data class Data(var title: String?, var body: String?) : Parcelable
+
 }

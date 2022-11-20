@@ -1,45 +1,32 @@
 package com.example.wapapp2.service
 
 import android.util.Log
-import androidx.datastore.dataStoreFile
 import com.example.wapapp2.datastore.MyDataStore
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.datastore.FcmTokenDTO
 import com.example.wapapp2.model.notifications.NotificationType
-import com.example.wapapp2.model.notifications.PushNotificationDTO
+import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.MyAccountViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     /** title = ChatRoomName  **/
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        val data = message.data
-        Log.e("onMessageReceived", data.toString())
+        val body = message.notification?.body.toString()
 
-        if (data.isNotEmpty()) {
+        if (!body.isNullOrEmpty()) {
             //영수증, 채팅, 정산 구분
-            when (NotificationType.valueOf(data["type"].toString())) {
-                NotificationType.Chat ->
-                    chat(data)
-                NotificationType.Receipt ->
-                    receipt(data)
-                else -> {
-                    calculation(data)
-                }
-            }
+            val receivedDTO = Gson().fromJson(body, ReceivedPushNotificationDTO::class.java)
+
 
         }
     }
