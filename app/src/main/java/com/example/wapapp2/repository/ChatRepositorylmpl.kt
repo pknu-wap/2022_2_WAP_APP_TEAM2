@@ -37,7 +37,7 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
                 .document()
                 .set(chatDTO)
                 .addOnFailureListener { exception ->
-                    TODO("전송실패")
+                    TODO("전송실패 -> 네트워크 연결을 확인해주세요 ")
                 }
     }
 
