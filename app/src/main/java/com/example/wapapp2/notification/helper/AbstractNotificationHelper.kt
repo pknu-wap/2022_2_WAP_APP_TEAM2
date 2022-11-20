@@ -11,9 +11,12 @@ import com.example.wapapp2.model.notifications.NotificationObj
 
 
 abstract class AbstractNotificationHelper
-protected constructor(context: Context, protected val channelId: String, protected val channelName: String, protected val
-channelDescription:
-String) {
+protected constructor(
+        context: Context, protected val channelId: String, protected val channelName: String,
+        protected val
+        channelDescription:
+        String,
+) {
     protected val notificationManager: NotificationManager
 
     init {
