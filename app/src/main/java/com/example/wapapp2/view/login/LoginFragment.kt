@@ -72,6 +72,7 @@ class LoginFragment : Fragment() {
         if (user != null) {
             val rootTransactionFragment = RootTransactionFragment()
 
+            CalendarRepositoryImpl.initialize()
             ReceiptImgRepositoryImpl.initialize()
             ReceiptRepositoryImpl.initialize()
             AppCheckRepository.initialize()

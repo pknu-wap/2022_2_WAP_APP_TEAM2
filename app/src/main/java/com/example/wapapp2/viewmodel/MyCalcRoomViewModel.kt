@@ -1,6 +1,5 @@
 package com.example.wapapp2.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
@@ -8,7 +7,6 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.MyCalcRoomRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.CoroutineScope
@@ -66,7 +64,6 @@ class MyCalcRoomViewModel : ViewModel() {
                         }
                     }
                 }
-
             }
         }
     }

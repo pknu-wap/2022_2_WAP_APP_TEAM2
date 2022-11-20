@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:padding="20dp"
-    >
+    android:padding="20dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:layout_marginBottom="30dp"
         >
         <TextView
-            android:id="@+id/calender_date"
+            android:id="@+id/calendar_date"
             android:text="10월"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             android:textSize="20sp"
             />
         <ImageView
-            android:id="@+id/calender_btnBack"
+            android:id="@+id/calendar_btnBack"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:clickable="true"
@@ -31,7 +31,7 @@
             />
 
         <ImageView
-            android:id="@+id/calender_btnNext"
+            android:id="@+id/calendar_btnNext"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_back"
@@ -102,13 +102,22 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/calender_RV"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        >
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/calendar_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="7"
-        />
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="7"
+
+            tools:listitem="@layout/calendar_day"
+            tools:itemCount="35"
+            />
+    </FrameLayout>
+
 
 </LinearLayout>

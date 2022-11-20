@@ -28,6 +28,11 @@ class CalendarDialogFragment : DialogFragment() {
 
     private lateinit var viewPagerAdapter: DialogViewPagerAdapter
 
+    companion object {
+        const val TAG = "calendarDialog"
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         calendarDialogViewModel.arguments = arguments ?: savedInstanceState
