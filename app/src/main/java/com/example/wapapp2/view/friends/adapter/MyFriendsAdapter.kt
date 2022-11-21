@@ -44,7 +44,7 @@ class MyFriendsAdapter(
             RecyclerView.ViewHolder(binding.root) {
 
         fun bind(friendDTO: FriendDTO) {
-            binding.myAccountId.text = friendDTO.email
+            binding.myAccountId.text = "email"
             binding.myProfileName.text = friendDTO.alias
 
             binding.root.setOnClickListener {

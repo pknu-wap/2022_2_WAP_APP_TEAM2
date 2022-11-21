@@ -72,8 +72,8 @@ class FriendsViewModel : ViewModel() {
                 result.addAll(friends)
             } else {
                 for (friend in friends) {
-                    //별명과 이메일 주소로 검색
-                    if (friend.email.contains(word) || friend.alias.contains(word)) {
+                    //별명으로 검색
+                    if (friend.alias.contains(word)) {
                         result.add(friend)
                     }
                 }
@@ -89,7 +89,7 @@ class FriendsViewModel : ViewModel() {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
                 friendsRepositoryImpl.addToMyFriend(
-                        FriendDTO(userDTO.id, userDTO.name, "", userDTO.email)
+                        FriendDTO(0, userDTO.id, userDTO.name)
                 )
             }
             result.await()
