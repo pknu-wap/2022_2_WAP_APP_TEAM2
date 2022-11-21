@@ -19,7 +19,7 @@ import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
-import com.example.wapapp2.viewmodel.CalenderViewModel
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
