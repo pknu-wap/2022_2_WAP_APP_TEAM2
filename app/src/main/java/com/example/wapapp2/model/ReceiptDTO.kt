@@ -1,5 +1,6 @@
 package com.example.wapapp2.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
 import com.google.firebase.firestore.*
@@ -43,8 +44,11 @@ data class ReceiptDTO(
 
         @get:Exclude
         public val date: String = DateTime.now().toString(),
+
+        @get:Exclude
+        var receiptImgBitmap: Bitmap?,
 ) : Parcelable {
-    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString(), null)
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)

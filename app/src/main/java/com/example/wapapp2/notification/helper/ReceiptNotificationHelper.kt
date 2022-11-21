@@ -1,9 +1,11 @@
 package com.example.wapapp2.notification.helper
 
 import android.content.Context
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.wapapp2.R
 import com.example.wapapp2.model.notifications.NotificationObj
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 
 class ReceiptNotificationHelper private constructor(context: Context)
     : AbstractNotificationHelper(context, context.getString(R.string.receipt_notification_channel_id), context.getString(R.string.receipt_notification_channel_name),
@@ -24,6 +26,11 @@ class ReceiptNotificationHelper private constructor(context: Context)
         notificationObj.notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
         notificationObj.notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         return notificationObj
+    }
+
+
+    fun notifyNotification(context: Context, sendFcmReceiptDTO: SendFcmReceiptDTO) {
+        val remoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_expanded_remoteviews)
     }
 
 }

@@ -5,7 +5,7 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.PushNotificationDTO
-import com.example.wapapp2.model.notifications.SendFcmChatDTO
+import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
