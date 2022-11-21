@@ -17,7 +17,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.asTask
 import kotlinx.coroutines.tasks.await
+import org.checkerframework.framework.qual.DefaultFor
 import org.joda.time.DateTime
+import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -34,38 +36,36 @@ class CalendarRepositoryImpl private constructor() : CalendarRepository{
         }
     }
 
-    /** snapshotlistener 분리 필요 register 변수 가져와야함 **/
-    override suspend fun getMyReceipts_with_addSnapshot(myCalcRoomIds: MutableSet<String>, snapshotlistener : EventListener<QuerySnapshot>)
-    : Pair<HashMap<String, List<ReceiptDTO>>, List<ListenerRegistration>> {
-        val tmpHashMap = HashMap<String, List<ReceiptDTO>>()
-        val tmpListRegisteration = listOf<ListenerRegistration>()
+    /** 각 방에 대해 수행 **/
+    override suspend fun getMyReceipts_with_addSnapshot(myCalcRoomID: String, snapshotlistener : EventListener<QuerySnapshot>)
+    = suspendCoroutine <Pair<HashMap<String, ArrayList<ReceiptDTO>>, ArrayList<ListenerRegistration>>> { continuation ->
+        val tmpHashMap = HashMap<String, ArrayList<ReceiptDTO>>()
+        val tmpListRegisteration = ArrayList<ListenerRegistration>()
+        val receiptCollection = firestore.collection(FireStoreNames.calc_rooms.name)
+                .document(myCalcRoomID)
+                .collection(FireStoreNames.receipts.name)
 
-        val tasks = listOf<Deferred<Task<Any>>>()
-        //각 방에 대해 수행
-            for(myCalcRoomID in myCalcRoomIds){
-                val receiptCollection = firestore.collection(FireStoreNames.calc_rooms.name)
-                    .document(myCalcRoomID)
-                    .collection(FireStoreNames.receipts.name)
+        // snapshot 연결
+        tmpListRegisteration.plus(receiptCollection.addSnapshotListener(snapshotlistener))
 
-                // snapshot 연결
-                tmpListRegisteration.plus(receiptCollection.addSnapshotListener(snapshotlistener))
-
-                //receipt hashmap 연결
-                receiptCollection.get()
-                    .addOnSuccessListener {
-                        for (dc in it.documents.toMutableList()) {
-                            val receiptDTO =  dc.toObject<ReceiptDTO>()!!
-                            val dstKey = DateTime.parse(receiptDTO.date).toString("yyyyMMdd")
-                            if (tmpHashMap.containsKey(receiptDTO.date)){
-                                tmpHashMap[dstKey]!!.plus(receiptDTO)
-                            }else {
-                                tmpHashMap[dstKey] = listOf(receiptDTO)
-                            }
-                        }
-                    }.await()
+        //receipt hashmap 연결
+        receiptCollection.get()
+            .addOnSuccessListener {
+                for (dc in it.documents.toMutableList()) {
+                    val receiptDTO = dc.toObject<ReceiptDTO>()!!
+                    val dstKey = DateTime.parse(receiptDTO.date).toString("yyyyMMdd")
+                    if (tmpHashMap.containsKey(dstKey)) {
+                        tmpHashMap[dstKey]!!.add(receiptDTO)
+                        Log.d("기존에 있던 것에 추가됨", receiptDTO.toString())
+                        Log.d("추가후",tmpHashMap.toString())
+                    } else {
+                        tmpHashMap[dstKey] = arrayListOf(receiptDTO)
+                        Log.d("새로 추가됨", receiptDTO.toString())
+                    }
+                }
+                Log.d("returned tmpHashmap", tmpHashMap.toString())
+                continuation.resume(Pair( tmpHashMap ,tmpListRegisteration))
             }
-
-        return Pair(tmpHashMap, tmpListRegisteration)
-    }
+        }
 
 }

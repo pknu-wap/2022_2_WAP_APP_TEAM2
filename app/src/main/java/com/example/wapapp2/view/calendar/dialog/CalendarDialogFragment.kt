@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 
 
-class CalendarDialogFragment(val hashMap : HashMap<String, List<ReceiptDTO>>) : DialogFragment() {
+class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>>) : DialogFragment() {
     private lateinit var binding: FragmentCalendarDialogBinding
     private val calendarDialogViewModel: CalendarDialogViewModel by viewModels()
     private val FIRST_VIEW_PAGER_POSITION = Int.MAX_VALUE / 2

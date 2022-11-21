@@ -17,7 +17,7 @@ import com.example.wapapp2.model.ReceiptDTO
 import org.joda.time.DateTime
 
 
-class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts : HashMap<String, List<ReceiptDTO>>, val dayItemOnClickListener : ListOnClickListener<String>)
+class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts : HashMap<String, ArrayList<ReceiptDTO>>, val dayItemOnClickListener : ListOnClickListener<String>)
     : RecyclerView.Adapter<CalendarAdapter.ViewHolder>(), IAdapterItemCount {
 
     private lateinit var item_binding: CalendarDayBinding
@@ -35,11 +35,6 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
             item_binding.calendarDay.text = dstDate.dayOfMonth.toString()
             if(dstDate.monthOfYear != dstMonth){ item_binding.calendarDay.setTextColor(Color.LTGRAY) }
             item_binding.dayMarking.adapter = DayMarkingItemAdapter(dstDate)
-            if(pos == 1){
-                Log.d("hashmapofReceipt", hashMapOfReceipts.toString())
-                Log.d("date",dstDate.toString())
-            }
-
             item_binding.root.setOnClickListener {
                 dayItemOnClickListener.onClicked(dstDate.toString(), pos)
             }
@@ -80,10 +75,14 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
                 inner_item_binding.marking.text = markingItems!![pos].name
                 //inner_item_binding.marking.setBackgroundColor(if (markingItems!![pos].status) 0x333333 else 0x000000)
             }
+
+
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayMarkingViewHolder {
             inner_item_binding = CalendarDayMarkingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            /** Click disable 구현 **/
+            inner_item_binding.root.setOnClickListener(View.OnClickListener { dayItemOnClickListener.onClicked(dstDate.toString(),-1) })
             return DayMarkingViewHolder(inner_item_binding.root)
         }
 

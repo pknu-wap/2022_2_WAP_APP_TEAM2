@@ -113,7 +113,6 @@
 
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:spanCount="7"
-
             tools:listitem="@layout/calendar_day"
             tools:itemCount="35"
             />

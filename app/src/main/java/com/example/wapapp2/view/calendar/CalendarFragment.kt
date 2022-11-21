@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalendarFragmentBinding
 import com.example.wapapp2.model.ReceiptDTO
@@ -30,7 +33,7 @@ class CalendarFragment : Fragment() {
         val TAG = "CalendarFragment"
     }
 
-    private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, pos ->
+    private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, _ ->
         val dialogFragment = CalendarDialogFragment( calendarViewModel.myReceiptMap.value ?: hashMapOf())
         dialogFragment.arguments = Bundle().apply {
             putString("selectedDayISO8601", dayISO8601)
@@ -50,11 +53,11 @@ class CalendarFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = CalendarFragmentBinding.inflate(layoutInflater)
-
         updateCal()
 
+        //unscrollable 구현 필요
+
         calendarViewModel.myReceiptMap.observe(viewLifecycleOwner){
-            Log.d("@@","UPDATED")
             updateCal()
         }
 
@@ -76,8 +79,7 @@ class CalendarFragment : Fragment() {
 
     fun updateCal() {
         val hashMap = calendarViewModel.myReceiptMap.value ?: hashMapOf()
-        Log.d("update HashMap", hashMap.toString())
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
-        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener,)
+        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener)
     }
 }

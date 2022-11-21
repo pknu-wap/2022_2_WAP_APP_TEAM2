@@ -10,7 +10,7 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.ReceiptDTO
 import org.joda.time.DateTime
 
-class DialogViewPagerAdapter(val hashMap: HashMap<String, List<ReceiptDTO>> ,beginDateText: String, context: Context) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
+class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>> ,beginDateText: String, context: Context) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
 () {
     private val layoutInflater: LayoutInflater
     private val dateFormat = "MM.dd E요일"

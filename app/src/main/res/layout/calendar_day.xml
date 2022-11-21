@@ -26,11 +26,13 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/day_marking"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="vertical"
+            android:contextClickable="false"
 
             tools:listitem="@layout/calendar_day_marking"
+            tools:itemCount="7"
             />
 
 
