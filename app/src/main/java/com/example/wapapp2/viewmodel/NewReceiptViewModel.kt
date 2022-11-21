@@ -29,58 +29,63 @@ class NewReceiptViewModel : ViewModel() {
         }
     }
 
-    private fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+    private fun addReceipt(receiptList: MutableList<ReceiptDTO>, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
-            //영수증 사진 있는 경우 추가
-            receiptDTO.imgUriInMyPhone?.also {
-                val imgFileName = async {
-                    receiptImgRepositoryImpl.uploadReceiptImg(it, calcRoomId)
-                }
+            var completed = false
+            var count = 0
 
-                imgFileName.await()?.apply {
-                    receiptDTO.imgUrl = this
-                }
-            }
-
-            //영수증 추가
-            val addReceiptResult = async {
-                receiptRepository.addReceipt(receiptDTO, calcRoomId)
-            }
-
-            if (addReceiptResult.await()) {
-                //정산방 영수증 문서들중 마지막 아이템을 가져오기
-                val lastDocumentId = async {
-                    receiptRepository.getLastDocumentId(calcRoomId)
-                }
-
-                if (lastDocumentId.await() != null) {
-                    //영수증 항목 추가
-                    val addProductsResult = async {
-                        receiptRepository
-                                .addProducts(lastDocumentId.await().toString(), receiptDTO.getProducts(), calcRoomId)
+            for (receipt in receiptList) {
+                //영수증 사진 있는 경우 추가
+                receipt.imgUriInMyPhone?.also {
+                    val imgFileName = async {
+                        receiptImgRepositoryImpl.uploadReceiptImg(it, calcRoomId)
                     }
 
-                    addProductsResult.await()
-                    withContext(Main) {
-                        this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
+                    imgFileName.await()?.apply {
+                        receipt.imgUrl = this
+                    }
+                }
+
+                //영수증 추가
+                val addReceiptResult = async {
+                    receiptRepository.addReceipt(receipt, calcRoomId)
+                }
+
+                if (addReceiptResult.await()) {
+                    //정산방 영수증 문서들중 마지막 아이템을 가져오기
+                    val lastDocumentId = async {
+                        receiptRepository.getLastDocumentId(calcRoomId)
+                    }
+
+                    if (lastDocumentId.await() != null) {
+                        //영수증 항목 추가
+                        val addProductsResult = async {
+                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts(), calcRoomId)
+                        }
+
+                        addProductsResult.await()
+                        withContext(Main) {
+                            if (++count == receiptList.size)
+                                this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
+                        }
+                    } else {
+                        withContext(Main) {
+                            if (++count == receiptList.size)
+                                this@NewReceiptViewModel.addReceiptResult.value = false
+                        }
                     }
                 } else {
-                    withContext(MainScope().coroutineContext) {
-                        this@NewReceiptViewModel.addReceiptResult.value = false
+                    withContext(Main) {
+                        if (++count == receiptList.size)
+                            this@NewReceiptViewModel.addReceiptResult.value = false
                     }
-                }
-            } else {
-                withContext(MainScope().coroutineContext) {
-                    this@NewReceiptViewModel.addReceiptResult.value = false
                 }
             }
         }
     }
 
     fun addAllReceipts() {
-        for (receipt in receiptMap.values) {
-            addReceipt(receipt, calcRoomId!!)
-        }
+        addReceipt(receiptMap.values.toMutableList(), calcRoomId!!)
     }
 
     fun addReceipt(receiptId: String) {

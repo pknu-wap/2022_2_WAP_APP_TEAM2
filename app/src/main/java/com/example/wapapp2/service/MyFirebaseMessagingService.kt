@@ -1,47 +1,63 @@
 package com.example.wapapp2.service
 
+import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.datastore.FcmTokenDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
+import com.example.wapapp2.model.notifications.SendFcmChatDTO
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import java.util.*
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     /** title = ChatRoomName  **/
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        val data = message.data
-        val chatDTO : ChatDTO?
-        val room = data["room_name"]?.let{
-            chatDTO = ChatDTO(
-                data["chatDTO_username"]!!,
-                Date(),
-                data["chatDTO_sendedTime"]!!,
-                data["chatDTO_senderId"]!!
-            )
+        val body = message.notification?.body
+
+        if (!body.isNullOrEmpty()) {
+            //영수증, 채팅, 정산 구분
+            val receivedDTO = Gson().fromJson(body, ReceivedPushNotificationDTO::class.java)
+
+            when (receivedDTO.type) {
+                NotificationType.Chat -> chat(receivedDTO)
+                NotificationType.Receipt -> receipt(receivedDTO)
+                NotificationType.Calculation -> calculation(receivedDTO)
+            }
         }
     }
 
     /** 토큰 생성시 서버에 등록 과정 필요 **/
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        //토큰 등록
-
-        FirebaseAuth.getInstance().currentUser?.let {
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(it.uid)
-                .collection("FCM_TOKEN")
-                .document().set(mapOf("token" to token))
+        CoroutineScope(Dispatchers.IO).launch {
+            MyDataStore.getINSTANCE().updateFcmToken(FcmTokenDTO(token))
         }
     }
 
+    private fun chat(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val data = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
+        val chatNotificationHelper = ChatNotificationHelper.getINSTANCE(applicationContext)
 
-    private fun sendNotification(title : String ,chatDTO: ChatDTO) {
-        val notificationBuilder = ChatNotificationHelper.getINSTANCE(this)
-            .notifyNotification(this, title , chatDTO)
+        val senderId = data.chatDTO.senderId
+        val senderName: String = if (FriendsViewModel.myFriendMap.containsKey(senderId))
+            FriendsViewModel.myFriendMap[senderId]!!.alias
+        else
+            data.chatDTO.userName
+
+        chatNotificationHelper.notifyNotification(applicationContext, data.roomName, data.chatDTO)
+    }
+
+    private fun receipt(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+    }
+
+    private fun calculation(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
     }
 }

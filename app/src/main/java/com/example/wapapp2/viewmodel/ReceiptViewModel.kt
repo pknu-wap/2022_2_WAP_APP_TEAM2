@@ -22,7 +22,6 @@ import kotlin.coroutines.resume
 class ReceiptViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
-    private val imgRepository = ReceiptImgRepositoryImpl.INSTANCE
     private var currentMySummary = 0
     var roomId: String? = null
 

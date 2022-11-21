@@ -3,14 +3,12 @@ package com.example.wapapp2.main
 import android.app.Application
 import androidx.collection.arrayMapOf
 import com.example.wapapp2.R
+import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.BankDTO
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.ktx.Firebase
 
 import net.danlew.android.joda.JodaTimeAndroid
 
@@ -21,6 +19,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MyDataStore.initialize(applicationContext)
         FirebaseApp.initializeApp(applicationContext)
 
         val settings = FirebaseFirestoreSettings.Builder()
