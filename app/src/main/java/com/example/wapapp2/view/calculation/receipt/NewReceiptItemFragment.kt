@@ -124,7 +124,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone == null) {
                 MaterialAlertDialogBuilder(requireActivity())
                         .setTitle(R.string.add_img)
-                        .setNegativeButton(R.string.exit) { dialog, which ->
+                        .setNegativeButton(R.string.close) { dialog, which ->
                             dialog.dismiss()
                         }
                         .setNegativeButton(R.string.shoot_camera) { dialog, which ->
@@ -144,7 +144,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             } else {
                 MaterialAlertDialogBuilder(requireActivity())
                         .setTitle(R.string.modify_img)
-                        .setNegativeButton(R.string.exit) { dialog, which ->
+                        .setNegativeButton(R.string.close) { dialog, which ->
                             dialog.dismiss()
                         }
                         .setNegativeButton(R.string.delete_img) { dialog, which ->

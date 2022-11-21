@@ -30,6 +30,7 @@ import com.example.wapapp2.view.chat.ChatFragment
 
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import java.text.DecimalFormat
 
@@ -194,7 +195,16 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
         binding.exitRoom.setOnClickListener {
             //방 나가기
-            currentCalcRoomViewModel.exitRoom()
+            MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.exit_from_room)
+                    .setMessage(R.string.msg_exit_from_calc_room)
+                    .setPositiveButton(R.string.exit) { dialog, which ->
+                        dialog.dismiss()
+                        currentCalcRoomViewModel.exitRoom(currentCalcRoomViewModel.roomId!!)
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                    }.setNegativeButton(R.string.close) { dialog, which ->
+                        dialog.dismiss()
+                    }.create().show()
+
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()

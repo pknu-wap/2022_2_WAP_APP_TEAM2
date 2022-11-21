@@ -77,7 +77,7 @@ class EditMyBankAccountFragment : Fragment() {
                 dialogViewBinding.icon.setImageResource(modifiedBankAccountDTO.bankDTO!!.iconId)
 
                 MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
-                        .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
+                        .setView(dialogViewBinding.root).setNegativeButton(R.string.close) { dialog, index ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.edit) { dialog, index ->
                             viewModel.modifyMyBankAccount(modifiedBankAccountDTO, originalBankAccountDTO)
