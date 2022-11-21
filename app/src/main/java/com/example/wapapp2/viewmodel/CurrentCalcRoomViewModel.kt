@@ -133,4 +133,11 @@ class CurrentCalcRoomViewModel : ViewModel() {
             calcRoomRepository.exitFromCalcRoom(roomId)
         }
     }
+
+    fun inviteFriends(list: MutableList<FriendDTO>, roomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = async { calcRoomRepository.inviteFriends(list, roomId) }
+            result.await()
+        }
+    }
 }

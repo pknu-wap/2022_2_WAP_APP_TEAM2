@@ -210,7 +210,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
         participantsInCalcRoomFragment.onNavDrawerListener = this
         childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
-                participantsInCalcRoomFragment, "participants").commit()
+                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG).commit()
     }
 
 

@@ -2,6 +2,7 @@ package com.example.wapapp2.repository
 
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
+import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.repository.interfaces.CalcRoomRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -95,4 +96,21 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                     .addSnapshotListener(snapshotListener)
 
 
+    /**
+     * 정산방에 친구 초대
+     */
+    override suspend fun inviteFriends(list: MutableList<FriendDTO>, roomId: String) {
+        //calcroom문서에 참여자id추가
+        firestore.collection(FireStoreNames.calc_rooms.name).document(roomId)
+                .update("participantIds", FieldValue.arrayUnion(list.toTypedArray()))
+
+        //user문서에 정산방 id추가
+        val collection = firestore.collection(FireStoreNames.users.name)
+
+        firestore.runBatch { batch ->
+            for (friend in list) {
+                batch.update(collection.document(friend.friendUserId), "myCalcRoomIds", FieldValue.arrayUnion(roomId))
+            }
+        }
+    }
 }

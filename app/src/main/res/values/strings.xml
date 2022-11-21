@@ -114,5 +114,7 @@
     <string name="success_add_receipts">영수증 추가 완료</string>
     <string name="exit_from_room">정산방에서 나가기</string>
     <string name="msg_exit_from_calc_room">정산방에서 나가시겠습니까?</string>
+    <string name="msg_invite_new_friends">선택한 친구들을 초대하시겠습니까?</string>
+    <string name="invite">초대</string>
 
 </resources>
