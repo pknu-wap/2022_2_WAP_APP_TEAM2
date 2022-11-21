@@ -15,9 +15,15 @@ interface FriendDao {
     @Delete
     suspend fun delete(friendDTO: FriendDTO)
 
+    @Query("SELECT count(*) FROM FriendDTO")
+    fun count(): Flow<Int>
+
     @Query("SELECT * FROM FriendDTO WHERE friendUserId = :friendId")
-    fun get(friendId: Int): Flow<FriendDTO>
+    fun get(friendId: String): Flow<FriendDTO?>
 
     @Query("SELECT * FROM FriendDTO WHERE friendUserId IN (:friendIds)")
     fun get(friendIds: List<String>): Flow<List<FriendDTO>>
+
+    @Query("SELECT * FROM FriendDTO")
+    fun getAll(): Flow<List<FriendDTO>>
 }

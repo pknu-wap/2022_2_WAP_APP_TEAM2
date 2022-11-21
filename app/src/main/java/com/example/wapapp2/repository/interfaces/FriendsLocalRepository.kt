@@ -11,7 +11,11 @@ interface FriendsLocalRepository {
 
     suspend fun delete(friendDTO: FriendDTO)
 
-    fun get(friendId: Int): Flow<FriendDTO>
+    fun get(friendId: String): Flow<FriendDTO?>
+
+    fun count(): Flow<Int>
 
     fun get(friendIds: List<String>): Flow<List<FriendDTO>>
+    fun getAll(): Flow<List<FriendDTO>>
+
 }

@@ -26,7 +26,7 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
             INSTANCE = FriendsRepositoryImpl()
         }
 
-        fun getINSTANCE() = INSTANCE
+        fun getINSTANCE() = INSTANCE!!
     }
 
     override suspend fun loadMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->

@@ -9,14 +9,16 @@ import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 import com.example.wapapp2.notification.helper.CalcNotificationHelper
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
 import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
-import com.example.wapapp2.repository.FcmRepositoryImpl
+import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -46,16 +48,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun chat(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-        val sendFcmChatDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
+        val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
 
-        val senderId = sendFcmChatDTO.chatDTO.senderId
-        val senderName: String = if (FriendsViewModel.myFriendMap.containsKey(senderId))
-            FriendsViewModel.myFriendMap[senderId]!!.alias
-        else
-            sendFcmChatDTO.chatDTO.userName
+        CoroutineScope(Dispatchers.IO).launch {
+            val sendFcmChatDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
+            val senderId = sendFcmChatDTO.chatDTO.senderId
 
-        val chatNotificationHelper = ChatNotificationHelper.getINSTANCE(applicationContext)
-        chatNotificationHelper.notifyNotification(applicationContext, sendFcmChatDTO)
+            friendsLocalRepository.get(senderId).collect { value ->
+                val senderName: String = //내 친구 목록에 있음
+                        value?.alias ?: //내 친구 목록에 없음
+                        sendFcmChatDTO.chatDTO.userName
+                sendFcmChatDTO.chatDTO.userName = senderName
+
+                withContext(Main) {
+                    val chatNotificationHelper = ChatNotificationHelper.getINSTANCE(applicationContext)
+                    chatNotificationHelper.notifyNotification(applicationContext, sendFcmChatDTO)
+                }
+            }
+        }
+
+
     }
 
     private fun receipt(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {

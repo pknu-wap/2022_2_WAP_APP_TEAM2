@@ -11,8 +11,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.wapapp2.R
-import com.example.wapapp2.commons.classes.DelayTextWatcher
-import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentAddMyFriendBinding
 import com.example.wapapp2.model.UserDTO
@@ -49,7 +47,7 @@ class AddMyFriendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userViewModel.myFriendsIdSet.addAll(FriendsViewModel.myFriendMap.keys)
+        userViewModel.myFriendsIdSet.addAll(FriendsViewModel.MY_FRIEND_MAP.keys)
     }
 
     override fun onCreateView(
