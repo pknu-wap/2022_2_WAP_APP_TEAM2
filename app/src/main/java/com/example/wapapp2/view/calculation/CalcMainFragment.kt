@@ -105,7 +105,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onStop() {
         super.onStop()
-        FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (!currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+
     }
 
     override fun onDestroyView() {
@@ -118,9 +121,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
         } else {
             binding.calculationSimpleInfo.summary.text = paymoney.toString()
-
             binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
-
         }
     }
 

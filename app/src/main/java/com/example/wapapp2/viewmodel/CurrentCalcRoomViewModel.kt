@@ -10,6 +10,7 @@ import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.repository.UserRepositoryImpl
 import com.example.wapapp2.repository.interfaces.CalcRoomRepository
@@ -35,6 +36,8 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     private var calcRoomListenerRegistration: ListenerRegistration? = null
     private var receiptsListenerRegistration: ListenerRegistration? = null
+
+    var exitFromRoom = false
 
     override fun onCleared() {
         super.onCleared()
@@ -127,6 +130,9 @@ class CurrentCalcRoomViewModel : ViewModel() {
     fun exitFromRoom(roomId: String) {
         //방 나가기
         //calcRoom문서 내 participantIds에서 내 id삭제
+        exitFromRoom = true
+        FcmRepositoryImpl.unSubscribeToCalcRoomChat(roomId)
+
         CoroutineScope(Dispatchers.Default).launch {
             //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
             userRepository.removeCalcRoomId(roomId)
@@ -138,6 +144,8 @@ class CurrentCalcRoomViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             val result = async { calcRoomRepository.inviteFriends(list, roomId) }
             result.await()
+
+            //초대받은 친구들에게 초대 알림 보내기
         }
     }
 }

@@ -64,7 +64,6 @@ class InviteFriendsFragment : Fragment() {
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
-        binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
 
         listAdapterDataObserver = ListAdapterDataObserver(binding.inviteFriendsLayout.searchFriendsList, binding.inviteFriendsLayout
                 .searchFriendsList.layoutManager as LinearLayoutManager, searchFriendsListAdapter)

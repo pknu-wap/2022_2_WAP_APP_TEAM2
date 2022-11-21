@@ -67,7 +67,5 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val sendFcmReceiptDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmReceiptDTO::class.java)
 
         calcNotificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
-        //채팅방 구독 연결
-        FcmRepositoryImpl.subscribeToCalcRoomChat(sendFcmReceiptDTO.roomId)
     }
 }

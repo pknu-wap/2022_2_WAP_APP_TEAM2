@@ -28,6 +28,7 @@ object FcmRepositoryImpl : FcmRepository {
         }
     }
 
+
     override fun unSubscribeToCalcRoomChat(roomId: String) {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(roomId)
     }

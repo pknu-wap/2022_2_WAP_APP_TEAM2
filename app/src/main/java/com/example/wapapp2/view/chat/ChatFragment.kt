@@ -96,7 +96,11 @@ class ChatFragment : Fragment(), ScrollListener {
                         .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
                         .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
                             val id = snapshot.getString("senderId").toString()
-                            val userName = currentCalcRoomViewModel.participantMap[id]!!.userName
+                            val userName: String = if (currentCalcRoomViewModel.participantMap.containsKey(id))
+                                currentCalcRoomViewModel.participantMap[id]!!.userName
+                            else
+                                snapshot.getString("userName")!!
+
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
                                     snapshot.getString("msg").toString(), id)
                         }
@@ -138,10 +142,11 @@ class ChatFragment : Fragment(), ScrollListener {
                 val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
                         .toString(), myAccountViewModel.myProfileData.value!!.id)
 
-                binding.textInputEditText.text?.clear()
                 // 전송
                 chatViewModel.sendMsg(newChat)
                 fcmViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
+                //입력 초기화
+                binding.textInputEditText.text?.clear()
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }

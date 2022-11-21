@@ -39,45 +39,6 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun getOptions(calcRoomDTO: CalcRoomDTO): FirestoreRecyclerOptions<ChatDTO> {
-        val query = Firebase.firestore
-                .collection("calc_rooms")
-                .document(calcRoomDTO.id!!)
-                .collection("chats")
-                .orderBy("sendedTime")
-
-        val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
-                .setQuery(query, SnapshotParser {
-                    //id로부터 사람이름
-                    ChatDTO(it.getString("userName").toString(), it.getTimestamp("sendedTime")?.toDate(), it.getString("msg").toString(), it.getString("senderId").toString())
-                })
-                .build()
-
-        return recyclerOption
-    }
-
-
-    inner class ChatLiveData(val documentReference: DocumentReference) : LiveData<ChatDTO>(), EventListener<DocumentSnapshot> {
-        private var snapshotListener: ListenerRegistration? = null
-
-        override fun onActive() {
-            super.onActive()
-            snapshotListener = documentReference.addSnapshotListener(this)
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-            snapshotListener?.remove()
-        }
-
-
-        override fun onEvent(result: DocumentSnapshot?, error: FirebaseFirestoreException?) {
-            val item = result?.let { document ->
-                document.toObject(ChatDTO::class.java)
-            }
-            value = item!!
-        }
-    }
 
     fun getQueryForOption(roomId: String): Query {
         val query = Firebase.firestore
