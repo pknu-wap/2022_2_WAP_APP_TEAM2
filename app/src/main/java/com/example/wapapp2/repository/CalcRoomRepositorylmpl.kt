@@ -83,7 +83,7 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
     override suspend fun exitFromCalcRoom(roomId: String) = suspendCoroutine<Boolean> { continuation ->
         val myId = auth.currentUser!!.uid
         firestore.collection(FireStoreNames.calc_rooms.name)
-                .document(roomId).update("participants", FieldValue.arrayRemove(myId))
+                .document(roomId).update("participantIds", FieldValue.arrayRemove(myId))
                 .addOnCompleteListener {
                     continuation.resume(it.isSuccessful)
                 }
