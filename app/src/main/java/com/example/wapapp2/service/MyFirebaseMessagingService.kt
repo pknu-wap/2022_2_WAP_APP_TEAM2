@@ -65,7 +65,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun calculation(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
         val calcNotificationHelper = CalcNotificationHelper.getINSTANCE(applicationContext)
         val sendFcmReceiptDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmReceiptDTO::class.java)
-        
+
         calcNotificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
     }
 }
