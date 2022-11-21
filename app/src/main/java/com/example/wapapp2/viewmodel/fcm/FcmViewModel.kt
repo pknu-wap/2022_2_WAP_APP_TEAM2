@@ -3,9 +3,11 @@ package com.example.wapapp2.viewmodel.fcm
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.PushNotificationDTO
 import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -32,6 +34,22 @@ class FcmViewModel : ViewModel() {
                     chatDTO.userName, body.toString()
             ))
             FcmRepositoryImpl.sendMessage(notificationDTO)
+        }
+    }
+
+    fun sendCalculation(receiptDTO: ReceiptDTO, calcRoomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val body = JsonObject()
+            body.addProperty("type", NotificationType.Calculation.name)
+
+            val sendFcmReceiptDTO = SendFcmReceiptDTO(receiptDTO, calcRoomId)
+
+            val data = Gson().toJsonTree(sendFcmReceiptDTO)
+            body.add("data", data)
+
+            val notificationDTO = PushNotificationDTO("/topics/${calcRoomId}", PushNotificationDTO.Notification(
+                    receiptDTO.name, body.toString()))
+            FcmRepositoryImpl.sendCalculation(notificationDTO)
         }
     }
 

@@ -9,6 +9,4 @@ data class SendFcmReceiptDTO(
         val receiptDTO: ReceiptDTO,
         @SerializedName("roomId")
         val roomId: String,
-        @SerializedName("payersName")
-        val payersName: String,
 )

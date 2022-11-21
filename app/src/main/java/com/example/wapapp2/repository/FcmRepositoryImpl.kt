@@ -14,7 +14,10 @@ import retrofit2.Response
 object FcmRepositoryImpl : FcmRepository {
     override suspend fun sendMessage(notificaiton: PushNotificationDTO) {
         val response = RetrofitClient.getClients().sendFcm(notificaiton)
+    }
 
+    override suspend fun sendCalculation(notificaiton: PushNotificationDTO) {
+        val response = RetrofitClient.getClients().sendFcm(notificaiton)
     }
 
     override fun subscribeToCalcRoomChat(roomId: String) {

@@ -7,5 +7,5 @@ import android.net.Uri
 interface ReceiptImgRepository {
     suspend fun uploadReceiptImg(uri: Uri, calcRoomId: String): String?
     suspend fun deleteReceiptImg(fileName: String): Boolean
-    suspend fun downloadReceiptImg(imgUrl: String): Bitmap
+    suspend fun downloadReceiptImg(imgUrl: String): Bitmap?
 }

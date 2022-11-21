@@ -89,7 +89,7 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString(), null)
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {

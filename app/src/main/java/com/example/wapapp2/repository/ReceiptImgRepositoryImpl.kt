@@ -60,7 +60,7 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
         return result
     }
 
-    override suspend fun downloadReceiptImg(imgUrl: String): Bitmap = suspendCoroutine<Bitmap> { continuation ->
+    override suspend fun downloadReceiptImg(imgUrl: String): Bitmap? = suspendCoroutine<Bitmap?> { continuation ->
         storage.reference.child("receiptimgs").child(imgUrl).getBytes(1280 * 1280).addOnCompleteListener {
             if (it.isSuccessful) {
                 val inputStream = it.result.inputStream()

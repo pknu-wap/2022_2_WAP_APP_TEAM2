@@ -26,6 +26,7 @@ import com.example.wapapp2.databinding.SummaryReceiptViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
+import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -101,6 +102,7 @@ class NewReceiptFragment : Fragment() {
         private val confirmBinding get() = _confirmBinding!!
         private var adapter: ReceiptsAdapter? = null
         private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
+        private val fcmViewModel by viewModels<FcmViewModel>()
 
         companion object {
             const val TAG = "ConfirmReceiptsDialogFragment"
@@ -154,6 +156,11 @@ class NewReceiptFragment : Fragment() {
             setWidthPercent(90, 75)
 
             newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
+                //영수증 추가 FCM전송
+                for (receipt in newReceiptViewModel.getReceipts()) {
+                    fcmViewModel.sendCalculation(receipt, newReceiptViewModel.calcRoomId!!)
+                }
+
                 LoadingDialogView.clearDialogs()
                 Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
                 requireActivity().onBackPressedDispatcher.onBackPressed()

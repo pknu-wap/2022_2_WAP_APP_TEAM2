@@ -1,6 +1,7 @@
 package com.example.wapapp2.notification.helper
 
 import android.content.Context
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.wapapp2.R
@@ -46,9 +47,8 @@ class CalcNotificationHelper private constructor(context: Context) :
                 val imgResult = async {
                     ReceiptImgRepositoryImpl.INSTANCE.downloadReceiptImg(sendFcmReceiptDTO.receiptDTO.imgUrl!!)
                 }
-                imgResult.await()
-                if (imgResult.getCompletionExceptionOrNull() == null) {
-                    sendFcmReceiptDTO.receiptDTO.receiptImgBitmap = imgResult.await()
+                imgResult.await()?.apply {
+                    sendFcmReceiptDTO.receiptDTO.receiptImgBitmap = this
                 }
                 createNotification(context, sendFcmReceiptDTO)
             }
@@ -62,12 +62,12 @@ class CalcNotificationHelper private constructor(context: Context) :
         val receiptDTO = sendFcmReceiptDTO.receiptDTO
 
         val collapsedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_collapsed_remoteviews)
-        collapsedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.payersName)
+        collapsedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.receiptDTO.payersId)
         collapsedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
         collapsedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
 
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_expanded_remoteviews)
-        expandedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.payersName)
+        expandedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.receiptDTO.payersId)
         expandedRemoteViews.setTextViewText(R.id.date_time, DateTime.parse(receiptDTO.date).toString(dateTimeFormat))
         expandedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
         expandedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
@@ -75,7 +75,11 @@ class CalcNotificationHelper private constructor(context: Context) :
         sendFcmReceiptDTO.receiptDTO.receiptImgBitmap?.apply {
             collapsedRemoteViews.setImageViewBitmap(R.id.receipt_image, this)
             expandedRemoteViews.setImageViewBitmap(R.id.receipt_image, this)
+        }
 
+        if (sendFcmReceiptDTO.receiptDTO.receiptImgBitmap == null) {
+            collapsedRemoteViews.setViewVisibility(R.id.receipt_image, View.GONE)
+            expandedRemoteViews.setViewVisibility(R.id.receipt_image, View.GONE)
         }
 
         val notificationObj = createNotification(context)
