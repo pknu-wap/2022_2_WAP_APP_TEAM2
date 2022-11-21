@@ -5,6 +5,7 @@ import androidx.collection.arrayMapOf
 import com.example.wapapp2.R
 import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.BankDTO
+import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,6 +29,7 @@ class MyApplication : Application() {
         FirebaseFirestore.getInstance().firestoreSettings = settings
         JodaTimeAndroid.init(applicationContext)
         initBanks()
+        FriendsLocalRepositoryImpl.initialize(applicationContext)
     }
 
     private fun initBanks() {
