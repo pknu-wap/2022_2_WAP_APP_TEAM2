@@ -34,8 +34,8 @@ data class ReceiptDTO(
         @PropertyName("status")
         var status: Boolean,
 
-        @get:Exclude
-        public var totalMoney: Int = 0,
+        @PropertyName("totalMoney")
+        var totalMoney: Int = 0,
 
         @get:Exclude
         private val productList: ArrayList<ReceiptProductDTO>,
