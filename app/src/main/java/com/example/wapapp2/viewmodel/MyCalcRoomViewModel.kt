@@ -12,10 +12,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class MyCalcRoomViewModel : ViewModel() {
     private val myCalcRoomRepositoryImpl = CalcRoomRepositorylmpl.getINSTANCE()
@@ -38,14 +34,6 @@ class MyCalcRoomViewModel : ViewModel() {
 
     }
 
-    fun exitFromCalcRoom(roomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                myCalcRoomRepositoryImpl.exitFromCalcRoom(roomId)
-            }
-            result.await()
-        }
-    }
 
     override fun onCleared() {
         super.onCleared()

@@ -13,12 +13,9 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
-import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
@@ -199,7 +196,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .setMessage(R.string.msg_exit_from_calc_room)
                     .setPositiveButton(R.string.exit) { dialog, which ->
                         dialog.dismiss()
-                        currentCalcRoomViewModel.exitRoom(currentCalcRoomViewModel.roomId!!)
+                        currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
                         requireActivity().onBackPressedDispatcher.onBackPressed()
                     }.setNegativeButton(R.string.close) { dialog, which ->
                         dialog.dismiss()

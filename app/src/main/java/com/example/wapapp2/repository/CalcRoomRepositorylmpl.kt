@@ -1,5 +1,6 @@
 package com.example.wapapp2.repository
 
+import android.provider.SyncStateContract.Helpers.update
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.FriendDTO
@@ -101,8 +102,14 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
      */
     override suspend fun inviteFriends(list: MutableList<FriendDTO>, roomId: String) {
         //calcroom문서에 참여자id추가
+        val idArr = arrayListOf<String>()
+        for (f in list) {
+            idArr.add(f.friendUserId)
+        }
+
+
         firestore.collection(FireStoreNames.calc_rooms.name).document(roomId)
-                .update("participantIds", FieldValue.arrayUnion(list.toTypedArray()))
+                .update("participantIds", FieldValue.arrayUnion(*idArr.toArray()))
 
         //user문서에 정산방 id추가
         val collection = firestore.collection(FireStoreNames.users.name)

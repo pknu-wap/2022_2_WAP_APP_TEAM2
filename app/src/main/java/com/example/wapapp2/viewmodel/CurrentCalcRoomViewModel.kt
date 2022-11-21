@@ -124,7 +124,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
         })
     }
 
-    fun exitRoom(roomId: String) {
+    fun exitFromRoom(roomId: String) {
         //방 나가기
         //calcRoom문서 내 participantIds에서 내 id삭제
         CoroutineScope(Dispatchers.Default).launch {

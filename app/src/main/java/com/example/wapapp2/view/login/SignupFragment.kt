@@ -45,7 +45,7 @@ class SignupFragment : Fragment() {
                     .commitAllowingStateLoss()
         }
 
-        fun UpdateProfile() {
+        fun UpdateProfile(uid: String) {
             db = FirebaseFirestore.getInstance()
             var gender: String = "man"
             var uid: String = "uid"
@@ -57,11 +57,13 @@ class SignupFragment : Fragment() {
                 }
             }
 
-            var userDTO =
-                    UserDTO("", viewBinding.userId.text.toString(), gender, "", "", viewBinding.userName.text.toString(), arrayListOf(),
+            val userDTO =
+                    UserDTO(
+                            id = uid, email = viewBinding.userId.text.toString(), gender = gender, imgUri = "", name = viewBinding.userName
+                            .text.toString(), "", arrayListOf(),
                             arrayListOf(), arrayListOf(), arrayListOf())
 
-            db!!.collection("users").document()?.set(userDTO)
+            db!!.collection("users").document(uid).set(userDTO)
         }
 
         fun createEmail() {
@@ -74,10 +76,11 @@ class SignupFragment : Fragment() {
                     auth?.createUserWithEmailAndPassword(viewBinding.userId.text.toString(), viewBinding.userPassword.text.toString())
                             ?.addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    val id = task.result.user?.uid
                                     Toast.makeText(context,
                                             "회원가입이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
 
-                                    UpdateProfile()
+                                    UpdateProfile(id!!)
                                     moveLoginPage()
                                 } else {
                                     Toast.makeText(context,
