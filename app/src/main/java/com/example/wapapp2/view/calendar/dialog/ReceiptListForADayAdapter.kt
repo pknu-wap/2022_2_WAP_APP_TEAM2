@@ -14,7 +14,7 @@ class ReceiptListForADayAdapter(private val list: ArrayList<ReceiptDTO>) : Recyc
         fun bind(position: Int) {
             val dstReceipt = list[position]
             binding.receiptName.text = dstReceipt.name
-            binding.time.text = DateTime.parse(dstReceipt.date).toString("aa hh:mm")
+            binding.time.text = DateTime.parse(dstReceipt.date.toString()).toString("aa hh:mm")
             binding.totalMoney.text = dstReceipt.totalMoney.toString()
 
             // 정산진행상태/ 등등 구현 필요
