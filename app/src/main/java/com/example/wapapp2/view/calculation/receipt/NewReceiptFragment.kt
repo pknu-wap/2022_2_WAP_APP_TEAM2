@@ -26,6 +26,7 @@ import com.example.wapapp2.databinding.SummaryReceiptViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
+import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -36,6 +37,8 @@ class NewReceiptFragment : Fragment() {
     companion object {
         const val TAG = "NewReceiptFragment"
     }
+
+    private val fcmViewModel by viewModels<FcmViewModel>()
 
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
@@ -82,6 +85,17 @@ class NewReceiptFragment : Fragment() {
                 binding.viewPager.setCurrentItem(adapter.itemCount - 1, true)
                 binding.receiptCount.text = adapter.itemCount.toString()
             }
+        }
+
+        newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
+            //영수증 추가 FCM전송
+            for (receipt in newReceiptViewModel.getReceipts()) {
+                fcmViewModel.sendCalculation(receipt, newReceiptViewModel.calcRoomId!!)
+            }
+
+            LoadingDialogView.clearDialogs()
+            Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         adapter.addFragment()
@@ -152,12 +166,6 @@ class NewReceiptFragment : Fragment() {
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             setWidthPercent(90, 75)
-
-            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
-                LoadingDialogView.clearDialogs()
-                Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
 
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직

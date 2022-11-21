@@ -85,7 +85,6 @@ class LoginFragment : Fragment() {
             ChatRepositorylmpl.initialize()
             UserRepositoryImpl.initialize()
             MyBankAccountRepositoryImpl.initialize()
-            MyCalcRoomRepositoryImpl.initialize()
             CalcRoomRepositorylmpl.initialize()
 
             myAccountViewModel.initMyProfile()

@@ -68,6 +68,14 @@
         tools:listitem="@layout/search_friend_item_view"
         />
 
+    <com.example.wapapp2.commons.view.NewLoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/save_btn"
+        app:layout_constraintTop_toBottomOf="@id/search_view"
+        />
+
     <Button
         android:id="@+id/save_btn"
         android:layout_width="match_parent"

@@ -33,11 +33,13 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
         this.onUpdateSummaryCallback = onUpdateSummaryCallback
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View? {
         binding = DutchCheckFragmentBinding.inflate(inflater)
 
-        binding.viewReceipts.adapter = ReceiptAdapter(requireContext(), DummyData.getReceipts(), this.receiptViewModel, this.onUpdateSummaryCallback )
+        binding.viewReceipts.adapter =
+                ReceiptAdapter(requireContext(), DummyData.getReceipts(), this.receiptViewModel, this.onUpdateSummaryCallback)
         onUpdateSummaryCallback.updateSummaryUI(receiptViewModel.getCurrentSummary)
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             if (isChecked) {

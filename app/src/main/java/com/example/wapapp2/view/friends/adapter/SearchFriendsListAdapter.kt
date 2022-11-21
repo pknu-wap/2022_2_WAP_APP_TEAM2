@@ -3,13 +3,14 @@ package com.example.wapapp2.view.friends.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.databinding.SearchFriendItemViewBinding
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.google.android.material.checkbox.MaterialCheckBox
 
 class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) :
-        RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>() {
+        RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>(), IAdapterItemCount {
     private val friendsList = mutableListOf<FriendDTO>()
     private val checkedSet = HashSet<String>()
     private val ignoreIdSet = mutableSetOf<String>()
@@ -96,6 +97,8 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
         holder.reset()
         super.onViewRecycled(holder)
     }
+
+    override fun getAdapterItemCount() = itemCount
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

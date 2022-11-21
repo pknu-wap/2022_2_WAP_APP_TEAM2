@@ -89,9 +89,7 @@ class GrouplistFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
         binding.loadingView.setContentView(binding.groupRV)
         return binding.root
@@ -133,6 +131,15 @@ class GrouplistFragment : Fragment() {
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 
+    override fun onStart() {
+        super.onStart()
+        adapter?.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter?.stopListening()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -141,6 +148,5 @@ class GrouplistFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        adapter?.stopListening()
     }
 }

@@ -1,4 +1,4 @@
-package com.example.wapapp2.model.notifications
+package com.example.wapapp2.model.notifications.send
 
 import com.example.wapapp2.model.ChatDTO
 import com.google.gson.annotations.SerializedName

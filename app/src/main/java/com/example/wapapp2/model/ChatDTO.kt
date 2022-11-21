@@ -11,7 +11,7 @@ import java.util.*
 
 @Parcelize
 data class ChatDTO(
-        @get:Exclude
+        @PropertyName("userName")
         @SerializedName("userName")
         var userName: String,
 

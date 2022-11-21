@@ -1,16 +1,14 @@
 package com.example.wapapp2.repository
 
-import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
-import androidx.core.net.toUri
 import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 import org.joda.time.DateTime
-import java.io.File
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
@@ -62,25 +60,16 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
         return result
     }
 
-    override suspend fun downloadReceiptImg(fileName: String, context: Context): Uri? {
-        val dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        dir?.apply {
-            if (!dir.exists())
-                dir.mkdir()
+    override suspend fun downloadReceiptImg(imgUrl: String): Bitmap? = suspendCoroutine<Bitmap?> { continuation ->
+        storage.reference.child("receiptimgs").child(imgUrl).getBytes(1280 * 1280).addOnCompleteListener {
+            if (it.isSuccessful) {
+                val inputStream = it.result.inputStream()
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                continuation.resume(bitmap)
+            } else {
+                continuation.resumeWithException(it.exception!!)
+            }
         }
-
-        val file = File(dir!!.absolutePath + "/.receipts/${fileName}.png")
-        file.createNewFile()
-
-        var result: Uri? = null
-
-        storage.reference.child("receiptimgs").child(fileName).getFile(file)
-                .addOnSuccessListener {
-                    result = file.toUri()
-                }.addOnFailureListener { }
-                .await()
-
-        return result
 
     }
 }

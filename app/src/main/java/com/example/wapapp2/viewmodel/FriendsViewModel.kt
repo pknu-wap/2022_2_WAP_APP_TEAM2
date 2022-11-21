@@ -9,6 +9,7 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.UserDTO
+import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.FriendsRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Tasks.await
@@ -23,6 +24,7 @@ import org.checkerframework.checker.units.qual.m
 
 class FriendsViewModel : ViewModel() {
     private val friendsRepositoryImpl: FriendsRepositoryImpl = FriendsRepositoryImpl.getINSTANCE()!!
+    private val calcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val fireStore = FirebaseFirestore.getInstance()
 

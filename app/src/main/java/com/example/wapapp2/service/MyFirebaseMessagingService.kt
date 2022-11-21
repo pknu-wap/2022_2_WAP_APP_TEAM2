@@ -1,12 +1,15 @@
 package com.example.wapapp2.service
 
 import com.example.wapapp2.datastore.MyDataStore
-import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.model.datastore.FcmTokenDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
-import com.example.wapapp2.model.notifications.SendFcmChatDTO
+import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
+import com.example.wapapp2.notification.helper.CalcNotificationHelper
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
+import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -25,11 +28,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (!body.isNullOrEmpty()) {
             //영수증, 채팅, 정산 구분
             val receivedDTO = Gson().fromJson(body, ReceivedPushNotificationDTO::class.java)
-
             when (receivedDTO.type) {
                 NotificationType.Chat -> chat(receivedDTO)
                 NotificationType.Receipt -> receipt(receivedDTO)
                 NotificationType.Calculation -> calculation(receivedDTO)
+                else -> {}
             }
         }
     }
@@ -43,21 +46,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun chat(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-        val data = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
-        val chatNotificationHelper = ChatNotificationHelper.getINSTANCE(applicationContext)
+        val sendFcmChatDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
 
-        val senderId = data.chatDTO.senderId
+        val senderId = sendFcmChatDTO.chatDTO.senderId
         val senderName: String = if (FriendsViewModel.myFriendMap.containsKey(senderId))
             FriendsViewModel.myFriendMap[senderId]!!.alias
         else
-            data.chatDTO.userName
+            sendFcmChatDTO.chatDTO.userName
 
-        chatNotificationHelper.notifyNotification(applicationContext, data.roomName, data.chatDTO)
+        val chatNotificationHelper = ChatNotificationHelper.getINSTANCE(applicationContext)
+        chatNotificationHelper.notifyNotification(applicationContext, sendFcmChatDTO)
     }
 
     private fun receipt(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val receiptNotificationHelper = ReceiptNotificationHelper.getINSTANCE(applicationContext)
     }
 
     private fun calculation(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val calcNotificationHelper = CalcNotificationHelper.getINSTANCE(applicationContext)
+        val sendFcmReceiptDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmReceiptDTO::class.java)
+
+        calcNotificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
     }
 }

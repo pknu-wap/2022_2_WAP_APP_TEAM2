@@ -22,7 +22,7 @@ class ReceiptAdapter(private val context: Context?, private val receipts: ArrayL
         fun bind(receipt: ReceiptDTO) {
             binding.description.text = "[ " + receipt.name + " ] - 김진우"
             binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
-            binding.dateTime.text = DateTime.parse(receipt.date).toString("yyyy-MM-dd")
+            binding.dateTime.text = receipt.date.toString("yyyy-MM-dd")
         }
     }
 

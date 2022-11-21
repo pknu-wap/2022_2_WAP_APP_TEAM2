@@ -38,7 +38,7 @@ class MyprofileFragment : Fragment() {
             dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
 
             MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
-                    .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
+                    .setView(dialogViewBinding.root).setNegativeButton(R.string.close) { dialog, index ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.remove) { dialog, index ->
                         myBankAccountsViewModel.removeMyBankAccount(bankAccountDTO)

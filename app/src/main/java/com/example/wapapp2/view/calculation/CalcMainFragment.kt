@@ -13,12 +13,10 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
-import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
@@ -29,6 +27,7 @@ import com.example.wapapp2.view.chat.ChatFragment
 
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import java.text.DecimalFormat
 
@@ -53,10 +52,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (arguments == null) {
+        roomId = if (arguments == null) {
             savedInstanceState?.getString("roomId")
         } else {
-            roomId = requireArguments().getString("roomId")!!
+            arguments!!.getString("roomId")!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.myFriendMap.toMutableMap())
@@ -99,6 +98,19 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        FcmRepositoryImpl.unSubscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (!currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -109,9 +121,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
         } else {
             binding.calculationSimpleInfo.summary.text = paymoney.toString()
-
             binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
-
         }
     }
 
@@ -182,13 +192,23 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
+            //방 나가기
+            MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.exit_from_room)
+                    .setMessage(R.string.msg_exit_from_calc_room)
+                    .setPositiveButton(R.string.exit) { dialog, which ->
+                        dialog.dismiss()
+                        currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                    }.setNegativeButton(R.string.close) { dialog, which ->
+                        dialog.dismiss()
+                    }.create().show()
 
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
         participantsInCalcRoomFragment.onNavDrawerListener = this
         childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
-                participantsInCalcRoomFragment, "participants").commit()
+                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG).commit()
     }
 
 

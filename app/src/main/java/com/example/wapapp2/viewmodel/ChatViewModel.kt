@@ -39,6 +39,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+
     fun getQueryForOption(roomId: String): Query {
         val query = Firebase.firestore
                 .collection(FireStoreNames.calc_rooms.name)

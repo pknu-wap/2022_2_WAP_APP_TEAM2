@@ -10,6 +10,7 @@ import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
 class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFriendListener) :
         RecyclerView.Adapter<CheckedFriendsListAdapter.ViewHolder>() {
     private val list = ArrayList<FriendDTO>()
+    val friends get() = list
 
     inner class ViewHolder(private val itemBinding: CheckedFriendItemviewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 

@@ -27,6 +27,10 @@ class ParticipantsInCalcRoomFragment : Fragment() {
 
     }
 
+    companion object {
+        const val TAG = "ParticipantsInCalcRoomFragment"
+    }
+
     private val adapter = ParticipantsInCalcRoomAdapter(participantOnClickListener)
     var onNavDrawerListener: OnNavDrawerListener? = null
 
