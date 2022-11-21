@@ -141,7 +141,7 @@ class ChatFragment : Fragment(), ScrollListener {
                 binding.textInputEditText.text?.clear()
                 // 전송
                 chatViewModel.sendMsg(newChat)
-                fcmViewModel.sendMessage(newChat, currentCalcRoomViewModel.roomId!!)
+                fcmViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }
