@@ -33,6 +33,7 @@ data class ReceiptDTO(
         @field:JvmField
         @PropertyName("status")
         var status: Boolean,
+
         @get:Exclude
         public var totalMoney: Int = 0,
 
@@ -43,12 +44,10 @@ data class ReceiptDTO(
         public var myMoney: Int = 0,
 
         @get:Exclude
-        public val date: String = DateTime.now().toString(),
+        public val date: DateTime = DateTime.now(),
 
-        @get:Exclude
-        var receiptImgBitmap: Bitmap?,
-) : Parcelable {
-    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString(), null)
+        ) : Parcelable {
+    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)

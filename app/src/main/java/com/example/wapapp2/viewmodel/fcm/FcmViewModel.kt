@@ -42,13 +42,14 @@ class FcmViewModel : ViewModel() {
             val body = JsonObject()
             body.addProperty("type", NotificationType.Calculation.name)
 
-            val sendFcmReceiptDTO = SendFcmReceiptDTO(receiptDTO, calcRoomId)
+            val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
+            receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)
 
             val data = Gson().toJsonTree(sendFcmReceiptDTO)
             body.add("data", data)
 
             val notificationDTO = PushNotificationDTO("/topics/${calcRoomId}", PushNotificationDTO.Notification(
-                    receiptDTO.name, body.toString()))
+                    sendFcmReceiptDTO.name, body.toString()))
             FcmRepositoryImpl.sendCalculation(notificationDTO)
         }
     }

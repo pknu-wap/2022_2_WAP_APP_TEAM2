@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.dummy.DummyData
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
@@ -53,10 +54,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (arguments == null) {
+        roomId = if (arguments == null) {
             savedInstanceState?.getString("roomId")
         } else {
-            roomId = requireArguments().getString("roomId")!!
+            arguments!!.getString("roomId")!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.myFriendMap.toMutableMap())
@@ -97,6 +98,16 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
             }
             true
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        FcmRepositoryImpl.unSubscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -182,7 +193,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .commit()
         }
         binding.exitRoom.setOnClickListener {
-
+            //방 나가기
+            currentCalcRoomViewModel.exitRoom()
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()

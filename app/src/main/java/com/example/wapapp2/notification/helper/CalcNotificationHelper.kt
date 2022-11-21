@@ -42,13 +42,13 @@ class CalcNotificationHelper private constructor(context: Context) :
 
     fun notifyNotification(context: Context, sendFcmReceiptDTO: SendFcmReceiptDTO) {
         // 영수증 사진 다운로드, 영수증 사진 없으면 사진 미표시
-        if (!sendFcmReceiptDTO.receiptDTO.imgUrl.isNullOrEmpty()) {
+        if (!sendFcmReceiptDTO.imgUrl.isNullOrEmpty()) {
             CoroutineScope(Dispatchers.Default).launch {
                 val imgResult = async {
-                    ReceiptImgRepositoryImpl.INSTANCE.downloadReceiptImg(sendFcmReceiptDTO.receiptDTO.imgUrl!!)
+                    ReceiptImgRepositoryImpl.INSTANCE.downloadReceiptImg(sendFcmReceiptDTO.imgUrl)
                 }
                 imgResult.await()?.apply {
-                    sendFcmReceiptDTO.receiptDTO.receiptImgBitmap = this
+                    sendFcmReceiptDTO.receiptImgBitmap = this
                 }
                 createNotification(context, sendFcmReceiptDTO)
             }
@@ -59,25 +59,24 @@ class CalcNotificationHelper private constructor(context: Context) :
     }
 
     private fun createNotification(context: Context, sendFcmReceiptDTO: SendFcmReceiptDTO) {
-        val receiptDTO = sendFcmReceiptDTO.receiptDTO
 
         val collapsedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_collapsed_remoteviews)
-        collapsedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.receiptDTO.payersId)
-        collapsedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
-        collapsedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
+        collapsedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.payersId)
+        collapsedRemoteViews.setTextViewText(R.id.total_money, sendFcmReceiptDTO.totalMoney.toString() + "원")
+        collapsedRemoteViews.setTextViewText(R.id.msg, sendFcmReceiptDTO.name)
 
         val expandedRemoteViews = RemoteViews(context.packageName, R.layout.calculation_notification_expanded_remoteviews)
-        expandedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.receiptDTO.payersId)
-        expandedRemoteViews.setTextViewText(R.id.date_time, DateTime.parse(receiptDTO.date).toString(dateTimeFormat))
-        expandedRemoteViews.setTextViewText(R.id.total_money, receiptDTO.totalMoney.toString() + "원")
-        expandedRemoteViews.setTextViewText(R.id.msg, receiptDTO.name)
+        expandedRemoteViews.setTextViewText(R.id.payer, sendFcmReceiptDTO.payersId)
+        expandedRemoteViews.setTextViewText(R.id.date_time, DateTime.parse(sendFcmReceiptDTO.createdTime).toString(dateTimeFormat))
+        expandedRemoteViews.setTextViewText(R.id.total_money, sendFcmReceiptDTO.totalMoney.toString() + "원")
+        expandedRemoteViews.setTextViewText(R.id.msg, sendFcmReceiptDTO.name)
 
-        sendFcmReceiptDTO.receiptDTO.receiptImgBitmap?.apply {
+        sendFcmReceiptDTO.receiptImgBitmap?.apply {
             collapsedRemoteViews.setImageViewBitmap(R.id.receipt_image, this)
             expandedRemoteViews.setImageViewBitmap(R.id.receipt_image, this)
         }
 
-        if (sendFcmReceiptDTO.receiptDTO.receiptImgBitmap == null) {
+        if (sendFcmReceiptDTO.receiptImgBitmap == null) {
             collapsedRemoteViews.setViewVisibility(R.id.receipt_image, View.GONE)
             expandedRemoteViews.setViewVisibility(R.id.receipt_image, View.GONE)
         }

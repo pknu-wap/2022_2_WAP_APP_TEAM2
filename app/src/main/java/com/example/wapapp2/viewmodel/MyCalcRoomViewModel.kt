@@ -1,15 +1,16 @@
 package com.example.wapapp2.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
-import com.example.wapapp2.repository.MyCalcRoomRepositoryImpl
+import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MyCalcRoomViewModel : ViewModel() {
-    private val myCalcRoomRepositoryImpl = MyCalcRoomRepositoryImpl.getINSTANCE()
+    private val myCalcRoomRepositoryImpl = CalcRoomRepositorylmpl.getINSTANCE()
     private val fireStore = FirebaseFirestore.getInstance()
     val myCalcRoomIds = MutableLiveData<MutableSet<String>>(mutableSetOf())
 

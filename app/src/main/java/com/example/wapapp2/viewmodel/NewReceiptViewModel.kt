@@ -31,7 +31,6 @@ class NewReceiptViewModel : ViewModel() {
 
     private fun addReceipt(receiptList: MutableList<ReceiptDTO>, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
-            var completed = false
             var count = 0
 
             for (receipt in receiptList) {
@@ -89,7 +88,9 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString(), null)
+        receiptMap[receiptId] = ReceiptDTO().apply {
+            id = receiptId
+        }
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {

@@ -123,4 +123,14 @@ class CurrentCalcRoomViewModel : ViewModel() {
             calcRoom.value = calcRoomDTO
         })
     }
+
+    fun exitRoom(roomId: String) {
+        //방 나가기
+        //calcRoom문서 내 participantIds에서 내 id삭제
+        CoroutineScope(Dispatchers.Default).launch {
+            //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
+            userRepository.removeCalcRoomId(roomId)
+            calcRoomRepository.exitFromCalcRoom(roomId)
+        }
+    }
 }

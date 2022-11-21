@@ -9,6 +9,7 @@ import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 import com.example.wapapp2.notification.helper.CalcNotificationHelper
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
 import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -27,7 +28,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (!body.isNullOrEmpty()) {
             //영수증, 채팅, 정산 구분
             val receivedDTO = Gson().fromJson(body, ReceivedPushNotificationDTO::class.java)
-
             when (receivedDTO.type) {
                 NotificationType.Chat -> chat(receivedDTO)
                 NotificationType.Receipt -> receipt(receivedDTO)
@@ -67,5 +67,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val sendFcmReceiptDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmReceiptDTO::class.java)
 
         calcNotificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
+        //채팅방 구독 연결
+        FcmRepositoryImpl.subscribeToCalcRoomChat(sendFcmReceiptDTO.roomId)
     }
 }

@@ -6,6 +6,7 @@ import com.example.wapapp2.repository.interfaces.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
@@ -55,6 +56,10 @@ class UserRepositoryImpl : UserRepository {
         }
     }
 
+    override suspend fun removeCalcRoomId(roomId: String) {
+        fireStore.collection(FireStoreNames.users.name).document(auth.currentUser!!.uid)
+                .update("myCalcRoomIds", FieldValue.arrayRemove(roomId))
+    }
 
     private fun convertToUserDTOSet(documents: List<DocumentSnapshot>, ignoreMyId: Boolean): MutableSet<UserDTO> {
         val dtoSet = mutableSetOf<UserDTO>()
@@ -77,5 +82,6 @@ class UserRepositoryImpl : UserRepository {
         }
         return dtoSet
     }
+
 
 }

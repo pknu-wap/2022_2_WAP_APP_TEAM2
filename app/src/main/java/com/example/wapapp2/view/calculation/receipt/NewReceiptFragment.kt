@@ -38,6 +38,8 @@ class NewReceiptFragment : Fragment() {
         const val TAG = "NewReceiptFragment"
     }
 
+    private val fcmViewModel by viewModels<FcmViewModel>()
+
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
 
@@ -85,6 +87,17 @@ class NewReceiptFragment : Fragment() {
             }
         }
 
+        newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
+            //영수증 추가 FCM전송
+            for (receipt in newReceiptViewModel.getReceipts()) {
+                fcmViewModel.sendCalculation(receipt, newReceiptViewModel.calcRoomId!!)
+            }
+
+            LoadingDialogView.clearDialogs()
+            Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
         adapter.addFragment()
     }
 
@@ -102,7 +115,6 @@ class NewReceiptFragment : Fragment() {
         private val confirmBinding get() = _confirmBinding!!
         private var adapter: ReceiptsAdapter? = null
         private val newReceiptViewModel: NewReceiptViewModel by viewModels({ requireParentFragment() })
-        private val fcmViewModel by viewModels<FcmViewModel>()
 
         companion object {
             const val TAG = "ConfirmReceiptsDialogFragment"
@@ -154,17 +166,6 @@ class NewReceiptFragment : Fragment() {
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             setWidthPercent(90, 75)
-
-            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
-                //영수증 추가 FCM전송
-                for (receipt in newReceiptViewModel.getReceipts()) {
-                    fcmViewModel.sendCalculation(receipt, newReceiptViewModel.calcRoomId!!)
-                }
-
-                LoadingDialogView.clearDialogs()
-                Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
 
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
