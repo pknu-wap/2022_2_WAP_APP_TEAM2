@@ -26,7 +26,7 @@ protected constructor(
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (notificationManager.getNotificationChannel(channelId) == null) {
-                val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
 
                 notificationManager.createNotificationChannel(channel)
             }

@@ -28,6 +28,7 @@ class ChatNotificationHelper private constructor(context: Context)
         val notificationObj = super.createNotification(context)
         notificationObj.notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
         notificationObj.notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        notificationObj.notificationBuilder.setShowWhen(true)
         return notificationObj
     }
 
@@ -37,7 +38,8 @@ class ChatNotificationHelper private constructor(context: Context)
         // 클릭시 채팅방 뜨도록 구현할 예정. ( 미완 )
         val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent,
+                PendingIntent.FLAG_IMMUTABLE)
         notificationObj.notificationBuilder.setContentIntent(pendingIntent)
 
         val remoteViews = RemoteViews(context.packageName, R.layout.chat_notification_remoteviews)
