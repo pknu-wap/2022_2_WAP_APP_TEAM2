@@ -37,13 +37,12 @@ class ChatRepositorylmpl private constructor() : ChatRepository {
                 .document()
                 .set(chatDTO)
                 .addOnFailureListener { exception ->
-                    TODO("전송실패")
+                    TODO("전송실패 -> 네트워크 연결을 확인해주세요 ")
                 }
     }
 
 
     //  https://firebase.google.com/docs/cloud-messaging/http-server-ref
-
     fun send(tokens: List<String>, roomDTO: CalcRoomDTO, chatDTO: ChatDTO): Int {
         try {
             //This is not recommended way because anyone can get your API key by using tools like Smali2Java and can send the notification to anyone.
