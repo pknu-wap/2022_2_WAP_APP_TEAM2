@@ -19,7 +19,7 @@ import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
-import com.example.wapapp2.viewmodel.CalenderViewModel
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
@@ -32,6 +32,8 @@ class GrouplistFragment : Fragment() {
 
     private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     companion object {
         const val TAG = "GrouplistFragment"
@@ -51,6 +53,7 @@ class GrouplistFragment : Fragment() {
                 .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
                 .addToBackStack(CalcMainFragment.TAG).commit()
     }
+
 
     /** Add Group **/
     private val addOnClickedItemListener = View.OnClickListener {
@@ -122,8 +125,8 @@ class GrouplistFragment : Fragment() {
                 }
                 adapter!!.startListening()
             }
+            myCalendarViewModel.loadCalendarReceipts(it)
         }
-
         myCalcRoomViewModel.loadMyCalcRoomIds()
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }

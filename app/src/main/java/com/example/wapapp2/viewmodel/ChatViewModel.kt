@@ -46,12 +46,6 @@ class ChatViewModel : ViewModel() {
                 .document(roomId)
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
-
-        /*
-        query.addSnapshotListener(snapshotListener)
-        //scroll 관련 구현 필요 snapshotlistener ??
-
-         */
         return query
     }
 

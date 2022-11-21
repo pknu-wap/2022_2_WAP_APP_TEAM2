@@ -7,10 +7,12 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
+
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
+
 import com.google.firebase.firestore.ktx.toObject
 
 class MyCalcRoomViewModel : ViewModel() {
@@ -55,7 +57,6 @@ class MyCalcRoomViewModel : ViewModel() {
                         }
                     }
                 }
-
             }
         }
     }
