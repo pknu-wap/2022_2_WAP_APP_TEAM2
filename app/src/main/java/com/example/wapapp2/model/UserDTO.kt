@@ -17,6 +17,8 @@ data class UserDTO(
         var imgUri: String,
         @PropertyName("name")
         var name: String,
+        @PropertyName("fcmToken")
+        var fcmToken: String,
         @PropertyName("myCalcRoomIds")
         val myCalcRoomIds: ArrayList<String>,
         @PropertyName("checkReceiptIds")
@@ -24,8 +26,8 @@ data class UserDTO(
         @PropertyName("completedReceiptIds")
         val completedReceiptIds: ArrayList<String>,
         @PropertyName("fixedReceiptIds")
-        val fixedReceiptIds: ArrayList<String>
+        val fixedReceiptIds: ArrayList<String>,
 ) : Parcelable {
-    constructor() : this("", "", "", "", "", arrayListOf(), arrayListOf(), arrayListOf(),
+    constructor() : this("", "", "", "", "", "", arrayListOf(), arrayListOf(), arrayListOf(),
             arrayListOf())
 }

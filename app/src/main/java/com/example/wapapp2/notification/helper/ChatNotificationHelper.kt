@@ -24,7 +24,7 @@ class ChatNotificationHelper private constructor(context: Context)
         }
     }
 
-    override fun createNotification(context: Context,): NotificationObj {
+    override fun createNotification(context: Context): NotificationObj {
         val notificationObj = super.createNotification(context)
         notificationObj.notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
         notificationObj.notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

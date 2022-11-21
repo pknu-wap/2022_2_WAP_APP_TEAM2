@@ -11,14 +11,20 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
+import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class LoginFragment : Fragment() {
+
+
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
     private lateinit var binding: FragmentLoginBinding
     var auth: FirebaseAuth? = null
@@ -43,7 +49,6 @@ class LoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         auth = FirebaseAuth.getInstance()
     }
 
@@ -85,6 +90,10 @@ class LoginFragment : Fragment() {
 
             myAccountViewModel.initMyProfile()
 
+            CoroutineScope(Dispatchers.IO).launch {
+                MyDataStore.getINSTANCE().checkFcmToken()
+            }
+
             parentFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment.TAG)
@@ -108,7 +117,7 @@ class LoginFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater)
+        binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
@@ -125,4 +134,6 @@ class LoginFragment : Fragment() {
         onBackPressedCallback.remove()
         super.onDestroy()
     }
+
+
 }
