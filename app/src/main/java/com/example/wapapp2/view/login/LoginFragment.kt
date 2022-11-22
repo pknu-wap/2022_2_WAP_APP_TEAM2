@@ -1,6 +1,8 @@
 package com.example.wapapp2.view.login
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,14 +16,23 @@ import com.example.wapapp2.databinding.FragmentLoginBinding
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 
 
 class LoginFragment : Fragment() {
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
     private lateinit var binding: FragmentLoginBinding
     var auth: FirebaseAuth? = null
+    var googleSignInClient: GoogleSignInClient? = null
+    val GOOGLE_LOGIN_CODE = 9001
+
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (!parentFragmentManager.popBackStackImmediate()) {
@@ -45,6 +56,13 @@ class LoginFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+
+        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
 
     fun emailLogin() {
@@ -103,6 +121,34 @@ class LoginFragment : Fragment() {
                 .commitAllowingStateLoss()
     }
 
+    fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        auth?.signInWithCredential(credential)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    moveMainPage(auth?.currentUser)
+                }
+            }
+    }
+
+    fun googleLogin() {
+        var signInIntent = googleSignInClient?.signInIntent
+        startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == GOOGLE_LOGIN_CODE && resultCode == Activity.RESULT_OK) {
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (result!!.isSuccess) {
+                val account = result!!.signInAccount
+                firebaseAuthWithGoogle(account!!)
+            }
+        }
+    }
+
+
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
@@ -111,6 +157,7 @@ class LoginFragment : Fragment() {
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
+        binding.btnGoogleLogin.setOnClickListener { googleLogin() }
 
         return binding.root
     }
