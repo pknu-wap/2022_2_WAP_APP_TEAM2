@@ -6,45 +6,35 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient"
     android:orientation="vertical"
-    android:weightSum="10"
     >
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.5"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Welcome Back!"
+            android:layout_marginTop="48dp"
+            android:text="#우정하자"
             android:textAlignment="center"
             android:textColor="#FFFF"
             android:textSize="32sp"
-            />
+            android:textStyle="bold"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign in to continue!"
-            android:textAlignment="center"
-            android:textColor="#FFFF"
-            />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        >
+        android:layout_marginTop="16dp">
 
         <EditText
-            android:id="@+id/editTextTextPersonName"
+            android:id="@+id/email_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -52,7 +42,7 @@
             android:layout_marginRight="12dp"
             android:backgroundTint="#FFFF"
             android:ems="10"
-            android:hint="Username"
+            android:hint="Email"
             android:inputType="textPersonName"
             android:minHeight="48dp"
             android:textColor="#FFFFFF"
@@ -60,7 +50,7 @@
             />
 
         <EditText
-            android:id="@+id/editTextTextPassword"
+            android:id="@+id/password_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
@@ -77,45 +67,91 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:gravity="end"
         android:orientation="vertical"
+        android:padding="12dp"
         >
 
         <Button
-            android:id="@+id/btn_signin"
+            android:id="@+id/btn_login"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
+            android:layout_height="48dp"
             android:backgroundTint="#FFFBFB"
-            android:padding="16dp"
-            android:text="Sign In"
+            android:text="로그인"
+            android:textSize="13sp"
             android:textAllCaps="false"
             android:textColor="#9C5ECC"
             />
 
-        <TextView
+        <Button
+            android:id="@+id/btn_signup"
             android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:backgroundTint="#FFFBFB"
+            android:text="회원가입"
+            android:textSize="13sp"
+            android:textAllCaps="false"
+            android:textColor="#9C5ECC"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="--------------------------------------------     or     --------------------------------------------"
-            android:textAlignment="center"
-            android:textColor="#FFFF"
-            />
+            android:layout_marginTop="16dp"
+            android:text="비밀번호를 잊으셨나요?"
+            android:textColor="@color/purple_700"/>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/View"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="or"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/View"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginRight="16dp"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/View"
+                android:layout_marginLeft="16dp"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4.5"
+        android:layout_height="wrap_content"
         >
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="12dp"
             android:layout_marginRight="12dp"

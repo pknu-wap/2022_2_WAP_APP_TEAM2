@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid
-        android:color="@color/bg_itembox"/>
-    <corners
-        android:radius="20dp" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#6084C6">
+
+    <item android:id="@android:id/background">
+
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_itembox" />
+            <corners android:radius="20dp" />
+        </shape>
+
+    </item>
+
+</ripple>

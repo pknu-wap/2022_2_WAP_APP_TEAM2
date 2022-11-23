@@ -1,32 +1,86 @@
 package com.example.wapapp2.view.editreceipt
 
+import android.annotation.SuppressLint
+import android.text.Editable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wapapp2.R
-import com.example.wapapp2.view.checkreceipt.CheckReceiptAdapter
+import com.example.wapapp2.commons.classes.DelayTextWatcher
+import com.example.wapapp2.databinding.ProductItemLayoutInNewCalcBinding
+import com.example.wapapp2.model.ReceiptProductDTO
 
-class EditReceiptAdapter (val itemList: ArrayList<ItemList>) : RecyclerView.Adapter<EditReceiptAdapter.CustomViewHolder>() {
+class EditReceiptAdapter(
+        private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+) : RecyclerView.Adapter<EditReceiptAdapter.CustomViewHolder>() {
+    private val itemList: MutableList<ReceiptProductDTO> = mutableListOf()
+    var items = itemList
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field.clear()
+            field.addAll(value)
+            notifyDataSetChanged()
+        }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.edit_receipt_detail, parent, false)
-        return CustomViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CustomViewHolder(ProductItemLayoutInNewCalcBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+    ), onUpdatedValueListener)
 
     override fun onBindViewHolder(holder: EditReceiptAdapter.CustomViewHolder, position: Int) {
-        holder.name.text = itemList.get(position).name
-        holder.amount.text = itemList.get(position).amount
+        holder.bind(itemList[position])
     }
 
-    override fun getItemCount(): Int {
-        return itemList.size
-    }
+    override fun getItemCount() = itemList.size
 
-    class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val name = itemView.findViewById<TextView>(R.id.edit_name)
-        val amount = itemView.findViewById<TextView>(R.id.edit_amount)
+
+    class CustomViewHolder(
+            private val binding: ProductItemLayoutInNewCalcBinding,
+            private val onUpdatedValueListener: EditReceiptFragment.OnUpdatedValueListener,
+    ) :
+            RecyclerView.ViewHolder(binding.root) {
+        private var nameTextWatcher: DelayTextWatcher? = null
+        private var countTextWatcher: DelayTextWatcher? = null
+        private var priceTextWatcher: DelayTextWatcher? = null
+
+        fun bind(receiptProductDTO: ReceiptProductDTO) {
+            nameTextWatcher?.run {
+                binding.nameEditText.removeTextChangedListener(this)
+                null
+            }
+            countTextWatcher?.run {
+                binding.countEditText.removeTextChangedListener(this)
+                null
+            }
+            priceTextWatcher?.run {
+                binding.priceEditText.removeTextChangedListener(this)
+                null
+            }
+
+            nameTextWatcher = object : DelayTextWatcher() {
+                override fun onFinalText(text: String) {
+                    receiptProductDTO.name = text
+                }
+            }
+            countTextWatcher = object : DelayTextWatcher() {
+                override fun onFinalText(text: String) {
+                    receiptProductDTO.name = text
+                }
+            }
+            priceTextWatcher = object : DelayTextWatcher() {
+                override fun onFinalText(text: String) {
+                    receiptProductDTO.price = text.toInt()
+                    onUpdatedValueListener.onUpdated()
+                }
+            }
+
+            binding.priceEditText.addTextChangedListener(priceTextWatcher)
+            binding.countEditText.addTextChangedListener(priceTextWatcher)
+            binding.nameEditText.addTextChangedListener(nameTextWatcher)
+
+            binding.priceEditText.text = receiptProductDTO.price.toString().toEditable()
+            binding.countEditText.text = receiptProductDTO.count.toString().toEditable()
+            binding.nameEditText.text = receiptProductDTO.name.toEditable()
+        }
+
+        private fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
     }
 }

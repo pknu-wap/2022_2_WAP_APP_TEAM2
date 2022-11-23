@@ -20,9 +20,8 @@
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackground"
             android:src="@drawable/ic_baseline_clear_24"
-
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title_text_layout"
             />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -34,7 +33,8 @@
             app:endIconMode="clear_text"
             app:expandedHintEnabled="true"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/remove_btn"
+            app:layout_constraintTop_toTopOf="parent"
+
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -70,89 +70,48 @@
             android:id="@+id/receipt_image_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="@string/receipt_img"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_money_edit_text_layout"
             />
 
         <ImageView
             android:id="@+id/receipt_image"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/receipt_sample"
-            app:layout_constraintBottom_toTopOf="@id/barrier1"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/receipt_img_btn"
             app:layout_constraintTop_toBottomOf="@id/receipt_image_label"
             />
 
 
         <Button
-            android:id="@+id/add_receipt_img_btn"
+            android:id="@+id/receipt_img_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_img"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/edit_receipt_img_btn"
-            app:layout_constraintTop_toBottomOf="@id/barrier1"
-            />
-
-        <Button
-            android:id="@+id/edit_receipt_img_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:backgroundTint="@color/design_default_color_secondary_variant"
-            android:text="@string/edit_img"
-            app:layout_constraintLeft_toRightOf="@id/add_receipt_img_btn"
-            app:layout_constraintRight_toLeftOf="@id/remove_receipt_img_btn"
-            app:layout_constraintTop_toBottomOf="@id/barrier1"
-            />
-
-        <Button
-            android:id="@+id/remove_receipt_img_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:backgroundTint="@color/gray"
-            android:text="@string/remove_img"
-            app:layout_constraintLeft_toRightOf="@id/edit_receipt_img_btn"
+            app:layout_constraintBottom_toBottomOf="@id/receipt_image"
+            app:layout_constraintLeft_toRightOf="@id/receipt_image"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barrier1"
+            app:layout_constraintTop_toTopOf="@id/receipt_image"
             />
 
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="add_receipt_img_btn,edit_receipt_img_btn,remove_receipt_img_btn"
-            />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="add_receipt_img_btn,edit_receipt_img_btn,remove_receipt_img_btn"
-            />
 
         <TextView
             android:id="@+id/products_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="@string/calculation_list"
             android:textSize="16sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/barrier2"
+            app:layout_constraintTop_toBottomOf="@id/receipt_image"
             />
 
         <LinearLayout

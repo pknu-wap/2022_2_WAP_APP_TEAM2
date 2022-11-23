@@ -9,17 +9,16 @@ import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.BankItemViewBinding
 import com.example.wapapp2.model.BankDTO
 
-class BankListAdapter(private val bankList: ArrayList<BankDTO>,
+class BankListAdapter(private val bankList: MutableList<BankDTO>,
                       private val bankOnClickedListener: ListOnClickListener<BankDTO>, private var selectedBankId: String? = null) :
-        RecyclerView
-        .Adapter<BankListAdapter.ViewHolder>() {
+        RecyclerView.Adapter<BankListAdapter.ViewHolder>() {
     private var selectedPosition = 0
     private val unselectedBackgroundTint = ColorStateList.valueOf(Color.WHITE)
     private val selectedBackgroundTint = ColorStateList.valueOf(Color.LTGRAY)
 
     inner class ViewHolder(private val viewBinding: BankItemViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
         fun bind() {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
 
             if (selectedBankId != null && selectedBankId == bankList[position].uid) {
                 viewBinding.root.backgroundTintList = selectedBackgroundTint

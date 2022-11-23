@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">WapApp2</string>
+    <string name="app_name">우정하자</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+
+    <string name="calendarKeyDatePattern">yyyyMMdd</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
@@ -29,16 +31,18 @@
     <string name="add_friend">친구추가</string>
     <string name="add_calculation_item">추가</string>
     <string name="check">확인</string>
-    <string name="exit">닫기</string>
+    <string name="exit">나가기</string>
+    <string name="close">닫기</string>
     <string name="shoot_camera">사진 촬영</string>
     <string name="pick_image">사진 선택</string>
     <string name="new_calc_room">정산방 추가</string>
     <string name="invite_friends_list">초대 친구 목록</string>
     <string name="input_search_friend_name">친구 이름 입력</string>
     <string name="hint_input_room_name">방 제목 입력</string>
-    <string name="edit_img">사진 교체</string>
+    <string name="modify_img">사진 편집</string>
+    <string name="replace_img">사진 교체</string>
     <string name="add_img">사진 추가</string>
-    <string name="remove_img">사진 삭제</string>
+    <string name="delete_img">사진 삭제</string>
     <string name="receipt_img">영수증 사진</string>
     <string name="removed_receipt">영수증이 삭제 되었습니다</string>
     <string name="unable_to_remove_receipt">영수증 삭제 불가</string>
@@ -60,7 +64,7 @@
     <string name="added_new_bank_account">새 계좌가 추가되었습니다</string>
     <string name="my_back_account_list">내 계좌 목록</string>
     <string name="remove">삭제</string>
-    <string name="edit">수정</string>
+    <string name="modify">수정</string>
     <string name="remove_my_account">내 계좌 삭제</string>
     <string name="removed_bank_account">계좌 삭제 완료</string>
     <string name="edit_my_bank_account">내 계좌 수정</string>
@@ -87,4 +91,41 @@
     <string name="invite_friends">친구 초대</string>
     <string name="go_to_today">오늘로 이동</string>
     <string name="go_to_first_selected_day">첫 선택날짜로 이동</string>
+    <string name="input_email_of_friend">추가할 친구의 이메일 입력</string>
+    <string name="cancel">취소</string>
+    <string name="empty_search_query">검색어를 입력해주세요!</string>
+    <string name="empty_my_friends">친구 목록이 비어있습니다</string>
+    <string name="empty_receipts">정산 내역이 없습니다</string>
+    <string name="no_search_results_found">검색 결과가 없습니다</string>
+
+    <string name="adding_my_bank_account">새 계좌를 추가하는 중입니다</string>
+    <string name="adding_my_friend">새 친구를 추가하는 중입니다</string>
+    <string name="is_duplicate_bank_account">이미 존재하는 계좌입니다</string>
+    <string name="set_alias">이름 수정</string>
+    <string name="hint_input_alias">지정할 별명을 입력</string>
+    <string name="empty_alias">값을 입력해주세요</string>
+    <string name="error_load_real_name_of_user">실제 이름 가져오기 실패</string>
+
+
+    <string name="Firebase_ApiKey"></string>
+    <string name="input_calculation_item_unit_price">단가</string>
+    <string name="count">수량</string>
+    <string name="empty_chats">채팅 내역이 없습니다</string>
+    <string name="empty_calc_rooms">정산방이 없습니다</string>
+    <string name="adding_receipts">영수증 추가 중</string>
+    <string name="success_add_receipts">영수증 추가 완료</string>
+    <string name="exit_from_room">정산방에서 나가기</string>
+    <string name="msg_exit_from_calc_room">정산방에서 나가시겠습니까?</string>
+    <string name="msg_invite_new_friends">선택한 친구들을 초대하시겠습니까?</string>
+    <string name="invite">초대</string>
+    <string name="modify_receipt">영수증 수정</string>
+    <string name="msg_modify_receipt">영수증 수정을 확정하시겠습니까?</string>
+    <string name="receipt">영수증</string>
+    <string name="loading_receipt_info">영수증 정보를 불러오는 중입니다</string>
+    <string name="work_for_receipt">영수증에 대한 작업</string>
+    <string name="available_remove_and_modify">삭제 또는 수정이 가능합니다</string>
+    <string name="remove_receipt">영수증 삭제</string>
+    <string name="unit_price">단가</string>
+    <string name="product_name">항목</string>
+
 </resources>

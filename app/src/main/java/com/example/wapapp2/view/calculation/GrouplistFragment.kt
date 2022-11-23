@@ -1,51 +1,57 @@
 package com.example.wapapp2.view.calculation
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.interfaces.ListOnClickListener
+import com.example.wapapp2.commons.view.RecyclerViewItemDecoration
 import com.example.wapapp2.databinding.GroupFragmentBinding
-import com.example.wapapp2.databinding.GroupItemBinding
-import com.example.wapapp2.databinding.ListAddViewBinding
-import com.example.wapapp2.dummy.DummyData
-import com.example.wapapp2.dummy.TestLogics
-import com.example.wapapp2.model.GroupItemDTO
+import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
+import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
+import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.joda.time.DateTime
 
 
 class GrouplistFragment : Fragment() {
-    private lateinit var binding: GroupFragmentBinding
+    private var _binding: GroupFragmentBinding? = null
+    private val binding get() = _binding!!
 
-    private lateinit var adapter: GroupAdapter
+    private var adapter: GroupAdapter? = null
+    private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
+
+    companion object {
+        const val TAG = "GrouplistFragment"
+    }
 
     /** Enter Group **/
-    private val onClickedItemListener = object : OnClickedItemListener {
-        override fun onClickedItem(position: Int) {
-            val fragment = CalcMainFragment()
-            val fragmentManager = requireParentFragment().parentFragmentManager
+    private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
+        val fragment = CalcMainFragment()
+        val fragmentManager = requireParentFragment().parentFragmentManager
 
-            fragment.arguments = Bundle().apply {
-                val dummyData = DummyData.getRoom()
-                putString("roomId", dummyData.roomId)
-            }
-            val tag = "CalcMain"
-
-            fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
-                            Fragment)
-                    .add(R.id.fragment_container_view, fragment, tag)
-                    .addToBackStack(tag).commit()
+        fragment.arguments = Bundle().apply {
+            putString("roomId", item.id)
         }
 
+        fragmentManager.beginTransaction()
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+                .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
+                .addToBackStack(CalcMainFragment.TAG).commit()
     }
 
 
@@ -58,21 +64,23 @@ class GrouplistFragment : Fragment() {
                     val fragment = NewReceiptFragment()
                     val fragmentManager = requireParentFragment().parentFragmentManager
                     dialog.dismiss()
+
                     fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
                                     Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment::class.java.name)
-                            .addToBackStack(NewReceiptFragment::class.java.name).commit()
+                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
+                            .addToBackStack(NewReceiptFragment.TAG).commit()
                 }.setPositiveButton(R.string.new_calc_room) { dialog, which ->
                     //정산방 추가
                     val fragment = NewCalcRoomFragment()
                     val fragmentManager = requireParentFragment().parentFragmentManager
                     dialog.dismiss()
+
                     fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment::class.java.name) as
+                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
                                     Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment::class.java.name)
-                            .addToBackStack(NewCalcRoomFragment::class.java.name).commit()
+                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
+                            .addToBackStack(NewCalcRoomFragment.TAG).commit()
                 }.create().show()
     }
 
@@ -81,97 +89,64 @@ class GrouplistFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        binding = GroupFragmentBinding.inflate(layoutInflater)
-        val groupItem = DummyData.getGroupList()
-        adapter = GroupAdapter(context, groupItem)
-        binding.groupRV.adapter = adapter
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
+        binding.loadingView.setContentView(binding.groupRV)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.groupRV.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        //binding.groupRV.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object :
+                ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (binding.addBtn.height > 0) {
+                    binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    binding.groupRV.addItemDecoration(RecyclerViewItemDecoration(requireContext(), true,
+                            binding.root.height - binding.addBtn.top - binding.addBtn.height / 2))
+                }
+            }
+        })
+
+        myCalcRoomViewModel.myCalcRoomIds.observe(viewLifecycleOwner) {
+            adapter?.stopListening()
+
+            if (it.isNotEmpty()) {
+                if (adapter == null) {
+                    adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
+                    binding.groupRV.adapter = adapter
+                    val dataObserver = ListAdapterDataObserver(binding.groupRV, binding.groupRV.layoutManager as
+                            LinearLayoutManager, adapter!!)
+                    dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
+                    adapter!!.registerAdapterDataObserver(dataObserver)
+                } else {
+                    adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
+                }
+                adapter!!.startListening()
+            }
+            myCalendarViewModel.loadCalendarReceipts(it)
+        }
+        myCalcRoomViewModel.loadMyCalcRoomIds()
+        binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 
     override fun onStart() {
         super.onStart()
-
-        // 알림 테스트
-        TestLogics.notifyChatNotification(requireContext())
-        TestLogics.notifyCalcNotification(requireContext())
+        adapter?.startListening()
     }
 
-    private enum class ItemViewType {
-        ADD, GROUP_ITEM
+    override fun onStop() {
+        super.onStop()
+        adapter?.stopListening()
     }
 
-    private inner class GroupItem(val date: String, val names: String, val state: String)
-
-    private inner class GroupAdapter(private val context: Context?, private val items: ArrayList<GroupItemDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        inner class GroupVH(val binding: GroupItemBinding) : RecyclerView.ViewHolder(binding.root) {
-
-            fun bind(groupItem: GroupItemDTO) {
-                var nameString = ""
-                var count = 1;
-                for (name in groupItem.members) {
-                    if (count > 3) {
-                        nameString += " 외 " + (groupItem.members.size - 3) + "명"
-                        break
-                    } else {
-                        nameString += name
-                        if (count != groupItem.members.size && count != 3)
-                            nameString += ", "
-                    }
-                    count++
-                }
-
-                binding.groupItemNames.text = nameString
-                binding.groupItemState.text = groupItem.state
-                binding.groupItemDate.text = DateTime.parse(groupItem.date).toString("yyyy-MM-dd")
-
-                binding.root.setOnClickListener {
-                    onClickedItemListener.onClickedItem(adapterPosition)
-                }
-            }
-
-        }
-
-        inner class AddVH(val binding: ListAddViewBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind() {
-                binding.groupBtnAdd.setOnClickListener {
-                    addOnClickedItemListener.onClick(binding.root)
-                }
-            }
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return if (position == itemCount - 1) (holder as AddVH).bind() else (holder as GroupVH).bind(items[position])
-        }
-
-        override fun getItemCount(): Int {
-            return items.size + 1
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return if (viewType == ItemViewType.GROUP_ITEM.ordinal) GroupVH(GroupItemBinding.inflate(LayoutInflater.from(context)))
-            else AddVH(ListAddViewBinding.inflate(LayoutInflater.from(context)))
-        }
-
-        override fun getItemViewType(position: Int): Int {
-            return if (position == itemCount - 1) ItemViewType.ADD.ordinal else ItemViewType.GROUP_ITEM.ordinal
-        }
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
-    private interface OnClickedItemListener {
-        fun onClickedItem(position: Int)
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

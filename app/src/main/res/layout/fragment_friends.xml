@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rv_myprofile"
@@ -12,13 +13,17 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        >
 
         <ImageView
-            android:id="@+id/iv_profile"
+            android:id="@+id/my_profile_img"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginStart="8dp"
@@ -27,29 +32,32 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/man" />
+            app:srcCompat="@drawable/man"
+            />
 
         <TextView
-            android:id="@+id/user_name1"
+            android:id="@+id/my_profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="name"
             android:textColor="@color/black"
             android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_profile"
-            app:layout_constraintStart_toEndOf="@+id/iv_profile"
-            app:layout_constraintTop_toTopOf="@+id/iv_profile" />
+            app:layout_constraintBottom_toBottomOf="@+id/my_profile_img"
+            app:layout_constraintStart_toEndOf="@+id/my_profile_img"
+            app:layout_constraintTop_toTopOf="@+id/my_profile_img"
+            />
 
         <TextView
-            android:id="@+id/user_id1"
+            android:id="@+id/my_account_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="ksu8063@naver.com"
-            app:layout_constraintBottom_toBottomOf="@+id/user_name1"
-            app:layout_constraintStart_toEndOf="@+id/user_name1"
-            app:layout_constraintTop_toTopOf="@+id/user_name1" />
+            app:layout_constraintBottom_toBottomOf="@+id/my_profile_name"
+            app:layout_constraintStart_toEndOf="@+id/my_profile_name"
+            app:layout_constraintTop_toTopOf="@+id/my_profile_name"
+            />
 
         <View
             android:layout_width="match_parent"
@@ -57,18 +65,21 @@
             android:background="#9F5E5E5E"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_profile"
+        android:id="@+id/my_friends_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
+        app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        />
 
     <TextView
         android:id="@+id/textView"
@@ -77,7 +88,8 @@
         android:layout_marginTop="8dp"
         android:text="내 프로필"
         app:layout_constraintStart_toStartOf="@+id/rv_myprofile"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/textView2"
@@ -86,8 +98,26 @@
         android:layout_marginTop="8dp"
         android:text="친구"
         app:layout_constraintStart_toStartOf="@+id/rv_myprofile"
-        app:layout_constraintTop_toBottomOf="@+id/rv_myprofile" />
+        app:layout_constraintTop_toBottomOf="@+id/rv_myprofile"
+        />
 
 
+    <com.example.wapapp2.commons.view.NewLoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView2"
+        />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_friend_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_baseline_person_add_alt_1_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

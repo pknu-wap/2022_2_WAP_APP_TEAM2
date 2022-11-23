@@ -1,31 +1,48 @@
 package com.example.wapapp2.view.friends
 
 import android.os.Bundle
+import android.os.Messenger
 import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DelayTextWatcher
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.databinding.FragmentInviteFriendsBinding
-import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
+import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import kotlin.collections.HashSet
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class InviteFriendsFragment : Fragment() {
-    private lateinit var binding: FragmentInviteFriendsBinding
+    private var _binding: FragmentInviteFriendsBinding? = null
+    private val binding get() = _binding!!
 
-    private val friendsViewModel: FriendsViewModel by viewModels()
+    companion object {
+        const val TAG = "InviteFriendsFragment"
+    }
 
-    private val onCheckedFriendListener: OnCheckedFriendListener = OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
-    private val onRemovedFriendListener: OnRemovedFriendListener = OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
+    private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({
+        parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
+    })
+    private val friendsViewModel: FriendsViewModel by activityViewModels()
+
+    private var listAdapterDataObserver: ListAdapterDataObserver? = null
+    private val onCheckedFriendListener: OnCheckedFriendListener =
+            OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
+    private val onRemovedFriendListener: OnRemovedFriendListener =
+            OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
@@ -33,44 +50,27 @@ class InviteFriendsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        checkedFriendsListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                changeViewState()
-            }
-
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                super.onItemRangeRemoved(positionStart, itemCount)
-                changeViewState()
-            }
-
-            fun changeViewState() {
-                binding.inviteFriendsLayout.inviteFriendsList.visibility = if (checkedFriendsListAdapter.itemCount == 0) View.GONE else
-                    View.VISIBLE
-            }
-        })
-
-        val bundle = arguments ?: savedInstanceState
-        val currentFriendsInRoomSet: HashSet<String> = bundle!!.getStringArrayList("currentFriendsInRoomList")!!.toHashSet()
-        friendsViewModel.currentRoomFriendsSet.addAll(currentFriendsInRoomSet)
-        searchFriendsListAdapter.ignoreIds(currentFriendsInRoomSet)
+        friendsViewModel.participantsInCalcRoom.addAll(calcRoomViewModel.participants.value!!.toMutableList())
+        searchFriendsListAdapter.ignoreIds(calcRoomViewModel.participantIds.toMutableSet())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        binding = FragmentInviteFriendsBinding.inflate(inflater)
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
+        _binding = FragmentInviteFriendsBinding.inflate(inflater, container, false)
+
+        binding.inviteFriendsLayout.loadingView.setContentView(binding.inviteFriendsLayout.searchFriendsList)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
-        binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
+
+        listAdapterDataObserver = ListAdapterDataObserver(binding.inviteFriendsLayout.searchFriendsList, binding.inviteFriendsLayout
+                .searchFriendsList.layoutManager as LinearLayoutManager, searchFriendsListAdapter)
+        listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.no_search_results_found))
+        searchFriendsListAdapter.registerAdapterDataObserver(listAdapterDataObserver!!)
 
         return binding.root
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putAll(arguments)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,20 +89,36 @@ class InviteFriendsFragment : Fragment() {
             searchFriendsListAdapter.setList(it)
         }
 
-        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                s?.apply { friendsViewModel.getFriends(toString()) }
+        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : DelayTextWatcher() {
+            override fun onFinalText(text: String) {
+                friendsViewModel.findFriend(text)
             }
         })
-        friendsViewModel.getFriends("")
+
+        binding.inviteFriendsLayout.saveBtn.setOnClickListener {
+            MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.invite_friends)
+                    .setMessage(R.string.msg_invite_new_friends)
+                    .setPositiveButton(R.string.invite) { dialog, which ->
+                        calcRoomViewModel.inviteFriends(checkedFriendsListAdapter.friends.toMutableList(), calcRoomViewModel.roomId!!)
+                        dialog.dismiss()
+                    }.setNegativeButton(R.string.cancel) { dialog, which ->
+                        dialog.dismiss()
+                    }.create().show()
+        }
+
+        friendsViewModel.findFriend("")
     }
 
+    override fun onDestroy() {
+        friendsViewModel.searchResultFriendsLiveData.value?.clear()
+        searchFriendsListAdapter.unregisterAdapterDataObserver(listAdapterDataObserver!!)
+        super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
 }

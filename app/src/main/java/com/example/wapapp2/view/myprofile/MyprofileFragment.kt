@@ -4,79 +4,98 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.PopupMenu
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
-import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.view.bankaccount.AddMyBankAccountFragment
 import com.example.wapapp2.view.bankaccount.EditMyBankAccountFragment
+import com.example.wapapp2.view.login.LoginFragment
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MyprofileFragment : Fragment() {
-    private val viewModel: MyBankAccountsViewModel by viewModels()
-    private lateinit var binding: FragmentMyprofileBinding
-    private val adapter = MyAccountListAdapter()
+    private val myBankAccountsViewModel by activityViewModels<MyBankAccountsViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
+    private var _binding: FragmentMyprofileBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var adapter: MyBankAccountsAdapter
+
+    companion object {
+        const val TAG = "MyProfile"
+    }
 
     private val onClickedPopupMenuListener = object : OnClickedPopupMenuListener {
         override fun onClickedRemove(bankAccountDTO: BankAccountDTO, position: Int) {
             val dialogViewBinding = FinalConfirmationMyBankAccountLayoutBinding.inflate(layoutInflater)
             dialogViewBinding.bankAccountHolder.text = bankAccountDTO.accountHolder
             dialogViewBinding.bankAccountNumber.text = bankAccountDTO.accountNumber
-            dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO.bankName
-            dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO.iconId)
+            dialogViewBinding.selectedBank.text = bankAccountDTO.bankDTO!!.bankName
+            dialogViewBinding.icon.setImageResource(bankAccountDTO.bankDTO!!.iconId)
 
-            val dialog = MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
-                    .setView(dialogViewBinding.root).setNegativeButton(R.string.exit) { dialog, index ->
+            MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.remove_my_account)
+                    .setView(dialogViewBinding.root).setNegativeButton(R.string.close) { dialog, index ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.remove) { dialog, index ->
-                        viewModel.removeMyBankAccount(bankAccountDTO)
+                        myBankAccountsViewModel.removeMyBankAccount(bankAccountDTO)
                         Toast.makeText(context, R.string.removed_bank_account, Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
-                    }.create()
-
-            dialog.show()
+                    }.create().show()
         }
 
         override fun onClickedEdit(bankAccountDTO: BankAccountDTO, position: Int) {
             val fragment = EditMyBankAccountFragment()
             fragment.arguments = Bundle().also {
-                it.putSerializable("bankAccountDTO", bankAccountDTO)
+                it.putParcelable("bankAccountDTO", bankAccountDTO)
             }
             parentFragmentManager
-                .beginTransaction()
-                .hide(this@MyprofileFragment)
-                .add(R.id.fragment_container_view, fragment, "MyprofileFragment")
-                .addToBackStack("MyprofileFragment")
-                .commit()
+                    .beginTransaction()
+                    .hide(this@MyprofileFragment)
+                    .add(R.id.fragment_container_view, fragment, EditMyBankAccountFragment.TAG)
+                    .addToBackStack(EditMyBankAccountFragment.TAG)
+                    .commit()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.defaultBankAccountHolder = "박준성"
-
+        myBankAccountsViewModel.defaultBankAccountHolder = myAccountViewModel.myProfileData.value!!.name
+        adapter = MyBankAccountsAdapter(myBankAccountsViewModel.getMyBankAccountsOptions(), onClickedPopupMenuListener)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        binding = FragmentMyprofileBinding.inflate(inflater)
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?,
+    ): View? {
+        _binding = FragmentMyprofileBinding.inflate(inflater, container, false)
+
+        binding.loadingView.setContentView(binding.bankList)
+        binding.loadingView.onSuccessful()
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        adapter.setList(DummyData.getMyBankAccountList("박준성"))
+
         binding.bankList.adapter = adapter
 
         binding.btnEdit.setOnClickListener {
             val dialog = DialogEditDetailFragment()
-            dialog
-                .show(parentFragmentManager, "CustomDialog")
+            dialog.show(parentFragmentManager, DialogEditDetailFragment.TAG)
+        }
+
+        binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val loginFragment = LoginFragment()
+
+            parentFragmentManager
+                    .beginTransaction()
+                    .hide(this@MyprofileFragment)
+                    .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                    .commitAllowingStateLoss()
         }
 
         return binding.root
@@ -88,59 +107,42 @@ class MyprofileFragment : Fragment() {
         binding.btnAddAcount.setOnClickListener {
             val addFragment = AddMyBankAccountFragment()
             parentFragmentManager.beginTransaction().hide(this@MyprofileFragment)
-                    .add(R.id.fragment_container_view, addFragment, "AddMyBankAccountFragment")
-                    .addToBackStack("AddMyBankAccountFragment").commit()
+                    .add(R.id.fragment_container_view, addFragment, AddMyBankAccountFragment.TAG)
+                    .addToBackStack(AddMyBankAccountFragment.TAG).commit()
+        }
+
+        myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
+            binding.myProfileName.text = it.name
+            binding.myAccountId.text = it.email
         }
     }
 
-    inner class MyAccountListAdapter : RecyclerView.Adapter<MyAccountListAdapter.ViewHolder>() {
-        private val list = ArrayList<BankAccountDTO>()
+    override fun onStart() {
+        super.onStart()
+        adapter.startListening()
+    }
 
-        fun setList(list: ArrayList<BankAccountDTO>) {
-            this.list.addAll(list)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter.stopListening()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (hidden) {
+            adapter.stopListening()
+        } else {
+            adapter.startListening()
         }
-
-        inner class ViewHolder(private val viewBinding: BankAccountListItemBinding) : RecyclerView.ViewHolder(viewBinding.root) {
-
-            fun bind() {
-                val position = adapterPosition
-
-                viewBinding.bankAccountHolder.text = list[position].accountHolder
-                viewBinding.bankAccountNumber.text = list[position].accountNumber
-                viewBinding.bankName.text = list[position].bankDTO.bankName
-                viewBinding.icon.setImageResource(list[position].bankDTO.iconId)
-
-                viewBinding.moreBtn.setOnClickListener { moreBtnView ->
-                    //PopupMenu 객체 생성
-                    val popup = PopupMenu(requireContext(), moreBtnView, Gravity.BOTTOM);
-                    popup.menuInflater.inflate(R.menu.my_bank_account_click_popup, popup.menu);
-                    popup.setOnMenuItemClickListener {
-                        when (it.itemId) {
-                            R.id.menu_remove -> {
-                                onClickedPopupMenuListener.onClickedRemove(list[position], position)
-                            }
-                            R.id.menu_edit -> {
-                                onClickedPopupMenuListener.onClickedEdit(list[position], position)
-                            }
-                            else -> {}
-                        }
-                        true
-                    }
-
-                    popup.show();
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            return ViewHolder(BankAccountListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind()
-        }
-
-        override fun getItemCount(): Int = list.size
     }
 
     interface OnClickedPopupMenuListener {

@@ -5,9 +5,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -16,88 +15,132 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.FileProvider
+import androidx.core.content.PackageManagerCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.content.getSystemService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.example.wapapp2.BuildConfig
-import com.example.wapapp2.utils.ImageUtils
+import com.example.wapapp2.utils.ImageUtils.createImageFile
+import com.example.wapapp2.utils.ImageUtils.currentPhotoPath
 import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.jar.Pack200
 
 
-class MyLifeCycleObserver(private val registry: ActivityResultRegistry)
+class MyLifeCycleObserver(private val registry: ActivityResultRegistry, private val context: Context)
     : DefaultLifecycleObserver {
-    private lateinit var pickImgLauncher: ActivityResultLauncher<String>
-    private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
+    private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private lateinit var permissionsLauncher: ActivityResultLauncher<Array<String>>
 
     private var pickImgCallback: ActivityResultCallback<Uri>? = null
-    private var cameraCallback: ActivityResultCallback<Boolean>? = null
-    private var imageUri: Uri? = null
+    private var permissionsCallback: ActivityResultCallback<Map<String, Boolean>>? = null
+    private var onCameraCallback: OnCameraCallback? = null
+
+    private var cameraUri: Uri? = null
 
     override fun onCreate(owner: LifecycleOwner) {
-        pickImgLauncher = registry.register("image", owner, ActivityResultContracts.GetContent()) {
+        pickImageLauncher = registry.register("image", owner, ActivityResultContracts.GetContent()) {
             pickImgCallback?.onActivityResult(it)
         }
 
-        cameraLauncher = registry.register("camera", owner, ActivityResultContracts.TakePicture()) {
-            cameraCallback?.onActivityResult(it)
+        cameraLauncher = registry.register("camera", owner, ActivityResultContracts.StartActivityForResult()) {
+            //data RESULT_OK, RESULT_CANCELED로 구분
+            if (it.resultCode == Activity.RESULT_OK)
+                onCameraCallback?.onResult(Uri.parse(cameraUri.toString()))
+            else
+                onCameraCallback?.onResult(null)
+
+            cameraUri = null
+        }
+
+        permissionsLauncher = registry.register("permissions", owner, ActivityResultContracts.RequestMultiplePermissions()) {
+            permissionsCallback?.onActivityResult(it)
         }
     }
 
-    fun selectImage(callback: ActivityResultCallback<Uri>) {
-        this.pickImgCallback = callback
-    }
+    fun pickImage(activity: Activity, callback: ActivityResultCallback<Uri>) {
+        pickImgCallback = callback
 
-
-    fun camera(context: Activity, callback: ActivityResultCallback<Boolean>) {
-
-        ImageUtils.createImageFile(context = context)?.also {
-            imageUri = FileProvider.getUriForFile(
-                    context,
-                    BuildConfig.APPLICATION_ID + ".fileprovider",
-                    it
-            )
-            cameraLauncher.launch(imageUri)
-        }
-    }
-
-    fun onTakePhotoClick(context: Activity, callback: ActivityResultCallback<Boolean>) {
-        this.cameraCallback = callback
-
-        /*
-        if (PermissionChecker.checkPermission(context, Manifest.permission.CAMERA) != PermissionChecker.PERMISSION_GRANTED) {
-            onRequestCameraClick(callback = takePicture)
+        if (!checkStoragePermissions(activity)) {
+            Toast.makeText(activity, "권한이 필요합니다", Toast.LENGTH_SHORT).show()
         } else {
-            camera(context, callback)
+            pickImageLauncher.launch("image/*")
         }
-
-         */
     }
 
-    fun checkPermissions(activity: Activity) {
-        val hasCamPerm = PermissionChecker.checkSelfPermission(activity, Manifest.permission.CAMERA) == PermissionChecker.PERMISSION_GRANTED
-        val hasWritePerm = PermissionChecker.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED
-        val hasReadPerm = PermissionChecker.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED
-        if (!hasCamPerm || !hasWritePerm || !hasReadPerm)
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    fun camera(activity: Activity, cameraCallback: OnCameraCallback) {
+        this.onCameraCallback = cameraCallback
+
+        if (!checkCameraPermission(activity)) {
+            Toast.makeText(activity, "권한이 필요합니다", Toast.LENGTH_SHORT).show()
+        } else {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                takePictureIntent.resolveActivity(activity.applicationContext.packageManager)?.also {
+                    val photoFile: File? = try {
+                        createImageFile(activity.applicationContext)
+                    } catch (ex: IOException) {
+                        null
+                    }
+                    photoFile?.also {
+                        val photoURI: Uri = FileProvider.getUriForFile(
+                                activity.applicationContext, "com.example.wapapp2.provider", it
+                        )
+                        cameraUri = photoURI
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                        takePictureIntent.putExtra("fileName", it.name)
+                    }
+                }
+            }
+            cameraLauncher.launch(intent)
+        }
+    }
+
+    private fun checkStoragePermissions(activity: Activity): Boolean {
+        val hasWritePerm =
+                PermissionChecker.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED
+        val hasReadPerm =
+                PermissionChecker.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED
+
+        return if (!hasWritePerm || !hasReadPerm) {
+            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+            false
+        } else {
+            true
+        }
     }
 
-    fun onRequestCameraClick(context: Activity, callback: ActivityResultCallback<Boolean>) {
-        /*
-        context.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-            // update image
-            val message = if (isGranted) {
-            } else {
-            }
-
-            if (isGranted) {
-                camera(context, callback)
-            }
-        }.launch(Manifest.permission.CAMERA)
-
-         */
+    private fun checkCameraPermission(activity: Activity): Boolean {
+        val cameraPerm =
+                PermissionChecker.checkSelfPermission(activity, Manifest.permission.CAMERA) == PermissionChecker.PERMISSION_GRANTED
+        return if (!cameraPerm) {
+            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), 1)
+            false
+        } else {
+            true
+        }
     }
 
+    @Throws(IOException::class)
+    private fun createImageFile(context: Context): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+                "receipt_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        ).apply {
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    fun interface OnCameraCallback {
+        fun onResult(uri: Uri?)
+    }
 }

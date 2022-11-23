@@ -1,9 +1,27 @@
 package com.example.wapapp2.model
 
+import android.os.Parcelable
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
-data class BankAccountDTO(val bankDTO: BankDTO, val accountNumber: String, val accountHolder: String) : Serializable {
-    fun toClipboardData(): String = "$accountNumber ${bankDTO.bankName}"
+@Parcelize
+data class BankAccountDTO(
+        @get:Exclude
+        var id: String,
+        @get:Exclude
+        var bankDTO: BankDTO?,
+        @PropertyName("accountNumber")
+        var accountNumber: String,
+        @PropertyName("accountHolder")
+        var accountHolder: String,
+        @PropertyName("bankId")
+        var bankId: String
+) : Parcelable {
+    constructor() : this("", null, "", "", "")
+
+    fun toClipboardData(): String = "$accountNumber ${bankDTO!!.bankName}"
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other)

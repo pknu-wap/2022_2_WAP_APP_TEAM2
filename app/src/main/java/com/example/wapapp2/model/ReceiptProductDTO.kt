@@ -1,8 +1,29 @@
 package com.example.wapapp2.model
 
+import android.os.Parcelable
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
+import kotlinx.parcelize.Parcelize
+
 /** 영수증 세부 항목
- * @param itemName : 메뉴이름
+ * @param name : 메뉴이름
  * @param price : 가격
- * @param personCount : 정산 참여 인원
+ * @param checkedUserIds : 확인한 인원id
  * **/
-data class ReceiptProductDTO(var id : String, var itemName: String, var price: Int, var personCount : Int)
+@Parcelize
+data class ReceiptProductDTO(
+        @get:Exclude
+        var id: String,
+        @PropertyName("name")
+        var name: String,
+        @PropertyName("price")
+        var price: Int,
+        @PropertyName("count")
+        var count: Int,
+        @PropertyName("checkedUserIds")
+        var checkedUserIds: ArrayList<String> = ArrayList<String>(),
+        @get:Exclude
+        var personCount: Int = 0,
+) : Parcelable {
+    constructor() : this("", "", 0, 0, arrayListOf(), 0)
+}

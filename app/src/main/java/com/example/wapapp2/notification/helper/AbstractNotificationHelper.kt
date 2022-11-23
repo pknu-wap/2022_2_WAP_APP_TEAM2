@@ -11,9 +11,12 @@ import com.example.wapapp2.model.notifications.NotificationObj
 
 
 abstract class AbstractNotificationHelper
-protected constructor(context: Context, protected val channelId: String, protected val channelName: String, protected val
-channelDescription:
-String) {
+protected constructor(
+        context: Context, protected val channelId: String, protected val channelName: String,
+        protected val
+        channelDescription:
+        String,
+) {
     protected val notificationManager: NotificationManager
 
     init {
@@ -23,7 +26,7 @@ String) {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (notificationManager.getNotificationChannel(channelId) == null) {
-                val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
 
                 notificationManager.createNotificationChannel(channel)
             }

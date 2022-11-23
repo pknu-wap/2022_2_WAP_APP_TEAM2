@@ -10,7 +10,7 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.ReceiptDTO
 import org.joda.time.DateTime
 
-class DialogViewPagerAdapter(beginDateText: String, context: Context) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
+class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>> ,beginDateText: String, context: Context) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
 () {
     private val layoutInflater: LayoutInflater
     private val dateFormat = "MM.dd E요일"
@@ -33,20 +33,18 @@ class DialogViewPagerAdapter(beginDateText: String, context: Context) : Recycler
             }
         }
 
-        fun bind() {
-            val position = adapterPosition
-
-            val list = ArrayList<ReceiptDTO>()
-            list.add(DummyData.getReceipt())
-            receiptListAdapter = ReceiptListForADayAdapter(list)
-            binding.receiptList.adapter = receiptListAdapter
-
+        fun bind(position: Int) {
             copiedDateTime = DateTime.parse(beginDate.toString())
             copiedDateTime = copiedDateTime.plusDays(position - FIRST_VIEW_PAGER_POSITION)
+
+            receiptListAdapter = ReceiptListForADayAdapter(ArrayList (hashMap[copiedDateTime.toString("yyyyMMdd")] ?: listOf() ))
+            binding.receiptList.adapter = receiptListAdapter
+
 
             binding.date.text = copiedDateTime.toString(dateFormat)
             binding.year.text = copiedDateTime.year.toString()
 
+            binding.fab.setOnClickListener {  }
         }
 
         fun clear() {
@@ -59,7 +57,7 @@ class DialogViewPagerAdapter(beginDateText: String, context: Context) : Recycler
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind()
+        holder.bind(position)
     }
 
     override fun onViewRecycled(holder: ViewHolder) {

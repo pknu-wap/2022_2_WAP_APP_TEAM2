@@ -3,15 +3,17 @@ package com.example.wapapp2.view.friends.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.databinding.SearchFriendItemViewBinding
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.google.android.material.checkbox.MaterialCheckBox
 
-class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) : RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>() {
-    private val friendsList = ArrayList<FriendDTO>()
+class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFriendListener) :
+        RecyclerView.Adapter<SearchFriendsListAdapter.ViewHolder>(), IAdapterItemCount {
+    private val friendsList = mutableListOf<FriendDTO>()
     private val checkedSet = HashSet<String>()
-    private val ignoreIdSet: HashSet<String> = HashSet<String>()
+    private val ignoreIdSet = mutableSetOf<String>()
     private var onCheckedStateChangedListener: MaterialCheckBox.OnCheckedStateChangedListener? = null
 
     inner class ViewHolder(private val itemBinding: SearchFriendItemViewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
@@ -19,27 +21,27 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
         fun bind() {
             reset()
 
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             val friendDTO = friendsList[position]
 
-            itemBinding.friendName.text = friendDTO.friendName
+            itemBinding.friendName.text = friendDTO.alias
 
-            if (checkedSet.contains(friendDTO.uid))
+            if (checkedSet.contains(friendDTO.friendUserId))
                 itemBinding.checkbox.checkedState = MaterialCheckBox.STATE_CHECKED
 
             onCheckedStateChangedListener = MaterialCheckBox.OnCheckedStateChangedListener { checkBox, state ->
                 var conflict: Boolean = false
 
                 if (state == MaterialCheckBox.STATE_CHECKED) {
-                    if (checkedSet.contains(friendDTO.uid))
+                    if (checkedSet.contains(friendDTO.friendUserId))
                         conflict = true
                     else
-                        checkedSet.add(friendDTO.uid)
+                        checkedSet.add(friendDTO.friendUserId)
                 } else {
-                    if (!checkedSet.contains(friendDTO.uid))
+                    if (!checkedSet.contains(friendDTO.friendUserId))
                         conflict = true
                     else
-                        checkedSet.remove(friendDTO.uid)
+                        checkedSet.remove(friendDTO.friendUserId)
                 }
 
                 if (!conflict)
@@ -60,14 +62,14 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
     }
 
 
-    fun setList(list: ArrayList<FriendDTO>) {
+    fun setList(list: MutableList<FriendDTO>) {
         friendsList.clear()
         friendsList.addAll(list)
 
         if (ignoreIdSet.isNotEmpty()) {
-            val removeIdxs = ArrayList<Int>()
+            val removeIdxs = mutableListOf<Int>()
             for (idx in friendsList.size - 1 downTo 0) {
-                if (ignoreIdSet.contains(friendsList[idx].uid)) {
+                if (ignoreIdSet.contains(friendsList[idx].friendUserId)) {
                     removeIdxs.add(idx)
                 }
             }
@@ -81,12 +83,12 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
     }
 
     fun uncheckItem(friendDTO: FriendDTO) {
-        checkedSet.remove(friendDTO.uid)
+        checkedSet.remove(friendDTO.friendUserId)
         notifyDataSetChanged()
     }
 
 
-    fun ignoreIds(set: HashSet<String>) {
+    fun ignoreIds(set: MutableSet<String>) {
         ignoreIdSet.clear()
         ignoreIdSet.addAll(set)
     }
@@ -95,6 +97,8 @@ class SearchFriendsListAdapter(private val onCheckedFriendListener: OnCheckedFri
         holder.reset()
         super.onViewRecycled(holder)
     }
+
+    override fun getAdapterItemCount() = itemCount
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
