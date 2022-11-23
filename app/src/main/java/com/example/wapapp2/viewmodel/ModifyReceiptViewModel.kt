@@ -1,8 +1,8 @@
 package com.example.wapapp2.viewmodel
 
 import android.net.Uri
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
@@ -15,6 +15,8 @@ class ModifyReceiptViewModel : ViewModel() {
 
     lateinit var originalReceiptDTO: ReceiptDTO
     var modifiedReceiptDTO: ReceiptDTO? = null
+
+    var currentRoomId: String? = null
 
     var receiptImgChanged = false
     var hasReceiptImg = false
@@ -61,27 +63,35 @@ class ModifyReceiptViewModel : ViewModel() {
 
             val result = async { receiptRepositoryImpl.modifyProducts(list, calcRoomId) }
             result.await()
-
         }
     }
 
     fun modifyReceiptImg(originalImgFileName: String, newImgUri: Uri, calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val deleteResult = async { receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName) }
-            deleteResult.await()
-            val uploadResult = async { receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId) }
-            uploadResult.await()
-
+            receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName)
+            receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId)
         }
     }
 
-    fun removeReceipt(calcRoomId: String, receiptId: String) {
+    fun removeReceipt(calcRoomId: String, receiptDTO: ReceiptDTO) {
         CoroutineScope(Dispatchers.IO).launch {
-            val deleteResult = async {
-                receiptRepositoryImpl.deleteReceipt(calcRoomId, receiptId)
+            //영수증 삭제
+            receiptRepositoryImpl.removeReceipt(calcRoomId, receiptDTO.id)
+            //영수증 사진 삭제
+            if (receiptDTO.imgUrl!!.isNotEmpty()) {
+                receiptImgRepositoryImpl.deleteReceiptImg(receiptDTO.imgUrl!!)
             }
-            deleteResult.await()
-
         }
+    }
+
+    fun calcTotalPrice(): String {
+        var price = 0
+
+        for (product in modifiedReceiptDTO!!.getProducts()) {
+            price += product.price
+        }
+
+        modifiedReceiptDTO!!.totalMoney = price
+        return price.toString()
     }
 }

@@ -194,7 +194,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
         itemBinding.priceEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
-                if (text.isNotEmpty()) {
+                if (isInt(text)) {
                     productDTO.price = text.toInt()
                 } else {
                     itemBinding.priceEditText.text = "0".toEditable()
@@ -217,7 +217,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
         itemBinding.countEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
-                if (text.isNotEmpty()) {
+                if (isInt(text)) {
                     productDTO.count = text.toInt()
                 } else {
                     itemBinding.countEditText.text = "1".toEditable()

@@ -86,13 +86,12 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         receiptCollection.document().update(map).addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
 
-    override suspend fun deleteReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
-        val receiptDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
-
-        receiptDocument.delete().addOnCompleteListener {
-            continuation.resume(it.isSuccessful)
-        }
+    override suspend fun removeReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
+        fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).delete().addOnCompleteListener {
+                    continuation.resume(it.isSuccessful)
+                }
     }
 
     override suspend fun modifyProducts(

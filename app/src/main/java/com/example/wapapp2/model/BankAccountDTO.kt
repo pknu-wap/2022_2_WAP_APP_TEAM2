@@ -17,7 +17,7 @@ data class BankAccountDTO(
         @PropertyName("accountHolder")
         var accountHolder: String,
         @PropertyName("bankId")
-        var bankId: String
+        var bankId: String,
 ) : Parcelable {
     constructor() : this("", null, "", "", "")
 

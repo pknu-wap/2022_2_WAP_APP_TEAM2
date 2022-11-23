@@ -40,7 +40,7 @@ class ReceiptsAdapter(
         fun bind(receiptDTO: ReceiptDTO) {
             binding.receiptDate.text = simpleDateFormat.format(receiptDTO.createdTime!!)
             binding.receiptTitle.text = receiptDTO.name
-            binding.receiptAmount.text = receiptDTO.totalMoney.toString().toEditable()
+            binding.totalMoney.text = receiptDTO.totalMoney.toString().toEditable()
 
             if (receiptDTO.imgUrl.isNullOrEmpty()) {
                 Glide.with(binding.root).clear(binding.receiptImage)
@@ -71,7 +71,6 @@ class ReceiptsAdapter(
         holder.bind(model)
     }
 
-    override fun getAdapterItemCount(): Int {
-        return itemCount
-    }
+    override fun getAdapterItemCount(): Int = itemCount
+
 }
