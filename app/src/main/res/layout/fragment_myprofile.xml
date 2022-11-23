@@ -152,7 +152,7 @@
                     android:nestedScrollingEnabled="false"
                     android:orientation="vertical"
                     android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text_myaccount"

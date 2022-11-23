@@ -23,7 +23,9 @@ class ReceiptViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private var currentMySummary = 0
-    var roomId: String? = null
+    var currentRoomId: String? = null
+    var currentReceiptId: String? = null
+    var currentReceiptDTO: ReceiptDTO? = null
 
     val getCurrentSummary get() = currentMySummary
 

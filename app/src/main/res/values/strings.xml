@@ -120,5 +120,12 @@
     <string name="invite">초대</string>
     <string name="modify_receipt">영수증 수정</string>
     <string name="msg_modify_receipt">영수증 수정을 확정하시겠습니까?</string>
+    <string name="receipt">영수증</string>
+    <string name="loading_receipt_info">영수증 정보를 불러오는 중입니다</string>
+    <string name="work_for_receipt">영수증에 대한 작업</string>
+    <string name="available_remove_and_modify">삭제 또는 수정이 가능합니다</string>
+    <string name="remove_receipt">영수증 삭제</string>
+    <string name="unit_price">단가</string>
+    <string name="product_name">항목</string>
 
 </resources>
