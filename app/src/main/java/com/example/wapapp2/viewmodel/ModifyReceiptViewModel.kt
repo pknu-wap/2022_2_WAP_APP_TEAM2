@@ -13,11 +13,13 @@ class ModifyReceiptViewModel : ViewModel() {
     private val receiptRepositoryImpl = ReceiptRepositoryImpl.INSTANCE
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
 
-    lateinit var receiptDTO: ReceiptDTO
+    lateinit var originalReceiptDTO: ReceiptDTO
+    var modifiedReceiptDTO : ReceiptDTO? = null
+
     var receiptImgChanged = false
     var hasReceiptImg = false
 
-    fun modifyReceipt(originalReceiptDTO: ReceiptDTO, modifiedReceiptDTO: ReceiptDTO, calcRoomId: String) {
+    fun modifyReceipt( calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             //수정 내역을 map으로 저장
             //수정가능 자료 : name, status(정산상태), img_url

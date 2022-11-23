@@ -70,7 +70,7 @@ class ReceiptViewModel : ViewModel() {
     }
 
     fun getProducts(receiptId: String, calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val result = async {
                 receiptRepository.getProducts(receiptId, calcRoomId)
             }
