@@ -19,7 +19,7 @@ class LoadingDialogView private constructor() {
                 return
             }
 
-            val binding = ProgressViewBinding.inflate(activity.layoutInflater)
+            val binding =   ProgressViewBinding.inflate(activity.layoutInflater)
             binding.progressMsg.text = msg
 
             val dialog = MaterialAlertDialogBuilder(activity)

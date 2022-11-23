@@ -91,7 +91,7 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
         }
 
         override fun getItemCount(): Int {
-            return markingItems.size
+            return if(markingItems.size <= 4) markingItems.size else 4
         }
 
     }

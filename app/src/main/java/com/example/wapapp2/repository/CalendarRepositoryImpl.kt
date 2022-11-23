@@ -53,17 +53,14 @@ class CalendarRepositoryImpl private constructor() : CalendarRepository{
             .addOnSuccessListener {
                 for (dc in it.documents.toMutableList()) {
                     val receiptDTO = dc.toObject<ReceiptDTO>()!!
+                    receiptDTO.roomID = myCalcRoomID
                     val dstKey = DateTime.parse(receiptDTO.date.toString()).toString("yyyyMMdd")
                     if (tmpHashMap.containsKey(dstKey)) {
                         tmpHashMap[dstKey]!!.add(receiptDTO)
-                        Log.d("기존에 있던 것에 추가됨", receiptDTO.toString())
-                        Log.d("추가후",tmpHashMap.toString())
                     } else {
                         tmpHashMap[dstKey] = arrayListOf(receiptDTO)
-                        Log.d("새로 추가됨", receiptDTO.toString())
                     }
                 }
-                Log.d("returned tmpHashmap", tmpHashMap.toString())
                 continuation.resume(Pair( tmpHashMap ,tmpListRegisteration))
             }
         }

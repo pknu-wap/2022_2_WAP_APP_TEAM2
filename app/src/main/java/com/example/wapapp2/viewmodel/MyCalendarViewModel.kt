@@ -38,12 +38,8 @@ class MyCalendarViewModel : ViewModel() {
                     })
                 }
                 pairOf_map_rl.await()?.let {
-                    Log.d("returned it.first", it.first.toString())
-                    Log.d("전 :: myReceiptMap.value", myReceiptMap.value.toString())
-
                     myReceiptMap.value = it.first ?: HashMap()
                     myCalcRoomReceiptListeners = it.second
-                    Log.d("후 ::myReceiptMap.value", myReceiptMap.value.toString())
                 }
             }
         }

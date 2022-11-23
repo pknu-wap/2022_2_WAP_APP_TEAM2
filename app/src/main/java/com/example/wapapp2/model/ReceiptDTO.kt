@@ -53,6 +53,8 @@ data class ReceiptDTO(
         productList.add(receiptProductDTO)
         totalMoney += receiptProductDTO.price
     }
+    var roomID : String? = null
+
 
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
@@ -69,5 +71,6 @@ data class ReceiptDTO(
         }
         throw Exception("no data")
     }
+
 
 }
