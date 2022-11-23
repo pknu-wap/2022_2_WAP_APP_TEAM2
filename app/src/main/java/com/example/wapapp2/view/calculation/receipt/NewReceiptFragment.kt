@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Observer
@@ -25,6 +26,7 @@ import com.example.wapapp2.databinding.ReceiptProductViewBinding
 import com.example.wapapp2.databinding.SummaryReceiptViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.observer.MyLifeCycleObserver
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
 import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import java.util.concurrent.atomic.AtomicInteger
@@ -40,12 +42,15 @@ class NewReceiptFragment : Fragment() {
 
     private val fcmViewModel by viewModels<FcmViewModel>()
 
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
+
+        newReceiptViewModel.myName = myAccountViewModel.myProfileData.value!!.name
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

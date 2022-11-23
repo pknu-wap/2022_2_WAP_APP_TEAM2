@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentEditReceiptBinding
 import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment.OnUpdatedValueListener
@@ -50,7 +51,7 @@ class EditReceiptFragment : Fragment() {
                 modifyReceiptViewModel.modifiedReceiptDTO = this
                         .copy(id = id, createdTime = createdTime, imgUrl = imgUrl, imgUriInMyPhone = imgUriInMyPhone,
                                 name = name, payersId = payersId, status = status,
-                                totalMoney = totalMoney, productList = arrayListOf(), myMoney = 0, date = date)
+                                totalMoney = totalMoney, productList = arrayListOf(), myMoney = 0, date = date, payersName = payersName)
             }
         }
 
@@ -75,7 +76,7 @@ class EditReceiptFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         modifyReceiptViewModel.originalReceiptDTO.apply {
-            binding.totalMoney.text = totalMoney.toString()
+            binding.totalMoney.text = DataTypeConverter.toKRW(totalMoney)
             binding.titleText.text = name.toEditable()
             binding.dateTime.text = simpleDateFormat.format(createdTime!!)
         }
@@ -175,7 +176,6 @@ class EditReceiptFragment : Fragment() {
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -3,6 +3,7 @@ package com.example.wapapp2.view.receipt
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.ReceiptProductInfoViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
@@ -17,9 +18,8 @@ class ReceiptProductsAdapter : RecyclerView.Adapter<ReceiptProductsAdapter.ViewH
             binding.count.text = model.count.toString()
 
             val totalPrice = model.price * model.count
-            val totalPriceTxt = "$totalPrice"
-            binding.unitPrice.text = model.price.toString()
-            binding.totalPrice.text = totalPriceTxt
+            binding.unitPrice.text = DataTypeConverter.toKRW(model.price)
+            binding.totalPrice.text = DataTypeConverter.toKRW(totalPrice)
         }
     }
 

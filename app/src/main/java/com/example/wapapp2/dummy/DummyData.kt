@@ -33,10 +33,10 @@ class DummyData {
         fun getReceipts(): ArrayList<ReceiptDTO> {
             val dummyReceipts = ArrayList<ReceiptDTO>()
 
-            val dummyReceipt1 = ReceiptDTO("1", null, "", null, "점심계산", "", false, 0, arrayListOf(), 0, DateTime.now())
+            val dummyReceipt1 = ReceiptDTO("1", null, "", null, "점심계산", "", "", false, 0, arrayListOf(), 0, DateTime.now())
             dummyReceipt1.addProduct(ReceiptProductDTO("", "돼지고기", 3600, 0, arrayListOf("1"), 0))
             dummyReceipt1.addProduct(ReceiptProductDTO("", "된장찌개", 3000, 0, arrayListOf("1"), 0))
-            val dummyReceipt2 = ReceiptDTO("2", null, "", null, "저녁계산", "", false, 0, arrayListOf(), 0, DateTime.now())
+            val dummyReceipt2 = ReceiptDTO("2", null, "", null, "저녁계산", "", "", false, 0, arrayListOf(), 0, DateTime.now())
             dummyReceipt2.addProduct(ReceiptProductDTO("", "숙소", 100000, 0, arrayListOf("1"), 0))
             dummyReceipt2.addProduct(ReceiptProductDTO("", "치킨", 20000, 0, arrayListOf("1"), 0))
 
@@ -44,7 +44,7 @@ class DummyData {
             return dummyReceipts
         }
 
-        fun getReceipt(): ReceiptDTO = ReceiptDTO("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now())
+        fun getReceipt(): ReceiptDTO = ReceiptDTO("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     }
 
