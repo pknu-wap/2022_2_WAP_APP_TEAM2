@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
 import org.joda.time.DateTime
 import kotlin.coroutines.resume
@@ -46,18 +48,11 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
         }
     }
 
-    override suspend fun deleteReceiptImg(fileName: String): Boolean {
-        var result = false
-
-        storage.reference.child("receiptimgs").child(fileName).delete()
-                .addOnSuccessListener {
-                    result = true
-                }.addOnFailureListener {
-                    var state = it.message
+    override suspend fun deleteReceiptImg(imgUrl: String) = suspendCoroutine<Boolean> { continuation ->
+        Firebase.storage.getReferenceFromUrl(imgUrl).delete()
+                .addOnCompleteListener {
+                    continuation.resume(it.isSuccessful)
                 }
-                .await()
-
-        return result
     }
 
     override suspend fun downloadReceiptImg(imgUrl: String): Bitmap? = suspendCoroutine<Bitmap?> { continuation ->

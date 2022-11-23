@@ -30,15 +30,11 @@ class EditReceiptFragment : Fragment() {
     private val binding get() = _binding!!
     private val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd E a hh:mm", Locale.getDefault())
 
-    private var roomId: String? = null
-
     private val receiptViewModel by viewModels<ReceiptViewModel>()
     private val modifyReceiptViewModel by viewModels<ModifyReceiptViewModel>()
 
     private val onUpdatedValueListener = OnUpdatedValueListener {
-        val newTotalMoney = receiptViewModel.calcTotalPrice()
-        modifyReceiptViewModel.originalReceiptDTO.totalMoney = newTotalMoney.toInt()
-        binding.totalMoney.text = modifyReceiptViewModel.originalReceiptDTO.totalMoney.toString()
+        binding.totalMoney.text = modifyReceiptViewModel.calcTotalPrice()
     }
 
     private val adapter = EditReceiptAdapter(onUpdatedValueListener)
@@ -47,7 +43,7 @@ class EditReceiptFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
-            roomId = getString("roomId")
+            modifyReceiptViewModel.currentRoomId = getString("roomId")
             modifyReceiptViewModel.originalReceiptDTO = getParcelable("receiptDTO")!!
             modifyReceiptViewModel.originalReceiptDTO.apply {
                 //영수증 복사
@@ -56,15 +52,14 @@ class EditReceiptFragment : Fragment() {
                                 name = name, payersId = payersId, status = status,
                                 totalMoney = totalMoney, productList = arrayListOf(), myMoney = 0, date = date)
             }
-
         }
+
         myLifeCycleObserver = MyLifeCycleObserver(requireActivity().activityResultRegistry, requireContext().applicationContext)
         lifecycle.addObserver(myLifeCycleObserver!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentEditReceiptBinding.inflate(inflater, container, false)
-
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -80,15 +75,16 @@ class EditReceiptFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         modifyReceiptViewModel.originalReceiptDTO.apply {
-            binding.totalMoney.text = totalMoney.toString().toEditable()
+            binding.totalMoney.text = totalMoney.toString()
             binding.titleText.text = name.toEditable()
             binding.dateTime.text = simpleDateFormat.format(createdTime!!)
         }
 
         receiptViewModel.products.observe(viewLifecycleOwner) {
             adapter.items = it
+            modifyReceiptViewModel.modifiedReceiptDTO!!.getProducts().addAll(it)
         }
-        receiptViewModel.getProducts(modifyReceiptViewModel.originalReceiptDTO.id!!, roomId!!)
+        receiptViewModel.getProducts(modifyReceiptViewModel.originalReceiptDTO.id!!, modifyReceiptViewModel.currentRoomId!!)
 
         binding.receiptImgBtn.setOnClickListener {
             if (modifyReceiptViewModel.originalReceiptDTO.imgUriInMyPhone == null) {
@@ -162,6 +158,8 @@ class EditReceiptFragment : Fragment() {
             modifyReceiptViewModel.hasReceiptImg = true
             val storageReference = Firebase.storage.getReferenceFromUrl(modifyReceiptViewModel.originalReceiptDTO.imgUrl!!)
             Glide.with(requireContext()).load(storageReference).into(binding.receiptImage)
+
+            binding.receiptImgBtn.text = getString(R.string.modify_img)
         }
     }
 

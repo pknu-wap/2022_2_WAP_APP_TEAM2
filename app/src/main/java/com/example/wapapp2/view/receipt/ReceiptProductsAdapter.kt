@@ -18,7 +18,8 @@ class ReceiptProductsAdapter : RecyclerView.Adapter<ReceiptProductsAdapter.ViewH
 
             val totalPrice = model.price * model.count
             val totalPriceTxt = "$totalPrice"
-            binding.unitPrice.text = totalPriceTxt
+            binding.unitPrice.text = model.price.toString()
+            binding.totalPrice.text = totalPriceTxt
         }
     }
 

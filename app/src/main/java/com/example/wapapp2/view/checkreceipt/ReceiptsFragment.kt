@@ -91,7 +91,7 @@ class ReceiptsFragment : Fragment() {
                     dialog.dismiss()
                 }.setPositiveButton(R.string.remove) { dialog, which ->
                     dialog.dismiss()
-                    modifyReceiptViewModel.removeReceipt(receiptViewModel.currentRoomId!!, item.id)
+                    modifyReceiptViewModel.removeReceipt(receiptViewModel.currentRoomId!!, item)
                 }
                 .create().show()
     }
