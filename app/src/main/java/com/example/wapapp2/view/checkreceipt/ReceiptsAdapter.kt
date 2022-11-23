@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
+import com.example.wapapp2.commons.interfaces.ListOnLongClickListener
 import com.example.wapapp2.databinding.CheckReceiptBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -18,19 +19,23 @@ import com.google.firebase.storage.ktx.storage
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDTO>, options: FirestoreRecyclerOptions<ReceiptDTO>) :
+class ReceiptsAdapter(
+        private val onClickListener: ListOnClickListener<ReceiptDTO>,
+        private val onLongClickListener: ListOnLongClickListener<ReceiptDTO>, options: FirestoreRecyclerOptions<ReceiptDTO>,
+) :
         FirestoreRecyclerAdapter<ReceiptDTO, ReceiptsAdapter.CustomViewHolder>(options), IAdapterItemCount {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            CustomViewHolder(CheckReceiptBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener)
+            CustomViewHolder(CheckReceiptBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener,
+                    onLongClickListener)
 
 
     class CustomViewHolder(
             private val binding: CheckReceiptBinding,
-            private val onClickListener:
-            ListOnClickListener<ReceiptDTO>,
+            private val onClickListener: ListOnClickListener<ReceiptDTO>,
+            private val onLongClickListener: ListOnLongClickListener<ReceiptDTO>,
     ) : RecyclerView.ViewHolder(binding.root) {
-        private val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd E a hh:mm", Locale.getDefault())
+        private val simpleDateFormat = SimpleDateFormat("yyyy.MM.dd E a hh:mm", Locale.getDefault())
 
         fun bind(receiptDTO: ReceiptDTO) {
             binding.receiptDate.text = simpleDateFormat.format(receiptDTO.createdTime!!)
@@ -50,6 +55,11 @@ class ReceiptsAdapter(private val onClickListener: ListOnClickListener<ReceiptDT
                 ).show()
 
                 onClickListener.onClicked(receiptDTO, bindingAdapterPosition)
+            }
+
+            binding.root.setOnLongClickListener {
+                onLongClickListener.onLongClicked(receiptDTO, bindingAdapterPosition)
+                true
             }
 
         }

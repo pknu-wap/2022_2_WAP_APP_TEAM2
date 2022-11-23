@@ -30,7 +30,7 @@
         android:layout_height="match_parent"
         android:background="#F1F1F1"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topAppBarLayout"

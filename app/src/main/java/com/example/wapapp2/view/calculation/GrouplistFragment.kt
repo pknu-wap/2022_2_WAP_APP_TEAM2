@@ -103,7 +103,7 @@ class GrouplistFragment : Fragment() {
             override fun onGlobalLayout() {
                 if (binding.addBtn.height > 0) {
                     binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    binding.groupRV.addItemDecoration(RecyclerViewItemDecoration(requireContext().applicationContext, true,
+                    binding.groupRV.addItemDecoration(RecyclerViewItemDecoration(requireContext(), true,
                             binding.root.height - binding.addBtn.top - binding.addBtn.height / 2))
                 }
             }

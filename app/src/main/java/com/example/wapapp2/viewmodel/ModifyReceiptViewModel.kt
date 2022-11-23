@@ -13,21 +13,23 @@ class ModifyReceiptViewModel : ViewModel() {
     private val receiptRepositoryImpl = ReceiptRepositoryImpl.INSTANCE
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
 
-    lateinit var receiptDTO: ReceiptDTO
+    lateinit var originalReceiptDTO: ReceiptDTO
+    var modifiedReceiptDTO: ReceiptDTO? = null
+
     var receiptImgChanged = false
     var hasReceiptImg = false
 
-    fun modifyReceipt(originalReceiptDTO: ReceiptDTO, modifiedReceiptDTO: ReceiptDTO, calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+    fun modifyReceipt(calcRoomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
             //수정 내역을 map으로 저장
             //수정가능 자료 : name, status(정산상태), img_url
             val map = HashMap<String, Any?>()
-            if (originalReceiptDTO.name != modifiedReceiptDTO.name)
-                map["name"] = modifiedReceiptDTO.name
-            if (originalReceiptDTO.status != modifiedReceiptDTO.status)
-                map["status"] = modifiedReceiptDTO.status
-            if (originalReceiptDTO.imgUrl != modifiedReceiptDTO.imgUrl)
-                map["imgUrl"] = modifiedReceiptDTO.imgUrl
+            if (originalReceiptDTO.name != modifiedReceiptDTO!!.name)
+                map["name"] = modifiedReceiptDTO!!.name
+            if (originalReceiptDTO.status != modifiedReceiptDTO!!.status)
+                map["status"] = modifiedReceiptDTO!!.status
+            if (originalReceiptDTO.imgUrl != modifiedReceiptDTO!!.imgUrl)
+                map["imgUrl"] = modifiedReceiptDTO!!.imgUrl
 
             val result = async { receiptRepositoryImpl.modifyReceipt(map, calcRoomId) }
             result.await()
@@ -35,7 +37,7 @@ class ModifyReceiptViewModel : ViewModel() {
     }
 
     fun modifyProducts(productList: ArrayList<HashMap<String, ReceiptProductDTO>>, calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val list = ArrayList<HashMap<String, Any?>>()
             var originalProductDTO: ReceiptProductDTO? = null
             var newProductDTO: ReceiptProductDTO? = null
@@ -64,7 +66,7 @@ class ModifyReceiptViewModel : ViewModel() {
     }
 
     fun modifyReceiptImg(originalImgFileName: String, newImgUri: Uri, calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val deleteResult = async { receiptImgRepositoryImpl.deleteReceiptImg(originalImgFileName) }
             deleteResult.await()
             val uploadResult = async { receiptImgRepositoryImpl.uploadReceiptImg(newImgUri, calcRoomId) }
@@ -73,8 +75,8 @@ class ModifyReceiptViewModel : ViewModel() {
         }
     }
 
-    fun deleteReceipt(calcRoomId: String, receiptId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+    fun removeReceipt(calcRoomId: String, receiptId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
             val deleteResult = async {
                 receiptRepositoryImpl.deleteReceipt(calcRoomId, receiptId)
             }

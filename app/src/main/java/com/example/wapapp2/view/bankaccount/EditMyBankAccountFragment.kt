@@ -79,7 +79,7 @@ class EditMyBankAccountFragment : Fragment() {
                 MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.final_confirmation)
                         .setView(dialogViewBinding.root).setNegativeButton(R.string.close) { dialog, index ->
                             dialog.dismiss()
-                        }.setPositiveButton(R.string.edit) { dialog, index ->
+                        }.setPositiveButton(R.string.modify) { dialog, index ->
                             viewModel.modifyMyBankAccount(modifiedBankAccountDTO, originalBankAccountDTO)
                             Toast.makeText(context, R.string.edied_my_bank_account, Toast.LENGTH_SHORT).show()
                             dialog.dismiss()

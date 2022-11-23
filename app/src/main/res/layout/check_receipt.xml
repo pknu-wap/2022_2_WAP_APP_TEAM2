@@ -9,6 +9,7 @@
     android:backgroundTint="@color/white"
     android:clickable="true"
     android:focusable="true"
+    android:longClickable="true"
     >
 
 
@@ -32,7 +33,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/receipt"
         />
 
     <TextView

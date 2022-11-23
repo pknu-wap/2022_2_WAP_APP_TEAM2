@@ -64,7 +64,7 @@
     <string name="added_new_bank_account">새 계좌가 추가되었습니다</string>
     <string name="my_back_account_list">내 계좌 목록</string>
     <string name="remove">삭제</string>
-    <string name="edit">수정</string>
+    <string name="modify">수정</string>
     <string name="remove_my_account">내 계좌 삭제</string>
     <string name="removed_bank_account">계좌 삭제 완료</string>
     <string name="edit_my_bank_account">내 계좌 수정</string>
@@ -118,5 +118,14 @@
     <string name="msg_exit_from_calc_room">정산방에서 나가시겠습니까?</string>
     <string name="msg_invite_new_friends">선택한 친구들을 초대하시겠습니까?</string>
     <string name="invite">초대</string>
+    <string name="modify_receipt">영수증 수정</string>
+    <string name="msg_modify_receipt">영수증 수정을 확정하시겠습니까?</string>
+    <string name="receipt">영수증</string>
+    <string name="loading_receipt_info">영수증 정보를 불러오는 중입니다</string>
+    <string name="work_for_receipt">영수증에 대한 작업</string>
+    <string name="available_remove_and_modify">삭제 또는 수정이 가능합니다</string>
+    <string name="remove_receipt">영수증 삭제</string>
+    <string name="unit_price">단가</string>
+    <string name="product_name">항목</string>
 
 </resources>
