@@ -93,8 +93,19 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean {
-        
+    override suspend fun removeProducts(
+            calcRoomId: String, receiptId: String,
+            removeIds: MutableList<String>,
+    ) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+
+        fireStore.runBatch { batch ->
+            for (removeId in removeIds) {
+                batch.delete(collection.document(removeId))
+            }
+        }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
 
     override suspend fun modifyProducts(

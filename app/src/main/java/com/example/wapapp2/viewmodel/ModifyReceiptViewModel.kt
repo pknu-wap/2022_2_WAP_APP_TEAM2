@@ -49,6 +49,9 @@ class ModifyReceiptViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 영수증 수정 로직
+     */
     fun modifyProducts(calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             // 삭제된 항목 집합   키 : id
@@ -86,7 +89,7 @@ class ModifyReceiptViewModel : ViewModel() {
 
             receiptRepositoryImpl.modifyProducts(modifiedMap, currentRoomId!!, originalReceiptDTO.id)
             receiptRepositoryImpl.addProducts(originalReceiptDTO.id, addedList, currentRoomId!!)
-            //삭제 하는 로직 추가하기
+            receiptRepositoryImpl.removeProducts(currentRoomId!!, originalReceiptDTO.id, removedSet.toMutableList())
         }
     }
 
