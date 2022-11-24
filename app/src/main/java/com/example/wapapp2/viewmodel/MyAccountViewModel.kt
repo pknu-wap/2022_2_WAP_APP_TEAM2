@@ -19,7 +19,7 @@ class MyAccountViewModel : ViewModel() {
     val myProfileData = MutableLiveData<UserDTO>()
 
     fun initMyProfile() {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val result = async {
                 userRepositoryImpl.getUser(auth.currentUser!!.uid)
             }

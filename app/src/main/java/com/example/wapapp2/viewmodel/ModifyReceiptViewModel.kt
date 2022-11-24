@@ -16,6 +16,9 @@ class ModifyReceiptViewModel : ViewModel() {
     lateinit var originalReceiptDTO: ReceiptDTO
     var modifiedReceiptDTO: ReceiptDTO? = null
 
+    val originalProductMap = mutableMapOf<String, ReceiptProductDTO>()
+    val modifiedProductMap = mutableMapOf<String, ReceiptProductDTO>()
+
     var currentRoomId: String? = null
 
     var receiptImgChanged = false

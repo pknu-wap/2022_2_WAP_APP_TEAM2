@@ -30,6 +30,10 @@ data class ReceiptDTO(
         var name: String,
         @PropertyName("payersId")
         var payersId: String,
+
+        @PropertyName("payersName")
+        var payersName: String,
+
         @field:JvmField
         @PropertyName("status")
         var status: Boolean,
@@ -47,7 +51,7 @@ data class ReceiptDTO(
         public val date: DateTime = DateTime.now(),
 
         ) : Parcelable {
-    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now())
+    constructor() : this("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)

@@ -20,6 +20,7 @@ class NewReceiptViewModel : ViewModel() {
     val addReceiptResult = MutableLiveData<Boolean>()
 
     var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
+    lateinit var myName: String
 
     fun removeProduct(receiptId: String, receiptProductDTO: ReceiptProductDTO): Int {
         try {
@@ -90,6 +91,7 @@ class NewReceiptViewModel : ViewModel() {
     fun addReceipt(receiptId: String) {
         receiptMap[receiptId] = ReceiptDTO().apply {
             id = receiptId
+            payersName = myName
         }
     }
 
