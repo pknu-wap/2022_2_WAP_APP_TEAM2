@@ -96,7 +96,7 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0)
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0, mutableListOf())
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }

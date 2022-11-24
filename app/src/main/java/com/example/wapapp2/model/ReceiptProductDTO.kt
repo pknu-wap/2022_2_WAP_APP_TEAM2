@@ -24,9 +24,9 @@ data class ReceiptProductDTO(
         var checkedUserIds: ArrayList<String> = ArrayList<String>(),
         @get:Exclude
         var personCount: Int = 0,
+        @PropertyName("participants")
+        val participants: MutableList<ReceiptProductParticipantDTO>,
 ) : Parcelable {
-    constructor() : this("", "", 0, 0, arrayListOf(), 0)
+    constructor() : this("", "", 0, 0, arrayListOf(), 0, mutableListOf())
 
-    @get:Exclude
-    val participants = mutableListOf<ReceiptProductParticipantDTO>()
 }

@@ -48,12 +48,15 @@ class ReceiptInfoFragment : Fragment() {
         }
     }
 
-    private val productOnClickListener = object : ListOnClickListener<ReceiptProductDTO> { item, pos ->
-    }
+    private val productOnClickListener =
+            ListOnClickListener<ReceiptProductDTO> { e, position ->
 
-    private val participantOnClickListener = object : ListOnClickListener<ReceiptProductParticipantDTO> { item, pos ->
+            }
 
-    }
+    private val participantOnClickListener =
+            ListOnClickListener<ReceiptProductParticipantDTO> { e, position ->
+
+            }
 
 
     private val adapter = ReceiptProductsAdapter(productOnClickListener, participantOnClickListener)
