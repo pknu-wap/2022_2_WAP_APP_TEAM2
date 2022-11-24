@@ -2,7 +2,6 @@ package com.example.wapapp2.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
@@ -14,7 +13,7 @@ class ModifyReceiptViewModel : ViewModel() {
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
 
     lateinit var originalReceiptDTO: ReceiptDTO
-    var modifiedReceiptDTO: ReceiptDTO? = null
+    lateinit var modifiedReceiptDTO: ReceiptDTO
 
     val originalProductMap = mutableMapOf<String, ReceiptProductDTO>()
     val modifiedProductMap = mutableMapOf<String, ReceiptProductDTO>()
@@ -24,48 +23,70 @@ class ModifyReceiptViewModel : ViewModel() {
     var receiptImgChanged = false
     var hasReceiptImg = false
 
+    fun setOriginalProducts(list: MutableList<ReceiptProductDTO>) {
+        for (product in list) {
+            val copiedDto = product.copy(id = product.id,
+                    name = product.name, price = product.price, count = product.count)
+
+            originalProductMap[product.id] = product
+            modifiedProductMap[product.id] = copiedDto
+        }
+    }
+
     fun modifyReceipt(calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             //수정 내역을 map으로 저장
             //수정가능 자료 : name, status(정산상태), img_url
             val map = HashMap<String, Any?>()
-            if (originalReceiptDTO.name != modifiedReceiptDTO!!.name)
-                map["name"] = modifiedReceiptDTO!!.name
-            if (originalReceiptDTO.status != modifiedReceiptDTO!!.status)
-                map["status"] = modifiedReceiptDTO!!.status
-            if (originalReceiptDTO.imgUrl != modifiedReceiptDTO!!.imgUrl)
-                map["imgUrl"] = modifiedReceiptDTO!!.imgUrl
+            if (originalReceiptDTO.name != modifiedReceiptDTO.name)
+                map["name"] = modifiedReceiptDTO.name
+            if (receiptImgChanged)
+                map["imgUrl"] = modifiedReceiptDTO.imgUrl
+            if (originalReceiptDTO.totalMoney != modifiedReceiptDTO.totalMoney)
+                map["totalMoney"] = modifiedReceiptDTO.totalMoney
 
-            val result = async { receiptRepositoryImpl.modifyReceipt(map, calcRoomId) }
-            result.await()
+            receiptRepositoryImpl.modifyReceipt(map, calcRoomId)
         }
     }
 
-    fun modifyProducts(productList: ArrayList<HashMap<String, ReceiptProductDTO>>, calcRoomId: String) {
+    fun modifyProducts(calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val list = ArrayList<HashMap<String, Any?>>()
-            var originalProductDTO: ReceiptProductDTO? = null
-            var newProductDTO: ReceiptProductDTO? = null
+            // 삭제된 항목 집합   키 : id
+            val removedSet = originalProductMap.keys.toMutableSet()
+            removedSet.subtract(modifiedProductMap.keys.toMutableSet())
 
-            for (map in productList) {
-                val modifiedMap = HashMap<String, Any?>()
-                originalProductDTO = map["original"]
-                newProductDTO = map["new"]
-                //수정가능 자료 : 체크유저id목록, 이름, 가격
+            // 추가된 항목 집합
+            val addedSet = modifiedProductMap.keys.toMutableSet()
+            addedSet.subtract(originalProductMap.keys.toMutableSet())
 
-                if (originalProductDTO?.name != newProductDTO?.name)
-                    modifiedMap["name"] = newProductDTO?.name
-                if (originalProductDTO?.price != newProductDTO?.price)
-                    modifiedMap["price"] = newProductDTO?.price
+            // 추가된 항목 맵   키 : id
+            val addedList = mutableListOf<ReceiptProductDTO>()
 
-                modifiedMap["checkedUserIds"] = newProductDTO?.checkedUserIds
-                modifiedMap["id"] = originalProductDTO?.id
+            // 수정되었을 가능성이 있는 모든 항목 집합
+            val modifiedSet = modifiedProductMap.keys.toMutableSet()
+            modifiedSet.intersect(originalProductMap.keys.toMutableSet())
 
-                list.add(modifiedMap)
+            // 수정된 항목 맵   키 : id
+            val modifiedMap = mutableMapOf<String, ReceiptProductDTO>()
+
+            // 수정가능 자료 : 이름, 수량 ,단가
+            // 수정된 항목 분석
+            for (id in modifiedSet) {
+                //수정 여부 확인
+                if (originalProductMap[id]!!.equalsSimple(modifiedProductMap[id]!!)) {
+                    //수정 됨
+                    modifiedMap[id] = modifiedProductMap[id]!!
+                }
             }
 
-            val result = async { receiptRepositoryImpl.modifyProducts(list, calcRoomId) }
-            result.await()
+            // 추가된 항목 분석
+            for (id in addedSet) {
+                addedList.add(modifiedProductMap[id]!!)
+            }
+
+            receiptRepositoryImpl.modifyProducts(modifiedMap, currentRoomId!!, originalReceiptDTO.id)
+            receiptRepositoryImpl.addProducts(originalReceiptDTO.id, addedList, currentRoomId!!)
+            //삭제 하는 로직 추가하기
         }
     }
 

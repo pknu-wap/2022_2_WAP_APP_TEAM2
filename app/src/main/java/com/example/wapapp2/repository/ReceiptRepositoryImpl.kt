@@ -50,20 +50,19 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
     override suspend fun addProducts(
-            documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String,
+            receiptId: String, productsList: MutableList<ReceiptProductDTO>, calcRoomId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val writeBatch = fireStore.batch()
 
         for (receiptProduct in productsList) {
             writeBatch.set(fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name)
-                    .document(documentId).collection(FireStoreNames.products.name).document(), receiptProduct)
+                    .document(receiptId).collection(FireStoreNames.products.name).document(), receiptProduct)
         }
 
         writeBatch.commit().addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
-
     }
 
     override suspend fun getLastDocumentId(calcRoomId: String) = suspendCoroutine<String?> { continuation ->
@@ -94,22 +93,24 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
+    override suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean {
+        
+    }
+
     override suspend fun modifyProducts(
-            productMapList: ArrayList<HashMap<String, Any?>>,
-            calcRoomId: String,
+            productMap: MutableMap<String, ReceiptProductDTO>, calcRoomId: String, receiptId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
 
         fireStore.runBatch { batch ->
-            for (map in productMapList) {
-                val id = map["id"].toString()
-                map.remove("id")
-
-                batch.update(collection.document(id), map)
+            for (product in productMap) {
+                batch.set(collection.document(product.key), product.value)
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
+
 
     override suspend fun getReceipts(calcRoomId: String) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
