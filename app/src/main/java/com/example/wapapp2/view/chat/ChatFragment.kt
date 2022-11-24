@@ -1,10 +1,12 @@
 package com.example.wapapp2.view.chat
 
+import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.animation.Animation
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,10 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
@@ -28,7 +33,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 
-class ChatFragment : Fragment(), ScrollListener {
+class ChatFragment : Fragment() {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
@@ -122,6 +127,26 @@ class ChatFragment : Fragment(), ScrollListener {
                             if (dc.type == DocumentChange.Type.ADDED) {
                                 lifecycleScope.launch {
                                     chatAdapter!!.submitData(PagingData.from(value.documents))
+
+                                    val lastVisiblePosition =
+                                        (binding.chatList.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                                    val loading = lastVisiblePosition == RecyclerView.NO_POSITION
+
+                                    // 새 메시지
+                                    if(!loading){
+                                        val newChatDTO = dc.document.toObject(ChatDTO::class.java)
+                                        val anim = binding.newMsgFrame.animate()
+                                        binding.newMsgFrame.visibility = View.VISIBLE
+                                        binding.newMsgTv.text = newChatDTO.userName + " : " + newChatDTO.msg
+                                        anim.apply {
+                                            duration = 3000
+                                            withEndAction{
+                                                binding.newMsgTv.text = ""
+                                                binding.newMsgFrame.visibility = View.GONE
+                                            }
+                                            start()
+                                        }
+                                    }
                                 }
                                 break
                             }
@@ -161,10 +186,6 @@ class ChatFragment : Fragment(), ScrollListener {
         super.onStop()
     }
 
-    override fun scrollToBottom() {
-        binding.chatList.scrollToPosition(binding.chatList.adapter!!.itemCount - 1)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -178,4 +199,6 @@ class ChatFragment : Fragment(), ScrollListener {
             chatAdapter?.startListening()
         }
     }
+
+
 }
