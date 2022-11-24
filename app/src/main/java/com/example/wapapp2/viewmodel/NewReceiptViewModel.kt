@@ -8,7 +8,6 @@ import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import org.joda.time.DateTime
 
 class NewReceiptViewModel : ViewModel() {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -60,7 +59,8 @@ class NewReceiptViewModel : ViewModel() {
                     if (lastDocumentId.await() != null) {
                         //영수증 항목 추가
                         val addProductsResult = async {
-                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts(), calcRoomId)
+                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts()
+                                    .toMutableList(), calcRoomId)
                         }
 
                         addProductsResult.await()
