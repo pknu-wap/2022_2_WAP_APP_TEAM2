@@ -18,7 +18,10 @@
             android:id="@+id/icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             android:src="@drawable/common_google_signin_btn_icon_dark_focused"
             />
 
@@ -29,15 +32,18 @@
             android:layout_alignTop="@id/icon"
             android:layout_toRightOf="@id/icon"
             android:text="토스뱅크"
+            android:textSize="16sp"
             />
 
         <TextView
             android:id="@+id/bank_account_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:layout_alignBottom="@id/icon"
             android:layout_toRightOf="@id/icon"
             android:text="123455677777"
+            android:textSize="15sp"
             />
 
     </RelativeLayout>
@@ -49,13 +55,14 @@
         android:layout_marginHorizontal="14dp"
         android:layout_marginBottom="13dp"
         android:text="계좌가 복사되었습니다."
+        android:textSize="15sp"
 
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bank_list"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="8dp"
         android:background="@color/white"

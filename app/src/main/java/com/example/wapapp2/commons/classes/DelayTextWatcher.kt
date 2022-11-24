@@ -31,4 +31,13 @@ abstract class DelayTextWatcher : TextWatcher {
     override fun beforeTextChanged(cs: CharSequence?, start: Int, count: Int, after: Int) {}
     override fun onTextChanged(cs: CharSequence?, start: Int, before: Int, count: Int) {}
 
+    fun isInt(text: String): Boolean {
+        return try {
+            text.toInt()
+            true
+        } catch (e: NumberFormatException) {
+            false
+        }
+
+    }
 }
