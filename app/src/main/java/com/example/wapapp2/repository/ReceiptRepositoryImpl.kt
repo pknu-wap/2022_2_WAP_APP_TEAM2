@@ -93,6 +93,10 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
+    override suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean {
+        
+    }
+
     override suspend fun modifyProducts(
             productMap: MutableMap<String, ReceiptProductDTO>, calcRoomId: String, receiptId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
@@ -106,6 +110,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
+
 
     override suspend fun getReceipts(calcRoomId: String) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
