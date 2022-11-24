@@ -13,8 +13,11 @@ import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.commons.classes.LoadingDialogView
+import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentReceiptInfoBinding
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.ReceiptProductParticipantDTO
 import com.example.wapapp2.view.editreceipt.ReceiptImgFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
@@ -45,8 +48,15 @@ class ReceiptInfoFragment : Fragment() {
         }
     }
 
+    private val productOnClickListener = object : ListOnClickListener<ReceiptProductDTO> { item, pos ->
+    }
 
-    private val adapter = ReceiptProductsAdapter()
+    private val participantOnClickListener = object : ListOnClickListener<ReceiptProductParticipantDTO> { item, pos ->
+
+    }
+
+
+    private val adapter = ReceiptProductsAdapter(productOnClickListener, participantOnClickListener)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
