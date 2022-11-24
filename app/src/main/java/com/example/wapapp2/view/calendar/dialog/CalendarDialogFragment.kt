@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 
 
-class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>>) : DialogFragment() {
+class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>>, val receiptItemClickListener: ReceiptItemClickListener) : DialogFragment() {
     private lateinit var binding: FragmentCalendarDialogBinding
     private val calendarDialogViewModel: CalendarDialogViewModel by viewModels()
     private val FIRST_VIEW_PAGER_POSITION = Int.MAX_VALUE / 2
@@ -40,7 +40,7 @@ class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>
         calendarDialogViewModel.arguments = arguments ?: savedInstanceState
         calendarDialogViewModel.firstSelectedDay = calendarDialogViewModel.arguments!!.getString("selectedDayISO8601", "")
         val dstKey = DateTime.parse(calendarDialogViewModel.firstSelectedDay).toString("yyyyMMdd")
-        viewPagerAdapter = DialogViewPagerAdapter( hashMap, calendarDialogViewModel.firstSelectedDay , requireContext())
+        viewPagerAdapter = DialogViewPagerAdapter( hashMap, calendarDialogViewModel.firstSelectedDay , requireContext(), receiptItemClickListener)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -1,6 +1,5 @@
 package com.example.wapapp2.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +21,6 @@ class MyCalendarViewModel : ViewModel() {
 
     fun loadCalendarReceipts(myCalcRoomIDs: MutableSet<String>) {
         for (myCalcRoomID in myCalcRoomIDs) {
-            Log.d("loadCalendarReceipt Started", myCalcRoomID.toString())
             viewModelScope.launch {
                 val pairOf_map_rl = async {
                     myCalendarRepositoryImpl.getMyReceipts_with_addSnapshot(myCalcRoomID, EventListener { value, error ->
@@ -38,12 +36,8 @@ class MyCalendarViewModel : ViewModel() {
                     })
                 }
                 pairOf_map_rl.await()?.let {
-                    Log.d("returned it.first", it.first.toString())
-                    Log.d("전 :: myReceiptMap.value", myReceiptMap.value.toString())
-
                     myReceiptMap.value = it.first ?: HashMap()
                     myCalcRoomReceiptListeners = it.second
-                    Log.d("후 ::myReceiptMap.value", myReceiptMap.value.toString())
                 }
             }
         }
