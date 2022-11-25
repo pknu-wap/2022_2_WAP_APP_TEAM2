@@ -38,14 +38,36 @@ class ModifyReceiptViewModel : ViewModel() {
             //수정 내역을 map으로 저장
             //수정가능 자료 : name, status(정산상태), img_url
             val map = HashMap<String, Any?>()
+
             if (originalReceiptDTO.name != modifiedReceiptDTO.name)
                 map["name"] = modifiedReceiptDTO.name
-            if (receiptImgChanged)
-                map["imgUrl"] = modifiedReceiptDTO.imgUrl
             if (originalReceiptDTO.totalMoney != modifiedReceiptDTO.totalMoney)
                 map["totalMoney"] = modifiedReceiptDTO.totalMoney
 
-            receiptRepositoryImpl.modifyReceipt(map, calcRoomId)
+/*
+            //사진이 변경된 경우
+            if (receiptImgChanged) {
+                // 기존에 사진이 있는 경우 삭제
+                if (originalReceiptDTO.imgUrl!!.isNotEmpty())
+                //receiptImgRepositoryImpl.deleteReceiptImg(originalReceiptDTO.imgUrl!!)
+
+                // 새 사진 업로드
+                    if (modifiedReceiptDTO.imgUriInMyPhone != null) {
+                        val uploadImg =
+                                async { receiptImgRepositoryImpl.uploadReceiptImg(modifiedReceiptDTO.imgUriInMyPhone!!, calcRoomId) }
+                        uploadImg.await()?.apply {
+                            // 사진 업로드 성공
+                            map["imgUrl"] = this
+                        }
+                        // receiptRepositoryImpl.modifyReceipt(map, calcRoomId)
+                    } else {
+                        // 사진을 삭제한 경우
+                        map["imgUrl"] = ""
+                        // receiptRepositoryImpl.modifyReceipt(map, calcRoomId)
+                    }
+
+            }
+*/
         }
     }
 
@@ -87,9 +109,9 @@ class ModifyReceiptViewModel : ViewModel() {
                 addedList.add(modifiedProductMap[id]!!)
             }
 
-            receiptRepositoryImpl.modifyProducts(modifiedMap, currentRoomId!!, originalReceiptDTO.id)
-            receiptRepositoryImpl.addProducts(originalReceiptDTO.id, addedList, currentRoomId!!)
-            receiptRepositoryImpl.removeProducts(currentRoomId!!, originalReceiptDTO.id, removedSet.toMutableList())
+            //receiptRepositoryImpl.modifyProducts(modifiedMap, currentRoomId!!, originalReceiptDTO.id)
+            // receiptRepositoryImpl.addProducts(originalReceiptDTO.id, addedList, currentRoomId!!)
+            //receiptRepositoryImpl.removeProducts(currentRoomId!!, originalReceiptDTO.id, removedSet.toMutableList())
         }
     }
 

@@ -150,7 +150,8 @@ class EditReceiptFragment : Fragment() {
                     .setNegativeButton(R.string.cancel) { dialog, which ->
                         dialog.dismiss()
                     }.setPositiveButton(R.string.modify) { dialog, which ->
-
+                        modifyReceiptViewModel.modifyReceipt(modifyReceiptViewModel.currentRoomId!!)
+                        modifyReceiptViewModel.modifyProducts(modifyReceiptViewModel.currentRoomId!!)
                         dialog.dismiss()
                     }.create().show()
         }
