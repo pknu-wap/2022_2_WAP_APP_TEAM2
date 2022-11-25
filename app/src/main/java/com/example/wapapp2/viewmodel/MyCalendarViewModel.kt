@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.CalendarRepositoryImpl
+import com.example.wapapp2.repository.interfaces.CalendarRepository
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 
 class MyCalendarViewModel : ViewModel() {
-    private val myCalendarRepositoryImpl = CalendarRepositoryImpl.getINSTANCE()
+    private val myCalendarRepository : CalendarRepository = CalendarRepositoryImpl.getINSTANCE()
     private var myCalcRoomReceiptListeners: ArrayList<ListenerRegistration>? = null
 
     /** Hashmap of my ReceiptDTOs <DateString ISO8610, ReceiptDTO> **/
@@ -23,7 +24,7 @@ class MyCalendarViewModel : ViewModel() {
         for (myCalcRoomID in myCalcRoomIDs) {
             viewModelScope.launch {
                 val pairOf_map_rl = async {
-                    myCalendarRepositoryImpl.getMyReceipts_with_addSnapshot(myCalcRoomID, EventListener { value, error ->
+                    myCalendarRepository.getMyReceipts_with_addSnapshot(myCalcRoomID, EventListener { value, error ->
                         value?.documentChanges.apply {
                             for (dc in this!!) {
                                 if (dc.type == DocumentChange.Type.ADDED) {

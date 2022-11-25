@@ -28,25 +28,8 @@ class GroupAdapter(
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd E", Locale.getDefault())
 
         fun bind(calcRoomDTO: CalcRoomDTO) {
-            /*
-            var nameString = ""
-            var count = 1;
-            for (name in calcRoomDTO.participantIds) {
-                if (count > 3) {
-                    nameString += " 외 " + (calcRoomDTO.members.size - 3) + "명"
-                    break
-                } else {
-                    nameString += name
-                    if (count != calcRoomDTO.members.size && count != 3)
-                        nameString += ", "
-                }
-                count++
-            }
-
-             */
-
             binding.groupItemNames.text = calcRoomDTO.name
-            //binding.groupItemState.text = calcRoomDTO.state
+            binding.groupItemState.text = if(calcRoomDTO.status.not()) "정산 진행중.." else ""
             binding.groupItemDate.text = dateFormat.format(calcRoomDTO.createdTime!!)
 
             binding.root.setOnClickListener {
