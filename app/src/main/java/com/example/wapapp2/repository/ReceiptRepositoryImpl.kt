@@ -39,12 +39,25 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
 
+    /**
+     * 영수증 추가
+     * 추가 하면서 calcRoom문서의 ongoingReceiptIds에 id 추가 필요
+     */
     override suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
         receiptDTO.payersId = currentUser!!.uid
 
         receiptCollection.document().set(receiptDTO).addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
+    }
+
+    override suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+        val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId)
+
+        calcRoomDocument.update("ongoingReceiptIds", FieldValue.arrayUnion(receiptId)).addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
@@ -90,12 +103,19 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
-    override suspend fun removeReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
+    override suspend fun removeReceipt(calcRoomId: String, receiptId: String) {
+        // 영수증 문서 삭제
         fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-                .document(receiptId).delete().addOnCompleteListener {
-                    continuation.resume(it.isSuccessful)
-                }
+                .document(receiptId).delete()
+
+        // calcRoom문서 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
+        val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId)
+
+        fireStore.runBatch { batch ->
+            batch.update("endReceiptIds", FieldValue.arrayRemove(receiptId))
+        }
     }
 
 
