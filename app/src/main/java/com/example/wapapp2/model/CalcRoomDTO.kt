@@ -29,8 +29,8 @@ data class CalcRoomDTO(
         @PropertyName("name")
         var name: String,
         @field:JvmField
-        @PropertyName("status")
-        var status: Boolean,
+        @PropertyName("calculationStatus")
+        var calculationStatus: Boolean,
         @get:Exclude
         val people: ArrayList<CalcRoomParticipantDTO>,
 ) : Parcelable {
