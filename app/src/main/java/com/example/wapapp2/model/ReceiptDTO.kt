@@ -23,7 +23,7 @@ data class ReceiptDTO(
         @PropertyName("createdTime")
         var createdTime: Date? = null,
         @PropertyName("imgUrl")
-        var imgUrl: String?,
+        var imgUrl: String,
         @get:Exclude
         var imgUriInMyPhone: Uri?,
         @PropertyName("name")
@@ -57,7 +57,8 @@ data class ReceiptDTO(
         productList.add(receiptProductDTO)
         totalMoney += receiptProductDTO.price
     }
-    var roomID : String? = null
+
+    var roomID: String? = null
 
 
     @Exclude

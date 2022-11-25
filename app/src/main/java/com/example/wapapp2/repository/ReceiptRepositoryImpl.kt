@@ -79,10 +79,15 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+    override suspend fun modifyReceipt(
+            map: MutableMap<String, Any?>, calcRoomId: String,
+            receiptId: String,
+    ) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-        receiptCollection.document().update(map).addOnCompleteListener { continuation.resume(it.isSuccessful) }
+        receiptCollection.document(receiptId).update(map.toMap()).addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
     }
 
     override suspend fun removeReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
@@ -93,8 +98,21 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean {
-        return false;
+
+    override suspend fun removeProducts(
+            calcRoomId: String, receiptId: String,
+            removeIds: MutableList<String>,
+    ) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+
+        fireStore.runBatch { batch ->
+            for (removeId in removeIds) {
+                batch.delete(collection.document(removeId))
+            }
+        }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
+
     }
 
     override suspend fun modifyProducts(

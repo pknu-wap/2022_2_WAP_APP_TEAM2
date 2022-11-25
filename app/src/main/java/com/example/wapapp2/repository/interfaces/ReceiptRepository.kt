@@ -9,7 +9,7 @@ interface ReceiptRepository {
     suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String): Boolean
     suspend fun addProducts(receiptId: String, productsList: MutableList<ReceiptProductDTO>, calcRoomId: String): Boolean
     suspend fun getLastDocumentId(calcRoomId: String): String?
-    suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String): Boolean
+    suspend fun modifyReceipt(map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String): Boolean
     suspend fun removeReceipt(calcRoomId: String, receiptId: String): Boolean
     suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean
     suspend fun modifyProducts(productMap: MutableMap<String, ReceiptProductDTO>, calcRoomId: String, receiptId: String): Boolean
