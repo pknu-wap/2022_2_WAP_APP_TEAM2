@@ -29,7 +29,7 @@ data class ReceiptProductDTO(
 ) : Parcelable {
     constructor() : this("", "", 0, 0, arrayListOf(), 0, mutableListOf())
 
-    fun equalsSimple(other: ReceiptProductDTO): Boolean {
-        return !(name != other.name || count != other.count || price != other.price)
-    }
+    fun equalsSimple(other: ReceiptProductDTO): Boolean =
+            !(name != other.name || count != other.count || price != other.price)
+
 }
