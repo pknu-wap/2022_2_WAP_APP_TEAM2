@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp"
+    >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/product_name"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/count"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.35"
+        />
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/count"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/name"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toRightOf="@id/name"
+        app:layout_constraintRight_toLeftOf="@id/price"
+
+        app:layout_constraintWidth_percent="0.15"
+        />
+
+
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/unit_price"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/name"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toRightOf="@id/count"
+
+        app:layout_constraintRight_toLeftOf="@id/total_price"
+        app:layout_constraintWidth_percent="0.25"
+        />
+
+    <TextView
+        android:id="@+id/total_price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/total_money"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/name"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintLeft_toRightOf="@id/price"
+
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintWidth_percent="0.25"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -157,7 +157,7 @@ class NewReceiptFragment : Fragment() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            DialogSize.setDialogSize(dialog!!, 90, 75)
+            DialogSize.setDialogSize(dialog!!, 95, 80)
 
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
