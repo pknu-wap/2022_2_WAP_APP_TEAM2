@@ -70,6 +70,11 @@ class InviteFriendsFragment : Fragment() {
         listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.no_search_results_found))
         searchFriendsListAdapter.registerAdapterDataObserver(listAdapterDataObserver!!)
 
+        binding.topAppBar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+
         return binding.root
     }
 

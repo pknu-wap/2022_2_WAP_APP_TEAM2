@@ -7,7 +7,7 @@ import com.example.wapapp2.commons.view.NewLoadingView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter
 
-class ListAdapterDataObserver(
+open class ListAdapterDataObserver(
         private val recycler: RecyclerView,
         private val manager: LinearLayoutManager,
         private val iAdapterItemCount: IAdapterItemCount,
@@ -64,12 +64,16 @@ class ListAdapterDataObserver(
         super.onItemRangeMoved(fromPosition, toPosition, itemCount)
     }
 
-    private fun onChangedList() {
+    protected fun onChangedList() {
         loadingView?.apply {
             if (iAdapterItemCount.getAdapterItemCount() > 0)
                 onSuccessful()
             else
                 onFailed(emptyMsg!!)
         }
+    }
+
+    protected fun onItemRangeInserted_super(positionStart: Int, itemCount: Int){
+        super.onItemRangeInserted(positionStart, itemCount)
     }
 }

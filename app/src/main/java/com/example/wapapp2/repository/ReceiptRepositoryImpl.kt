@@ -94,7 +94,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
     override suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean {
-        
+        return false;
     }
 
     override suspend fun modifyProducts(

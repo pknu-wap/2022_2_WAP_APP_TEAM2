@@ -1,21 +1,20 @@
 package com.example.wapapp2.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.repository.ChatRepositorylmpl
 import com.example.wapapp2.repository.interfaces.ChatRepository
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
@@ -33,9 +32,12 @@ class ChatViewModel : ViewModel() {
     }
 
 
-    fun sendMsg(chatDTO: ChatDTO) {
+    fun sendMsg(chatDTO: ChatDTO, sendMsgOnFailCallback: SendMsgOnFailCallback ){
         CoroutineScope(Dispatchers.Default).launch {
-            chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO)
+            val result = async { chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO) }
+            if (result.await().not()){
+                sendMsgOnFailCallback.OnFail()
+            }
         }
     }
 
@@ -56,5 +58,9 @@ class ChatViewModel : ViewModel() {
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
                 .addSnapshotListener(listener)
+    }
+
+    fun interface SendMsgOnFailCallback{
+        fun OnFail()
     }
 }
