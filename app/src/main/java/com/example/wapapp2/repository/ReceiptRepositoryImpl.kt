@@ -103,19 +103,19 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    /**
+     * 영수증 삭제 -> calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
+     */
     override suspend fun removeReceipt(calcRoomId: String, receiptId: String) {
         // 영수증 문서 삭제
         fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
                 .document(receiptId).delete()
 
-        // calcRoom문서 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
-        val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+        // calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
+        fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId)
-
-        fireStore.runBatch { batch ->
-            batch.update("endReceiptIds", FieldValue.arrayRemove(receiptId))
-        }
+                .update(FieldPath.of("endReceiptIds", "ongoingReceiptIds"), FieldValue.arrayRemove(receiptId))
     }
 
 

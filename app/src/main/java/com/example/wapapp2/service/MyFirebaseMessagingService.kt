@@ -48,12 +48,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun chat(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-        val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
 
         CoroutineScope(Dispatchers.IO).launch {
             val sendFcmChatDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
             val senderId = sendFcmChatDTO.chatDTO.senderId
 
+            val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
             friendsLocalRepository.get(senderId).collect { value ->
                 val senderName: String = //내 친구 목록에 있음
                         value?.alias ?: //내 친구 목록에 없음
@@ -66,7 +66,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 }
             }
         }
-
 
     }
 

@@ -98,11 +98,10 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         }
 
         binding.removeBtn.setOnClickListener {
-            if (newReceiptViewModel.removeReceipt(receiptId!!)) {
+            if (newReceiptViewModel.removeReceipt(receiptId!!))
                 Toast.makeText(requireActivity(), R.string.removed_receipt, Toast.LENGTH_SHORT).show()
-            } else {
+            else
                 Toast.makeText(requireActivity(), R.string.unable_to_remove_receipt, Toast.LENGTH_SHORT).show()
-            }
         }
 
         binding.receiptImage.setOnClickListener {
@@ -189,7 +188,6 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     private fun addProduct() {
         val itemBinding = ProductItemLayoutInNewCalcBinding.inflate(layoutInflater)
         val productDTO = newReceiptViewModel.addProduct(receiptId!!)
-        itemBinding.root.tag = productDTO
         val addedPosition = binding.productsList.childCount - 1
 
         itemBinding.priceEditText.addTextChangedListener(object : DelayTextWatcher() {
