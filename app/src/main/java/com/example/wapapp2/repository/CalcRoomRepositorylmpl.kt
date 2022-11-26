@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
+import java.lang.reflect.Field
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -56,17 +57,6 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
     }
 
     /**
-     * 정산방 삭제
-     */
-    override suspend fun deleteCalcRoom(calcRoomDTO: CalcRoomDTO) {
-        firestore
-                .collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomDTO.id.toString()).delete()
-                .addOnCompleteListener { task ->
-                }
-    }
-
-    /**
      * 정산방 데이터 실시간 감시
      */
     override fun snapshotCalcRoom(
@@ -92,14 +82,28 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
     }
 
     /**
-     * 정산방에서 나가기
+     * 정산방에서 나가기 -> 남아있는 인원 없으면 정산방 삭제
      */
     override suspend fun exitFromCalcRoom(roomId: String) = suspendCoroutine<Boolean> { continuation ->
         val myId = auth.currentUser!!.uid
-        firestore.collection(FireStoreNames.calc_rooms.name)
-                .document(roomId).update("participantIds", FieldValue.arrayRemove(myId))
+        val roomDocument = firestore.collection(FireStoreNames.calc_rooms.name)
+            .document(roomId)
+
+        roomDocument.update("participantIds", FieldValue.arrayRemove(myId))
                 .addOnCompleteListener {
-                    continuation.resume(it.isSuccessful)
+                    roomDocument.get().addOnCompleteListener() {
+                        if(it.isSuccessful){
+                            if((it.result["participantIds"] as List<String>).size <= 0)
+                                roomDocument.delete().addOnCompleteListener{ continuation.resume(it.isSuccessful)}
+                            else
+                                continuation.resume(it.isSuccessful)
+                        }
+                        else
+                            continuation.resume(it.isSuccessful)
+
+                    }
+
+
                 }
     }
 

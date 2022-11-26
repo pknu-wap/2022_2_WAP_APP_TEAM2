@@ -8,7 +8,6 @@ import com.google.firebase.firestore.ListenerRegistration
 
 interface CalcRoomRepository {
     suspend fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO) : Boolean
-    suspend fun deleteCalcRoom(calcRoomDTO: CalcRoomDTO)
     suspend fun getCalcRoom(roomId: String): CalcRoomDTO
     suspend fun inviteFriends(list: MutableList<FriendDTO>, roomId: String)
     fun getMyCalcRoomIds(listener: EventListener<DocumentSnapshot>): ListenerRegistration

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 
 
 import androidx.core.content.ContextCompat.getColor
@@ -197,8 +198,12 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .setMessage(R.string.msg_exit_from_calc_room)
                     .setPositiveButton(R.string.exit) { dialog, which ->
                         dialog.dismiss()
-                        currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        if(currentCalcRoomViewModel.calcRoom.value!!.calculationStatus)
+                            Toast.makeText(context,"진행중인 정산이 존재합니다!",Toast.LENGTH_SHORT).show()
+                        else{
+                            currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
                     }.setNegativeButton(R.string.close) { dialog, which ->
                         dialog.dismiss()
                     }.create().show()
