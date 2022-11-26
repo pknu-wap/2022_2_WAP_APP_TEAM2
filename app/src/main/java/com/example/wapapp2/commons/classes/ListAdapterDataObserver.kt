@@ -94,5 +94,9 @@ open class ListAdapterDataObserver(
         recycler.scrollToPosition(if (manager.reverseLayout) 0 else positionStart)
     }
 
+    fun scrollToTop(){
+        recycler.scrollToPosition(if (manager.reverseLayout) iAdapterItemCount.getAdapterItemCount()-1 else 0)
+    }
+
 
 }

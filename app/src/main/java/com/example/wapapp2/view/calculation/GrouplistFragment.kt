@@ -35,6 +35,8 @@ class GrouplistFragment : Fragment() {
     private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
+    var dataObserver : CalcRoomDataObserver? = null
+
     companion object {
         const val TAG = "GrouplistFragment"
     }
@@ -98,10 +100,10 @@ class GrouplistFragment : Fragment() {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
                     binding.groupRV.adapter = adapter
-                    val dataObserver = ListAdapterDataObserver(binding.groupRV, binding.groupRV.layoutManager as
+                    dataObserver = CalcRoomDataObserver(binding.groupRV, binding.groupRV.layoutManager as
                             LinearLayoutManager, adapter!!)
-                    dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
-                    adapter!!.registerAdapterDataObserver(dataObserver)
+                    dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
+                    adapter!!.registerAdapterDataObserver(dataObserver!!)
                 } else {
                     adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
                 }
@@ -130,5 +132,9 @@ class GrouplistFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        dataObserver?.apply {
+            adapter!!.unregisterAdapterDataObserver(this)
+        }
+
     }
 }
