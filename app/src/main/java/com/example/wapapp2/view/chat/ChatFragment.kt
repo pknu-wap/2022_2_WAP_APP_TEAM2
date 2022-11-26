@@ -69,10 +69,12 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 //스크롤이 끝으로 이동한 경우 하단 채팅알림 지우기
+                if (!isVisible)
+                    return@setOnScrollChangeListener
+
                 if (binding.newMsgFrame.visibility == View.VISIBLE) {
                     chatDataObserver?.apply {
                         if (atBottom(0)) {
-                            binding.newMsgFrame.clearAnimation()
                             resetNewMsgView()
                         }
                     }
@@ -207,6 +209,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
      * 리스트 스크롤이 끝이 아니면서 새 메시지를 받았을때 -> 화면에 표시
      */
     override fun onReceived() {
+        if (!isVisible)
+            return
+
         chatAdapter?.getLastChatDTO()?.apply {
             val alias = if (currentCalcRoomViewModel.participantMap.containsKey(senderId))
                 currentCalcRoomViewModel.participantMap[senderId]!!.userName
@@ -217,7 +222,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             binding.newMsgTv.text = msg
             binding.newMsgFrame.visibility = View.VISIBLE
 
-            binding.newMsgFrame.clearAnimation()
             val anim = binding.newMsgFrame.animate()
             anim.apply {
                 duration = 3000
@@ -230,7 +234,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             //레이아웃 클릭 시 리스트 스크롤 끝으로 이동
             binding.newMsgFrame.setOnClickListener {
                 chatDataObserver?.scrollToBottom(0)
-                binding.newMsgFrame.clearAnimation()
                 resetNewMsgView()
             }
 
@@ -239,8 +242,12 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     }
 
     private fun resetNewMsgView() {
-        binding.newMsgTv.text = ""
-        binding.newMsgFrame.visibility = View.GONE
+        if (isVisible) {
+            binding.newMsgFrame.clearAnimation()
+
+            binding.newMsgTv.text = ""
+            binding.newMsgFrame.visibility = View.GONE
+        }
     }
 
 }
