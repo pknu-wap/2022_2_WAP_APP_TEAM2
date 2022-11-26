@@ -55,33 +55,15 @@ class GrouplistFragment : Fragment() {
     }
 
 
-    /** Add Group **/
+    /** Add Room **/
     private val addOnClickedItemListener = View.OnClickListener {
-        MaterialAlertDialogBuilder(requireActivity())
-                .setTitle(R.string.add)
-                .setNeutralButton(R.string.new_calculation) { dialog, which ->
-                    //정산 추가
-                    val fragment = NewReceiptFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
+        val fragment = NewCalcRoomFragment()
+        val fragmentManager = requireParentFragment().parentFragmentManager
 
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                            .addToBackStack(NewReceiptFragment.TAG).commit()
-                }.setPositiveButton(R.string.new_calc_room) { dialog, which ->
-                    //정산방 추가
-                    val fragment = NewCalcRoomFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
-
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
-                            .addToBackStack(NewCalcRoomFragment.TAG).commit()
-                }.create().show()
+        fragmentManager.beginTransaction()
+            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
+            .addToBackStack(NewCalcRoomFragment.TAG).commit()
     }
 
 

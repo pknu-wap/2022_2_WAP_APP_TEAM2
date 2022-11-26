@@ -29,15 +29,24 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
     /**
      * 정산방 생성
      */
-    override suspend fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO) {
+    override suspend fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO) = suspendCoroutine<Boolean> { continuation ->
         val newDocument = firestore
                 .collection(FireStoreNames.calc_rooms.name)
                 .document()
+        val myRoomIDsDocument = firestore.collection(FireStoreNames.users.name).document(auth.currentUser!!.uid)
         newDocument.set(calcRoomDTO).addOnCompleteListener {
-            if (it.isSuccessful)
-                newDocument.id // 참여 정산방목록으로 저장
+            if (it.isSuccessful){
+                calcRoomDTO.id = newDocument.id // 참여 정산방목록으로 저장
+                myRoomIDsDocument
+                    .update("myCalcRoomIds", FieldValue.arrayUnion(calcRoomDTO.id))
+                    .addOnCompleteListener {
+                        if(it.isSuccessful) continuation.resume(true)
+                        else continuation.resume(false)
+                    }
+            }
+            else
+                continuation.resume(false)
         }
-
     }
 
     /**
@@ -48,7 +57,6 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                 .collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomDTO.id.toString()).delete()
                 .addOnCompleteListener { task ->
-
                 }
     }
 
@@ -57,8 +65,8 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
      */
     override fun snapshotCalcRoom(
             roomId: String, listener: EventListener<DocumentSnapshot>,
-    ): ListenerRegistration = firestore.collection(FireStoreNames.calc_rooms
-            .name).document(roomId).addSnapshotListener(listener)
+    ): ListenerRegistration = firestore.collection(FireStoreNames.calc_rooms.name)
+        .document(roomId).addSnapshotListener(listener)
 
 
     /**
