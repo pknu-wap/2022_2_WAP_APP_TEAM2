@@ -8,6 +8,7 @@ import com.example.wapapp2.repository.interfaces.CalcRoomRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -33,16 +34,21 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
         val newDocument = firestore
                 .collection(FireStoreNames.calc_rooms.name)
                 .document()
-        val myRoomIDsDocument = firestore.collection(FireStoreNames.users.name).document(auth.currentUser!!.uid)
+
+        //calcRoom collection에 저장
         newDocument.set(calcRoomDTO).addOnCompleteListener {
             if (it.isSuccessful){
-                calcRoomDTO.id = newDocument.id // 참여 정산방목록으로 저장
-                myRoomIDsDocument
-                    .update("myCalcRoomIds", FieldValue.arrayUnion(calcRoomDTO.id))
-                    .addOnCompleteListener {
-                        if(it.isSuccessful) continuation.resume(true)
-                        else continuation.resume(false)
-                    }
+                CoroutineScope(Dispatchers.Default).launch {
+                    calcRoomDTO.id = newDocument.id // 참여 정산방목록으로 저장
+                    val results = ArrayList<Deferred<Boolean>>()
+
+                    // user collection에 참여방id 저장
+                    for ( participant in calcRoomDTO.participantIds)
+                        results.add(async { addRoomID_toParticipant(participant,calcRoomDTO.id.toString()) })
+
+                    if(false in results.awaitAll()) continuation.resume(false)
+                    else continuation.resume(true)
+                }
             }
             else
                 continuation.resume(false)
@@ -126,6 +132,19 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
             for (friend in list) {
                 batch.update(collection.document(friend.friendUserId), "myCalcRoomIds", FieldValue.arrayUnion(roomId))
             }
+        }
+    }
+
+
+    private suspend fun addRoomID_toParticipant(participant : String, roomId : String) = suspendCoroutine<Boolean>{ continuation ->
+        CoroutineScope(Dispatchers.Main).launch{
+            val participantDocument = firestore.collection(FireStoreNames.users.name).document(participant)
+            participantDocument
+                .update("myCalcRoomIds", FieldValue.arrayUnion(roomId))
+                .addOnCompleteListener {
+                    if(it.isSuccessful) continuation.resume(true)
+                    else continuation.resume(false)
+                }
         }
     }
 }
