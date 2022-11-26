@@ -11,12 +11,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DeviceUtils
 import com.example.wapapp2.main.MainActivity
 import com.example.wapapp2.model.notifications.NotificationObj
+import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 
 class ChatNotificationHelper private constructor(context: Context)
-    : AbstractNotificationHelper(context, context.getString(R.string.chat_notification_channel_id), context.getString(R.string.chat_notification_channel_name),
+    : AbstractNotificationHelper(context, NotificationType.Chat.channelId, context.getString(R.string.chat_notification_channel_name),
         context.getString(R.string.chat_notification_channel_description)) {
 
     companion object {
@@ -34,6 +36,7 @@ class ChatNotificationHelper private constructor(context: Context)
         notificationObj.notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
         notificationObj.notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         notificationObj.notificationBuilder.setShowWhen(true)
+
         return notificationObj
     }
 
@@ -59,8 +62,10 @@ class ChatNotificationHelper private constructor(context: Context)
         notificationObj.notificationBuilder.setContentTitle(sendFcmChatDTO.chatDTO.userName)
         notificationObj.notificationBuilder.setContentText(sendFcmChatDTO.chatDTO.msg)
         notificationObj.notificationBuilder.setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_baseline_person_24)
-                ?.toBitmap(config = Bitmap.Config.RGB_565))
+                ?.toBitmap(config = Bitmap.Config.ARGB_8888))
         notifyNotification(notificationObj)
+
+        DeviceUtils.wakeLock(context)
     }
 
 }

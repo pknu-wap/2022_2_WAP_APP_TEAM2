@@ -125,7 +125,6 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
             idArr.add(f.friendUserId)
         }
 
-
         firestore.collection(FireStoreNames.calc_rooms.name).document(roomId)
                 .update("participantIds", FieldValue.arrayUnion(*idArr.toArray()))
 

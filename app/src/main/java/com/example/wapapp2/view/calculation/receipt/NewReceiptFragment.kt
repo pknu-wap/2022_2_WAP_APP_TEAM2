@@ -1,8 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
 import android.app.Dialog
-import android.content.res.Resources
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +12,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
@@ -24,11 +20,8 @@ import com.example.wapapp2.commons.classes.DialogSize
 import com.example.wapapp2.commons.classes.LoadingDialogView
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.observer.MyLifeCycleObserver
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
-import com.example.wapapp2.viewmodel.fcm.FcmViewModel
-import java.util.concurrent.atomic.AtomicInteger
 
 
 class NewReceiptFragment : Fragment() {
@@ -38,8 +31,6 @@ class NewReceiptFragment : Fragment() {
     companion object {
         const val TAG = "NewReceiptFragment"
     }
-
-    private val fcmViewModel by viewModels<FcmViewModel>()
 
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
@@ -94,7 +85,7 @@ class NewReceiptFragment : Fragment() {
         newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
             //영수증 추가 FCM전송
             for (receipt in newReceiptViewModel.getReceipts()) {
-                fcmViewModel.sendCalculation(receipt, newReceiptViewModel.calcRoomId!!)
+                newReceiptViewModel.sendNewReceipt(receipt, newReceiptViewModel.calcRoomId!!)
             }
 
             LoadingDialogView.clearDialogs()

@@ -35,7 +35,7 @@ class GrouplistFragment : Fragment() {
     private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
-    var dataObserver : CalcRoomDataObserver? = null
+    var dataObserver: CalcRoomDataObserver? = null
 
     companion object {
         const val TAG = "GrouplistFragment"
@@ -63,9 +63,9 @@ class GrouplistFragment : Fragment() {
         val fragmentManager = requireParentFragment().parentFragmentManager
 
         fragmentManager.beginTransaction()
-            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
-            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
-            .addToBackStack(NewCalcRoomFragment.TAG).commit()
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+                .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
+                .addToBackStack(NewCalcRoomFragment.TAG).commit()
     }
 
 

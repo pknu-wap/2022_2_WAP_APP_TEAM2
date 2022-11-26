@@ -101,14 +101,14 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onStart() {
         super.onStart()
-        FcmRepositoryImpl.unSubscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
         // 방에서 나간 경우 -> 채팅 알림 구독 해제
         if (!currentCalcRoomViewModel.exitFromRoom)
-            FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
 
     }
 

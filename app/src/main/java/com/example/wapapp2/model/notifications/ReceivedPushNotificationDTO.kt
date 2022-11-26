@@ -8,6 +8,8 @@ import kotlinx.parcelize.Parcelize
 data class ReceivedPushNotificationDTO(
         @SerializedName("type")
         val type: NotificationType,
+        @SerializedName("calcRoomId")
+        val calcRoomId: String,
         @SerializedName("data")
         val data: JsonObject,
 )
