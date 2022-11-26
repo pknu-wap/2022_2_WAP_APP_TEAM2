@@ -63,6 +63,7 @@
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/save_btn"
         app:layout_constraintTop_toBottomOf="@id/search_view"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="2"
         tools:listitem="@layout/search_friend_item_view"
         />

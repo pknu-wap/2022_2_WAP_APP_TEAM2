@@ -3,37 +3,44 @@ package com.example.wapapp2.view.calculation.calcroom
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
-import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
+import com.example.wapapp2.model.CalcRoomDTO
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
+import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 
 
 class NewCalcRoomFragment : Fragment() {
-    private var _binding: FragmentNewCalcRoomBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentNewCalcRoomBinding
 
     companion object {
         const val TAG = "NewCalcRoomFragment"
     }
 
-    private val calcRoomViewModel: FriendsViewModel by activityViewModels()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
+    private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
-            OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
+            OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
     private val onRemovedFriendListener: OnRemovedFriendListener =
-            OnRemovedFriendListener { friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, false) }
+            OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
@@ -49,16 +56,68 @@ class NewCalcRoomFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        _binding = FragmentNewCalcRoomBinding.inflate(inflater, container, false)
-        binding.inviteFriendsLayout.searchFriendsList.layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager
-                .VERTICAL, false)
+        binding = FragmentNewCalcRoomBinding.inflate(inflater)
 
-        listAdapterDataObserver = ListAdapterDataObserver(binding.inviteFriendsLayout.searchFriendsList, binding.inviteFriendsLayout
-                .searchFriendsList.layoutManager as LinearLayoutManager, searchFriendsListAdapter)
-        searchFriendsListAdapter.registerAdapterDataObserver(listAdapterDataObserver!!)
+        binding.topAppBar.setNavigationOnClickListener {
+            friendsViewModel.reset()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
 
-        binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
+        binding.inviteFriendsLayout.searchFriendsList.apply {
+            adapter = searchFriendsListAdapter
+
+            listAdapterDataObserver = ListAdapterDataObserver(
+                this,
+                this.layoutManager as LinearLayoutManager,
+                this.adapter!!::getItemCount)
+            listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.empty_friends_list))
+            searchFriendsListAdapter!!.registerAdapterDataObserver(listAdapterDataObserver!!)
+        }
+
+        // 정산방 등록
+        binding.inviteFriendsLayout.saveBtn.setOnClickListener {
+            if (myAccountViewModel.myProfileData == null){
+                Toast.makeText(context, "네트워크 연결을 확인하세요",Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (binding.roomNameEdit.text!!.isEmpty()){
+                Toast.makeText(context, "채팅방 제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (checkedFriendsListAdapter.itemCount <= 0){
+                Toast.makeText(context, "친구를 초대해주세요", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val newCalcRoomDTO : CalcRoomDTO = CalcRoomDTO()
+            newCalcRoomDTO.name = binding.roomNameEdit.text.toString()
+            newCalcRoomDTO.creatorUserId = myAccountViewModel.myProfileData!!.value!!.id
+            newCalcRoomDTO.participantIds = checkedFriendsListAdapter.getParticipantIDs(newCalcRoomDTO.creatorUserId)
+
+            //backstack 막아야합니다.
+
+            myCalcRoomViewModel.addNewCalcRoom(newCalcRoomDTO) {
+                // newRoomAdded Callback -> 생성된 방 열기
+                val fragment = CalcMainFragment()
+                val fragmentManager = parentFragmentManager
+
+                fragment.arguments = Bundle().apply {
+                    putString("roomId", it.id)
+                }
+
+                friendsViewModel.reset()
+                fragmentManager.popBackStack()
+                fragmentManager.beginTransaction()
+                    .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+                    .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
+                    .addToBackStack(CalcMainFragment.TAG).commitAllowingStateLoss()
+
+            }
+        }
+
 
         return binding.root
     }
@@ -66,7 +125,7 @@ class NewCalcRoomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calcRoomViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
+        friendsViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
             if (it.isChecked) {
                 checkedFriendsListAdapter.addItem(it.friendDTO)
             } else {
@@ -74,8 +133,7 @@ class NewCalcRoomFragment : Fragment() {
                 searchFriendsListAdapter.uncheckItem(it.friendDTO)
             }
         }
-
-        calcRoomViewModel.searchResultFriendsLiveData.observe(viewLifecycleOwner) {
+        friendsViewModel.searchResultFriendsLiveData.observe(viewLifecycleOwner) {
             searchFriendsListAdapter.setList(it)
         }
 
@@ -89,14 +147,21 @@ class NewCalcRoomFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                s?.apply { calcRoomViewModel.findFriend(toString()) }
+                s?.apply { friendsViewModel.findFriend(toString()) }
             }
         })
-        calcRoomViewModel.findFriend("")
+        friendsViewModel.findFriend("")
     }
 
+
+    override fun onPause() {
+        checkedFriendsListAdapter.resetItem()
+        super.onPause()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        listAdapterDataObserver?.apply {
+            searchFriendsListAdapter.unregisterAdapterDataObserver(this)
+        }
     }
 }

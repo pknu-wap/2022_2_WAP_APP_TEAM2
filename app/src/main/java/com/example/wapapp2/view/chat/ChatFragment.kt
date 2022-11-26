@@ -243,4 +243,10 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
         binding.newMsgFrame.visibility = View.GONE
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        chatDataObserver?.apply {
+            chatAdapter?.unregisterAdapterDataObserver(this)
+        }
+    }
 }

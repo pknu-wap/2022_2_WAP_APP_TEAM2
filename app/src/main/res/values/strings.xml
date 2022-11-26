@@ -112,6 +112,7 @@
     <string name="count">수량</string>
     <string name="empty_chats">채팅 내역이 없습니다</string>
     <string name="empty_calc_rooms">정산방이 없습니다</string>
+    <string name="empty_friends_list">친구를 추가해보세요</string>
     <string name="adding_receipts">영수증 추가 중</string>
     <string name="success_add_receipts">영수증 추가 완료</string>
     <string name="exit_from_room">정산방에서 나가기</string>

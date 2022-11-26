@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalendarFragmentBinding
 import com.example.wapapp2.view.calculation.CalcMainFragment
-import com.example.wapapp2.view.calculation.GrouplistFragment
 import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
 import com.example.wapapp2.view.calendar.dialog.ReceiptItemClickListener
 import com.example.wapapp2.view.main.MainHostFragment
@@ -55,14 +55,14 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
     ): View? {
         // Inflate the layout for this fragment
         binding = CalendarFragmentBinding.inflate(layoutInflater)
+        binding.calendarRv.layoutManager = object : GridLayoutManager(context,7) { override fun canScrollVertically() = false }
         updateCal()
-
-        //unscrollable 구현 필요
 
         calendarViewModel.myReceiptMap.observe(viewLifecycleOwner){
             updateCal()
         }
 
+        //unscrollable
 
         binding.calendarBtnBack.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.minusMonths(1)

@@ -1,14 +1,9 @@
 package com.example.wapapp2.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.example.wapapp2.commons.interfaces.NewSnapshotListener
-import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
-import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.interfaces.FriendsRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject

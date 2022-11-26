@@ -35,6 +35,8 @@ class GrouplistFragment : Fragment() {
     private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
+    var dataObserver : CalcRoomDataObserver? = null
+
     companion object {
         const val TAG = "GrouplistFragment"
     }
@@ -55,33 +57,15 @@ class GrouplistFragment : Fragment() {
     }
 
 
-    /** Add Group **/
+    /** Add Room **/
     private val addOnClickedItemListener = View.OnClickListener {
-        MaterialAlertDialogBuilder(requireActivity())
-                .setTitle(R.string.add)
-                .setNeutralButton(R.string.new_calculation) { dialog, which ->
-                    //정산 추가
-                    val fragment = NewReceiptFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
+        val fragment = NewCalcRoomFragment()
+        val fragmentManager = requireParentFragment().parentFragmentManager
 
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                            .addToBackStack(NewReceiptFragment.TAG).commit()
-                }.setPositiveButton(R.string.new_calc_room) { dialog, which ->
-                    //정산방 추가
-                    val fragment = NewCalcRoomFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
-
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
-                            .addToBackStack(NewCalcRoomFragment.TAG).commit()
-                }.create().show()
+        fragmentManager.beginTransaction()
+            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
+            .addToBackStack(NewCalcRoomFragment.TAG).commit()
     }
 
 
@@ -116,10 +100,10 @@ class GrouplistFragment : Fragment() {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
                     binding.groupRV.adapter = adapter
-                    val dataObserver = ListAdapterDataObserver(binding.groupRV, binding.groupRV.layoutManager as
+                    dataObserver = CalcRoomDataObserver(binding.groupRV, binding.groupRV.layoutManager as
                             LinearLayoutManager, adapter!!)
-                    dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
-                    adapter!!.registerAdapterDataObserver(dataObserver)
+                    dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
+                    adapter!!.registerAdapterDataObserver(dataObserver!!)
                 } else {
                     adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
                 }
@@ -148,5 +132,9 @@ class GrouplistFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        dataObserver?.apply {
+            adapter!!.unregisterAdapterDataObserver(this)
+        }
+
     }
 }

@@ -29,7 +29,7 @@ class GroupAdapter(
 
         fun bind(calcRoomDTO: CalcRoomDTO) {
             binding.groupItemNames.text = calcRoomDTO.name
-            binding.groupItemState.text = if (calcRoomDTO.calculationStatus.not()) "정산 진행중.." else ""
+            binding.groupItemState.text = if(calcRoomDTO.calculationStatus) "정산 진행중.." else ""
             binding.groupItemDate.text = dateFormat.format(calcRoomDTO.createdTime!!)
 
             binding.root.setOnClickListener {
