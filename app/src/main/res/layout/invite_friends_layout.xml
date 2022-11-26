@@ -60,7 +60,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/save_btn"
         app:layout_constraintTop_toBottomOf="@id/search_view"
