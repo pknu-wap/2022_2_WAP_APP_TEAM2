@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
@@ -18,7 +21,8 @@ import com.example.wapapp2.viewmodel.FriendsViewModel
 
 
 class NewCalcRoomFragment : Fragment() {
-    private lateinit var binding: FragmentNewCalcRoomBinding
+    private var _binding: FragmentNewCalcRoomBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         const val TAG = "NewCalcRoomFragment"
@@ -34,41 +38,27 @@ class NewCalcRoomFragment : Fragment() {
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
 
+    private var listAdapterDataObserver: ListAdapterDataObserver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        checkedFriendsListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                changeViewState()
-            }
-
-            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                super.onItemRangeRemoved(positionStart, itemCount)
-                changeViewState()
-            }
-
-            fun changeViewState() {
-                if (checkedFriendsListAdapter.itemCount == 0) {
-                    binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
-                } else {
-                    binding.inviteFriendsLayout.inviteFriendsList.visibility = View.VISIBLE
-                }
-            }
-        })
     }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentNewCalcRoomBinding.inflate(inflater)
+        _binding = FragmentNewCalcRoomBinding.inflate(inflater, container, false)
+        binding.inviteFriendsLayout.searchFriendsList.layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager
+                .VERTICAL, false)
 
-        binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
+        listAdapterDataObserver = ListAdapterDataObserver(binding.inviteFriendsLayout.searchFriendsList, binding.inviteFriendsLayout
+                .searchFriendsList.layoutManager as LinearLayoutManager, searchFriendsListAdapter)
+        searchFriendsListAdapter.registerAdapterDataObserver(listAdapterDataObserver!!)
+
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
-
-        binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
+        binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
 
         return binding.root
     }
@@ -105,4 +95,8 @@ class NewCalcRoomFragment : Fragment() {
         calcRoomViewModel.findFriend("")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

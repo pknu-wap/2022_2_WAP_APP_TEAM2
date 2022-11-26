@@ -32,7 +32,7 @@
         android:layout_marginLeft="16dp"
         android:labelFor="@id/receipt_count"
         android:text="@string/receipt_count"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@id/receipt_count"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@id/receipt_count"
@@ -45,7 +45,7 @@
         android:layout_marginLeft="8dp"
         android:text="1"
         android:textColor="@color/black"
-        android:textSize="19sp"
+        android:textSize="14sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/view_pager"
         app:layout_constraintLeft_toRightOf="@id/receipt_count_label"
@@ -53,13 +53,17 @@
         app:layout_constraintTop_toBottomOf="@id/topAppBarLayout"
         />
 
-    <Button
+    <TextView
         android:id="@+id/add_receipt_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
         android:text="@string/add_receipt"
+        android:textColor="@color/design_default_color_primary"
         app:layout_constraintBottom_toTopOf="@id/view_pager"
         app:layout_constraintLeft_toRightOf="@id/receipt_count"
         app:layout_constraintRight_toRightOf="parent"

@@ -57,6 +57,9 @@ class NewReceiptViewModel : ViewModel() {
                     }
 
                     if (lastDocumentId.await() != null) {
+                        //ongoingReceiptIds에 추가
+                        receiptRepository.addOngoingReceipt(lastDocumentId.await()!!, calcRoomId)
+
                         //영수증 항목 추가
                         val addProductsResult = async {
                             receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts()
