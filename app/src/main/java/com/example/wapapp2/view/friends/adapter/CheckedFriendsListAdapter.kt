@@ -22,9 +22,7 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
             itemBinding.removeBtn.setOnClickListener {
                 onRemovedFriendListener.onRemoved(friendDTO)
             }
-
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -50,7 +48,11 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
                 break
             }
         }
+    }
 
-
+    fun getParticipantIDs(myId : String) : ArrayList<String>{
+        val result = arrayListOf<String>(myId)
+        friends.forEach { result.add(it.friendUserId) }
+        return result
     }
 }

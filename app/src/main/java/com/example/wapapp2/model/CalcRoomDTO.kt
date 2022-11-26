@@ -30,7 +30,7 @@ data class CalcRoomDTO(
         var name: String,
         @field:JvmField
         @PropertyName("calculationStatus")
-        var calculationStatus: Boolean,
+        var calculationStatus: Boolean,   // true if "정산 완료/ 정산항목 없음", false if "정산진행중.."
         @get:Exclude
         val people: ArrayList<CalcRoomParticipantDTO>,
 ) : Parcelable {
