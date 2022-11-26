@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.repository.ChatRepositorylmpl
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.interfaces.ChatRepository
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
@@ -32,10 +35,10 @@ class ChatViewModel : ViewModel() {
     }
 
 
-    fun sendMsg(chatDTO: ChatDTO, sendMsgOnFailCallback: SendMsgOnFailCallback ){
+    fun sendMsg(chatDTO: ChatDTO, sendMsgOnFailCallback: SendMsgOnFailCallback) {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async { chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO) }
-            if (result.await().not()){
+            if (result.await().not()) {
                 sendMsgOnFailCallback.OnFail()
             }
         }
@@ -60,7 +63,19 @@ class ChatViewModel : ViewModel() {
                 .addSnapshotListener(listener)
     }
 
-    fun interface SendMsgOnFailCallback{
+
+    /**
+     * 새 채팅 내역 알림
+     */
+    fun sendChat(chatDTO: ChatDTO, calcRoomDTO: CalcRoomDTO) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val calcRoomId = calcRoomDTO.id!!
+            val sendFcmChatDTO = SendFcmChatDTO(chatDTO, calcRoomDTO.name, calcRoomId)
+            FcmRepositoryImpl.sendFcmToTopic(NotificationType.Chat, calcRoomId, sendFcmChatDTO)
+        }
+    }
+
+    fun interface SendMsgOnFailCallback {
         fun OnFail()
     }
 }

@@ -18,11 +18,11 @@ import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.view.NewLoadingView
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
-import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentChange
 import kotlinx.coroutines.launch
@@ -40,7 +40,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val fcmViewModel by viewModels<FcmViewModel>()
 
     private var chatDataObserver: ChatDataObserver? = null
 
@@ -55,7 +54,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fcmViewModel.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
+        FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onCreateView(
@@ -174,7 +173,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
                 // 전송
                 chatViewModel.sendMsg(newChat) { Toast.makeText(context, "네트워크 연결을 확인하세요!", Toast.LENGTH_SHORT).show() }
-                fcmViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
+                chatViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
                 //입력 초기화
                 binding.textInputEditText.text?.clear()
             } else {

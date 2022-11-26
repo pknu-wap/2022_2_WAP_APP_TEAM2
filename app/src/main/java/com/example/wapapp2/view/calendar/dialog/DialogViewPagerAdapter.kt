@@ -44,7 +44,6 @@ class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>>
             binding.date.text = copiedDateTime.toString(dateFormat)
             binding.year.text = copiedDateTime.year.toString()
 
-            binding.fab.setOnClickListener {  }
         }
 
         fun clear() {

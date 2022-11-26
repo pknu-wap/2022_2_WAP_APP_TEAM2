@@ -4,6 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
@@ -142,6 +145,19 @@ class NewReceiptViewModel : ViewModel() {
         }
 
         return price.toString()
+    }
+
+
+    /**
+     * 새로운 영수증 추가 알림
+     */
+    fun sendNewReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
+            receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)
+
+            FcmRepositoryImpl.sendFcmToTopic(NotificationType.Receipt, calcRoomId, sendFcmReceiptDTO)
+        }
     }
 
 
