@@ -10,14 +10,17 @@ import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.R
 import com.example.wapapp2.databinding.DutchCheckFragmentBinding
 import com.example.wapapp2.databinding.ViewReceiptItemBinding
 import com.example.wapapp2.databinding.ViewRecentCalcItemBinding
 import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
+import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 import org.joda.time.DateTime
 import java.text.DecimalFormat
@@ -48,6 +51,16 @@ class DutchCheckFragment(onFixOngoingReceipt: OnFixOngoingCallback, onUpdateSumm
                 onFixOngoingReceipt.onFixOngoingReceipt()
             }
         })
+        binding.btnAdd.setOnClickListener {
+            //영수증 추가
+            val fragment = NewReceiptFragment()
+            val fragmentManager = requireParentFragment().parentFragmentManager
+
+            fragmentManager.beginTransaction()
+                .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG) as Fragment)
+                .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
+                .addToBackStack(NewReceiptFragment.TAG).commit()
+        }
 
         return binding.root
     }
