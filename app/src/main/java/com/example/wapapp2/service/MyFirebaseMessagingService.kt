@@ -4,9 +4,11 @@ import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.datastore.FcmTokenDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
 import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
+import com.example.wapapp2.notification.helper.NewCalcRoomNotificationHelper
 import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
@@ -86,7 +88,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * 새로운 정산방 알림
      */
     private fun newCalcRoom(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val notificationHelper = NewCalcRoomNotificationHelper.getINSTANCE(applicationContext)
+        val sendFcmCalcRoomDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmCalcRoomDTO::class.java)
 
-
+        notificationHelper.notifyNotification(applicationContext, sendFcmCalcRoomDTO)
     }
 }

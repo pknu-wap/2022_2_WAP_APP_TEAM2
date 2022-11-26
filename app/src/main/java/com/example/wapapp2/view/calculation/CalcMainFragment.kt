@@ -56,7 +56,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         roomId = if (arguments == null) {
             savedInstanceState?.getString("roomId")
         } else {
-            arguments!!.getString("roomId")!!
+            requireArguments().getString("roomId")!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
@@ -109,7 +109,8 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         // 방에서 나간 경우 -> 채팅 알림 구독 해제
         if (!currentCalcRoomViewModel.exitFromRoom)
             FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
-
+        else
+            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -198,9 +199,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .setMessage(R.string.msg_exit_from_calc_room)
                     .setPositiveButton(R.string.exit) { dialog, which ->
                         dialog.dismiss()
-                        if(currentCalcRoomViewModel.calcRoom.value!!.calculationStatus)
-                            Toast.makeText(context,"진행중인 정산이 존재합니다!",Toast.LENGTH_SHORT).show()
-                        else{
+                        if (currentCalcRoomViewModel.calcRoom.value!!.calculationStatus)
+                            Toast.makeText(context, "진행중인 정산이 존재합니다!", Toast.LENGTH_SHORT).show()
+                        else {
                             currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }

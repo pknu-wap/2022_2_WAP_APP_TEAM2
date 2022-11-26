@@ -55,7 +55,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
-
     }
 
     override fun onCreateView(

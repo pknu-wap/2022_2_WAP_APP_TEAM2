@@ -1,6 +1,7 @@
 package com.example.wapapp2.notification.helper
 
 import android.content.Context
+import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -36,6 +37,7 @@ class ReceiptNotificationHelper private constructor(context: Context)
         notificationObj.notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
         notificationObj.notificationBuilder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notificationObj.notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        notificationObj.notificationBuilder.setAutoCancel(true)
         return notificationObj
     }
 
@@ -84,6 +86,14 @@ class ReceiptNotificationHelper private constructor(context: Context)
 
         notificationObj.notificationBuilder.setCustomContentView(collapsedRemoteViews)
         notificationObj.notificationBuilder.setCustomBigContentView(expandedRemoteViews)
+
+
+        val arguments = Bundle().apply {
+            putParcelable("notificationType", NotificationType.Receipt)
+            putString("calcRoomId", sendFcmReceiptDTO.roomId)
+        }
+
+        notificationObj.notificationBuilder.setContentIntent(createActivityIntent(context, arguments))
         notifyNotification(notificationObj)
 
         DeviceUtils.wakeLock(context)
