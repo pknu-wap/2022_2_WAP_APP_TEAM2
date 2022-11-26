@@ -38,19 +38,12 @@ open class ListAdapterDataObserver(
 
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
         super.onItemRangeInserted(positionStart, itemCount)
-        val count = iAdapterItemCount.getAdapterItemCount()
-        val lastVisiblePosition =
-                if (manager.reverseLayout) manager.findFirstCompletelyVisibleItemPosition()
-                else manager.findLastCompletelyVisibleItemPosition()
-        val loading = lastVisiblePosition == RecyclerView.NO_POSITION
 
-        val atBottom = if (manager.reverseLayout)
-            lastVisiblePosition == 0
-        else
-            positionStart >= count - 1 && lastVisiblePosition == positionStart - 1
+        val loading = isLoading()
+        val atBottom = atBottom(positionStart)
 
         if (loading || atBottom)
-            recycler.scrollToPosition(if (manager.reverseLayout) 0 else positionStart)
+            scrollToBottom(positionStart)
 
         onChangedList()
     }
@@ -64,6 +57,10 @@ open class ListAdapterDataObserver(
         super.onItemRangeMoved(fromPosition, toPosition, itemCount)
     }
 
+    /**
+     * 리스트가 비어있으면 메시지 표시하고 리스트 숨김
+     * 비어있지 않으면 리스트 표시
+     */
     protected fun onChangedList() {
         loadingView?.apply {
             if (iAdapterItemCount.getAdapterItemCount() > 0)
@@ -73,7 +70,29 @@ open class ListAdapterDataObserver(
         }
     }
 
-    protected fun onItemRangeInserted_super(positionStart: Int, itemCount: Int){
-        super.onItemRangeInserted(positionStart, itemCount)
+
+    fun atBottom(positionStart: Int): Boolean {
+        val count = iAdapterItemCount.getAdapterItemCount()
+        val lastVisiblePosition =
+                if (manager.reverseLayout) manager.findFirstCompletelyVisibleItemPosition()
+                else manager.findLastCompletelyVisibleItemPosition()
+
+        return if (manager.reverseLayout)
+            lastVisiblePosition == 0
+        else
+            positionStart >= count - 1 && lastVisiblePosition == positionStart - 1
     }
+
+    fun isLoading(): Boolean {
+        val lastVisiblePosition =
+                if (manager.reverseLayout) manager.findFirstCompletelyVisibleItemPosition()
+                else manager.findLastCompletelyVisibleItemPosition()
+        return lastVisiblePosition == RecyclerView.NO_POSITION
+    }
+
+    fun scrollToBottom(positionStart: Int) {
+        recycler.scrollToPosition(if (manager.reverseLayout) 0 else positionStart)
+    }
+
+
 }

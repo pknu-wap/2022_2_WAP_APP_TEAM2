@@ -82,15 +82,15 @@ class ChatPagingAdapter(
 
 
     override fun getAdapterItemCount(): Int = itemCount
+
     override fun checkLastMessageMine(): Boolean {
-        if(itemCount > 0){
-            return getLastChatDTO().senderId == myId
-        }
-        else return false
+        return if (itemCount > 0) {
+            getLastChatDTO().senderId == myId
+        } else false
     }
 
-    public fun getLastChatDTO() : ChatDTO {
-        return getItem(itemCount-1)!!.toObject(ChatDTO::class.java)!!
+    fun getLastChatDTO(): ChatDTO {
+        return getItem(0)!!.toObject(ChatDTO::class.java)!!
     }
 
 }
