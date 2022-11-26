@@ -3,6 +3,7 @@ package com.example.wapapp2.view.calculation.calcroom
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -58,6 +59,7 @@ class NewCalcRoomFragment : Fragment() {
         binding = FragmentNewCalcRoomBinding.inflate(inflater)
 
         binding.topAppBar.setNavigationOnClickListener {
+            friendsViewModel.reset()
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
@@ -106,6 +108,7 @@ class NewCalcRoomFragment : Fragment() {
                     putString("roomId", it.id)
                 }
 
+                friendsViewModel.reset()
                 fragmentManager.popBackStack()
                 fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
@@ -150,6 +153,11 @@ class NewCalcRoomFragment : Fragment() {
         friendsViewModel.findFriend("")
     }
 
+
+    override fun onPause() {
+        checkedFriendsListAdapter.resetItem()
+        super.onPause()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         listAdapterDataObserver?.apply {

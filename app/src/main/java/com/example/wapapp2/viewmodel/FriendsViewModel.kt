@@ -148,10 +148,13 @@ class FriendsViewModel : ViewModel() {
                     }
                 }
             }
-
-
         }
     }
+
+    fun reset(){
+        friendsListLiveData.value = arrayListOf()
+    }
+
 
     data class FriendCheckDTO(val isChecked: Boolean, val friendDTO: FriendDTO)
 }
