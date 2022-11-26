@@ -3,12 +3,11 @@ package com.example.wapapp2.view.calculation.calcroom
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
@@ -38,9 +37,9 @@ class NewCalcRoomFragment : Fragment() {
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
-            OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
+            OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
     private val onRemovedFriendListener: OnRemovedFriendListener =
-            OnRemovedFriendListener { friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, false) }
+            OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
@@ -66,12 +65,12 @@ class NewCalcRoomFragment : Fragment() {
         binding.inviteFriendsLayout.searchFriendsList.apply {
             adapter = searchFriendsListAdapter
 
-            val dataObserver = ListAdapterDataObserver(
+            listAdapterDataObserver = ListAdapterDataObserver(
                 this,
                 this.layoutManager as LinearLayoutManager,
                 this.adapter!!::getItemCount)
-            dataObserver.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.empty_friends_list))
-            searchFriendsListAdapter!!.registerAdapterDataObserver(dataObserver)
+            listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.empty_friends_list))
+            searchFriendsListAdapter!!.registerAdapterDataObserver(listAdapterDataObserver!!)
         }
 
         // 정산방 등록
@@ -123,7 +122,7 @@ class NewCalcRoomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calcRoomViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
+        friendsViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
             if (it.isChecked) {
                 checkedFriendsListAdapter.addItem(it.friendDTO)
             } else {
@@ -153,6 +152,8 @@ class NewCalcRoomFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        listAdapterDataObserver?.apply {
+            searchFriendsListAdapter.unregisterAdapterDataObserver(this)
+        }
     }
 }
