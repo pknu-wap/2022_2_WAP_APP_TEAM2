@@ -43,11 +43,10 @@
         android:layout_marginLeft="8dp"
         android:text="0원"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBaseline_toBaselineOf="@id/total_money_label"
         app:layout_constraintLeft_toRightOf="@id/total_money_label"
         />
-
 
 
     <TextView
@@ -67,7 +66,7 @@
         android:layout_marginLeft="8dp"
         android:text="1"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBaseline_toBaselineOf="@id/receipt_count_label"
         app:layout_constraintLeft_toRightOf="@id/receipt_count_label"
         />
@@ -75,10 +74,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/receipt_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="12dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/save_btn"
         app:layout_constraintTop_toBottomOf="@id/barrier1"
         />

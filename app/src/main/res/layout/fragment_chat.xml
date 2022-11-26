@@ -20,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/chat_msg_item_sended"
         />
+
     <com.example.wapapp2.commons.view.NewLoadingView
         android:id="@+id/loading_view"
         android:layout_width="match_parent"
@@ -30,35 +31,35 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/new_msg_frame"
-        android:padding="5dp"
-        android:background="@color/white"
-        app:layout_constraintBottom_toTopOf="@id/text_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:padding="5dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/text_input_layout"
         >
+
         <TextView
-            app:layout_constraintBottom_toBottomOf="parent"
             android:id="@+id/new_msg_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="newMSg"
             android:background="@drawable/chat_msg_bubble_left"
-            android:backgroundTint="#226200EE"
+            android:backgroundTint="#3B6200EE"
             android:padding="5dp"
+            android:text="newMSg"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <ImageView
             android:layout_width="13dp"
             android:layout_height="13dp"
-            android:src="@drawable/ic_back"
+            android:layout_marginRight="10dp"
             android:rotation="270"
 
-            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginRight="10dp"
-
+            app:layout_constraintTop_toTopOf="parent"
             />
 
 

@@ -1,19 +1,11 @@
 package com.example.wapapp2.view.calendar.dialog
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.DialogCalculationItemBinding
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
-import com.example.wapapp2.repository.interfaces.FriendsLocalRepository
-import com.example.wapapp2.view.calculation.CalcMainFragment
-import com.example.wapapp2.view.main.MainHostFragment
 import org.joda.time.DateTime
 
 class ReceiptListForADayAdapter(private val list: ArrayList<ReceiptDTO>, val receiptItemClickListener: ReceiptItemClickListener) : RecyclerView.Adapter<ReceiptListForADayAdapter.ViewHolder>() {

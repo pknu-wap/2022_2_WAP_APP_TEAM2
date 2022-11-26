@@ -49,8 +49,7 @@ data class ReceiptDTO(
 
         @get:Exclude
         public val date: DateTime = DateTime.now(),
-
-        ) : Parcelable {
+) : Parcelable {
     constructor() : this("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
@@ -58,8 +57,8 @@ data class ReceiptDTO(
         totalMoney += receiptProductDTO.price
     }
 
+    @get:Exclude
     var roomID: String? = null
-
 
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList

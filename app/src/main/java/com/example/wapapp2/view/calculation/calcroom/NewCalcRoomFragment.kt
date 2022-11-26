@@ -38,15 +38,18 @@ class NewCalcRoomFragment : Fragment() {
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
-            OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
+            OnCheckedFriendListener { isChecked, friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, isChecked) }
     private val onRemovedFriendListener: OnRemovedFriendListener =
-            OnRemovedFriendListener { friendDTO -> friendsViewModel.checkedFriend(friendDTO, false) }
+            OnRemovedFriendListener { friendDTO -> calcRoomViewModel.checkedFriend(friendDTO, false) }
 
     private val searchFriendsListAdapter: SearchFriendsListAdapter = SearchFriendsListAdapter(onCheckedFriendListener)
     private val checkedFriendsListAdapter: CheckedFriendsListAdapter = CheckedFriendsListAdapter(onRemovedFriendListener)
 
+    private var listAdapterDataObserver: ListAdapterDataObserver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -120,7 +123,7 @@ class NewCalcRoomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        friendsViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
+        calcRoomViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
             if (it.isChecked) {
                 checkedFriendsListAdapter.addItem(it.friendDTO)
             } else {
@@ -148,4 +151,8 @@ class NewCalcRoomFragment : Fragment() {
         friendsViewModel.findFriend("")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
