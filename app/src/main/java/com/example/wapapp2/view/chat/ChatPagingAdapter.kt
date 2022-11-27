@@ -61,8 +61,9 @@ class ChatPagingAdapter(
             binding.userName.text = model.userName
         }
 
+        // for reverse
         private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
-            return if (currentPosition - 1 < 0) false else getItem(currentPosition - 1)?.get("senderId") == userId
+            return if (currentPosition >= itemCount) false else getItem(currentPosition + 1)?.get("senderId") == userId
         }
     }
 
