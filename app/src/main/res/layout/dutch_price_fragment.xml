@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:paddingVertical="5dp"
         >
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:background="@drawable/bg_btn"
 
             android:id="@+id/btn_calc_done"
@@ -42,7 +42,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:background="@drawable/bg_btn"
 
             android:id="@+id/btn_calc_add"

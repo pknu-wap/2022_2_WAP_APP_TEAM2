@@ -19,23 +19,64 @@
         android:id="@+id/description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/sep_line"
         android:layout_marginTop="8dp"
         android:text="[ Title ] - 결제자"
-        android:textStyle="italic"
         android:textSize="14sp"
-        android:layout_below="@id/sep_line"
-        />
+        android:textStyle="italic" />
+
+    <LinearLayout
+        android:id="@+id/item_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description"
+        android:weightSum="7"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="항목"
+            android:textSize="12sp"
+            android:textColor="#8C8C8C" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="총금액"
+            android:textSize="12sp"
+            android:textColor="#8C8C8C"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="예상 금액"
+            android:layout_weight="1.5"
+            android:textSize="12sp"
+            android:textColor="#8C8C8C"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="선택 인원"
+            android:textColor="#8C8C8C"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recent_calc_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/item_description"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:layout_below="@id/description"
-        tools:listitem="@layout/view_recent_calc_item"
         tools:itemCount="3"
-        />
+        tools:listitem="@layout/view_recent_calc_item" />
 
 
     <TextView
