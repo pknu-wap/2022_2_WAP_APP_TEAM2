@@ -42,7 +42,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    /** 토큰 생성시 서버에 등록 과정 필요 **/
+    /** 토큰 변경 시 서버에 토큰 변경 등록 **/
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         CoroutineScope(Dispatchers.IO).launch {

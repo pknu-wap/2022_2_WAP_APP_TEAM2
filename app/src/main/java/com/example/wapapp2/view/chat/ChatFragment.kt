@@ -54,13 +54,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.chatList)
 
@@ -184,10 +180,17 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onStart() {
         super.onStart()
+        //채팅방이 화면에 띄워진 상태 -> 알림 구독 해제
+        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -214,8 +217,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
         chatAdapter?.getLastChatDTO()?.apply {
             val alias = if (currentCalcRoomViewModel.participantMap.containsKey(senderId))
                 currentCalcRoomViewModel.participantMap[senderId]!!.userName
-            else
-                userName
+            else userName
 
             val msg = "$alias : $msg"
             binding.newMsgTv.text = msg
@@ -235,7 +237,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
                 chatDataObserver?.scrollToBottom(0)
                 resetNewMsgView()
             }
-
         }
 
     }
