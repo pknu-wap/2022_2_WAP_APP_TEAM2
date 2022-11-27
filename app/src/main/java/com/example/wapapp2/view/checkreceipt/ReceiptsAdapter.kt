@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.commons.interfaces.ListOnLongClickListener
@@ -40,7 +41,7 @@ class ReceiptsAdapter(
         fun bind(receiptDTO: ReceiptDTO) {
             binding.receiptDate.text = simpleDateFormat.format(receiptDTO.createdTime!!)
             binding.receiptTitle.text = receiptDTO.name
-            binding.receiptAmount.text = receiptDTO.totalMoney.toString().toEditable()
+            binding.totalMoney.text = DataTypeConverter.toKRW(receiptDTO.totalMoney)
 
             if (receiptDTO.imgUrl.isNullOrEmpty()) {
                 Glide.with(binding.root).clear(binding.receiptImage)
@@ -50,7 +51,7 @@ class ReceiptsAdapter(
             }
 
             binding.root.setOnClickListener {
-                Toast.makeText(binding.root.context, "총 금액 : ${receiptDTO.totalMoney}\n영수증 이름 : ${receiptDTO.name})", Toast
+                Toast.makeText(binding.root.context, "총 금액 : ${receiptDTO.totalMoney}\n영수증 이름 : ${receiptDTO.name}", Toast
                         .LENGTH_SHORT
                 ).show()
 
@@ -71,7 +72,6 @@ class ReceiptsAdapter(
         holder.bind(model)
     }
 
-    override fun getAdapterItemCount(): Int {
-        return itemCount
-    }
+    override fun getAdapterItemCount(): Int = itemCount
+
 }

@@ -4,11 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import org.joda.time.DateTime
 
 class NewReceiptViewModel : ViewModel() {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -20,6 +22,7 @@ class NewReceiptViewModel : ViewModel() {
     val addReceiptResult = MutableLiveData<Boolean>()
 
     var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
+    lateinit var myName: String
 
     fun removeProduct(receiptId: String, receiptProductDTO: ReceiptProductDTO): Int {
         try {
@@ -57,9 +60,13 @@ class NewReceiptViewModel : ViewModel() {
                     }
 
                     if (lastDocumentId.await() != null) {
+                        //ongoingReceiptIds에 추가
+                        receiptRepository.addOngoingReceipt(lastDocumentId.await()!!, calcRoomId)
+
                         //영수증 항목 추가
                         val addProductsResult = async {
-                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts(), calcRoomId)
+                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts()
+                                    .toMutableList(), calcRoomId)
                         }
 
                         addProductsResult.await()
@@ -90,11 +97,12 @@ class NewReceiptViewModel : ViewModel() {
     fun addReceipt(receiptId: String) {
         receiptMap[receiptId] = ReceiptDTO().apply {
             id = receiptId
+            payersName = myName
         }
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0)
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0, mutableListOf())
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }
@@ -137,6 +145,19 @@ class NewReceiptViewModel : ViewModel() {
         }
 
         return price.toString()
+    }
+
+
+    /**
+     * 새로운 영수증 추가 알림
+     */
+    fun sendNewReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
+            receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)
+
+            FcmRepositoryImpl.sendFcmToTopic(NotificationType.Receipt, calcRoomId, sendFcmReceiptDTO)
+        }
     }
 
 

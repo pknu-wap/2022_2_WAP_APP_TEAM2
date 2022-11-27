@@ -65,10 +65,17 @@ class InviteFriendsFragment : Fragment() {
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
 
+        //처음 화면 실행 시에는 선택된 친구 목록 레이아웃 숨김
+        binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
+
         listAdapterDataObserver = ListAdapterDataObserver(binding.inviteFriendsLayout.searchFriendsList, binding.inviteFriendsLayout
                 .searchFriendsList.layoutManager as LinearLayoutManager, searchFriendsListAdapter)
         listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.no_search_results_found))
         searchFriendsListAdapter.registerAdapterDataObserver(listAdapterDataObserver!!)
+
+        binding.topAppBar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
 
         return binding.root
     }
@@ -79,9 +86,13 @@ class InviteFriendsFragment : Fragment() {
         friendsViewModel.friendCheckedLiveData.observe(viewLifecycleOwner) {
             if (it.isChecked) {
                 checkedFriendsListAdapter.addItem(it.friendDTO)
+                binding.inviteFriendsLayout.inviteFriendsList.visibility = View.VISIBLE
             } else {
                 checkedFriendsListAdapter.removeItem(it.friendDTO)
                 searchFriendsListAdapter.uncheckItem(it.friendDTO)
+
+                if (checkedFriendsListAdapter.itemCount == 0)
+                    binding.inviteFriendsLayout.inviteFriendsList.visibility = View.GONE
             }
         }
 
@@ -120,5 +131,4 @@ class InviteFriendsFragment : Fragment() {
         _binding = null
     }
 
-    fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
 }

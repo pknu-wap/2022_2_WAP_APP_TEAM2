@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -43,11 +44,10 @@
         android:layout_marginLeft="8dp"
         android:text="0원"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBaseline_toBaselineOf="@id/total_money_label"
         app:layout_constraintLeft_toRightOf="@id/total_money_label"
         />
-
 
 
     <TextView
@@ -67,7 +67,7 @@
         android:layout_marginLeft="8dp"
         android:text="1"
         android:textColor="@color/black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBaseline_toBaselineOf="@id/receipt_count_label"
         app:layout_constraintLeft_toRightOf="@id/receipt_count_label"
         />
@@ -81,7 +81,8 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/save_btn"
         app:layout_constraintTop_toBottomOf="@id/barrier1"
-        />
+        app:layout_constraintVertical_bias="0.75"
+        tools:layout_editor_absoluteX="16dp" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
@@ -97,5 +98,5 @@
         android:layout_height="wrap_content"
         android:text="@string/add_receipt"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        tools:layout_editor_absoluteX="16dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

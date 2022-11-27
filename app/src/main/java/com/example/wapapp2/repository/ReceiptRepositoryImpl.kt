@@ -39,6 +39,10 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
 
+    /**
+     * 영수증 추가
+     * 추가 하면서 calcRoom문서의 ongoingReceiptIds에 id 추가 필요
+     */
     override suspend fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
@@ -49,21 +53,29 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    override suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+        val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId)
+
+        calcRoomDocument.update("ongoingReceiptIds", FieldValue.arrayUnion(receiptId)).addOnCompleteListener {
+            continuation.resume(it.isSuccessful)
+        }
+    }
+
     override suspend fun addProducts(
-            documentId: String, productsList: ArrayList<ReceiptProductDTO>, calcRoomId: String,
+            receiptId: String, productsList: MutableList<ReceiptProductDTO>, calcRoomId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val writeBatch = fireStore.batch()
 
         for (receiptProduct in productsList) {
             writeBatch.set(fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name)
-                    .document(documentId).collection(FireStoreNames.products.name).document(), receiptProduct)
+                    .document(receiptId).collection(FireStoreNames.products.name).document(), receiptProduct)
         }
 
         writeBatch.commit().addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
-
     }
 
     override suspend fun getLastDocumentId(calcRoomId: String) = suspendCoroutine<String?> { continuation ->
@@ -80,37 +92,63 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun modifyReceipt(map: HashMap<String, Any?>, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+    override suspend fun modifyReceipt(
+            map: MutableMap<String, Any?>, calcRoomId: String,
+            receiptId: String,
+    ) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
-        receiptCollection.document().update(map).addOnCompleteListener { continuation.resume(it.isSuccessful) }
-    }
-
-    override suspend fun deleteReceipt(calcRoomId: String, receiptId: String) = suspendCoroutine<Boolean> { continuation ->
-        val receiptDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
-
-        receiptDocument.delete().addOnCompleteListener {
+        receiptCollection.document(receiptId).update(map.toMap()).addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
 
-    override suspend fun modifyProducts(
-            productMapList: ArrayList<HashMap<String, Any?>>,
-            calcRoomId: String,
+    /**
+     * 영수증 삭제 -> calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
+     */
+    override suspend fun removeReceipt(calcRoomId: String, receiptId: String) {
+        // 영수증 문서 삭제
+        fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).delete()
+
+        // calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
+        fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId)
+                .update(FieldPath.of("endReceiptIds", "ongoingReceiptIds"), FieldValue.arrayRemove(receiptId))
+    }
+
+
+    override suspend fun removeProducts(
+            calcRoomId: String, receiptId: String,
+            removeIds: MutableList<String>,
     ) = suspendCoroutine<Boolean> { continuation ->
         val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
 
         fireStore.runBatch { batch ->
-            for (map in productMapList) {
-                val id = map["id"].toString()
-                map.remove("id")
+            for (removeId in removeIds) {
+                batch.delete(collection.document(removeId))
+            }
+        }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
 
-                batch.update(collection.document(id), map)
+    }
+
+    override suspend fun modifyProducts(
+            productMap: MutableMap<String, ReceiptProductDTO>, calcRoomId: String, receiptId: String,
+    ) = suspendCoroutine<Boolean> { continuation ->
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+
+        fireStore.runBatch { batch ->
+            for (product in productMap) {
+                batch.set(collection.document(product.key), product.value)
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
+
 
     override suspend fun getReceipts(calcRoomId: String) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)

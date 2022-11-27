@@ -71,21 +71,15 @@
     <string name="edied_my_bank_account">내 계좌 정보가 수정되었습니다</string>
 
 
-    <string name="calc_notification_channel_name">정산정보</string>
-    <string name="calc_notification_channel_id">100</string>
-    <string name="calc_notification_channel_description">정산과 관련된 정보를 알립니다.</string>
-
-    <string name="calc_room_notification_channel_name">정산방</string>
-    <string name="calc_room_notification_channel_id">200</string>
-    <string name="calc_room_notification_channel_description">정산방 생성 시 알립니다.</string>
+    <string name="new_calc_room_notification_channel_name">정산방 초대</string>
+    <string name="new_calc_room_notification_channel_description">정산방에 초대되었음을 알립니다.</string>
 
     <string name="chat_notification_channel_name">채팅</string>
-    <string name="chat_notification_channel_id">300</string>
     <string name="chat_notification_channel_description">채팅 내용을 표시합니다.</string>
 
     <string name="receipt_notification_channel_name">영수증</string>
-    <string name="receipt_notification_channel_id">400</string>
     <string name="receipt_notification_channel_description">영수증 추가 시 알립니다.</string>
+
     <string name="added_new_receipt">정산에 참여해주세요!</string>
     <string name="payer">결제자</string>
     <string name="invite_friends">친구 초대</string>
@@ -112,6 +106,7 @@
     <string name="count">수량</string>
     <string name="empty_chats">채팅 내역이 없습니다</string>
     <string name="empty_calc_rooms">정산방이 없습니다</string>
+    <string name="empty_friends_list">친구를 추가해보세요</string>
     <string name="adding_receipts">영수증 추가 중</string>
     <string name="success_add_receipts">영수증 추가 완료</string>
     <string name="exit_from_room">정산방에서 나가기</string>
@@ -127,5 +122,6 @@
     <string name="remove_receipt">영수증 삭제</string>
     <string name="unit_price">단가</string>
     <string name="product_name">항목</string>
+    <string name="invited_to_new_calc_room">정산방에 초대되었습니다.</string>
 
 </resources>

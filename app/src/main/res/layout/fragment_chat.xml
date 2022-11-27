@@ -29,6 +29,42 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/new_msg_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="5dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/text_input_layout"
+        >
+
+        <TextView
+            android:id="@+id/new_msg_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chat_msg_bubble_left"
+            android:backgroundTint="#3B6200EE"
+            android:padding="5dp"
+            android:text="newMSg"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginRight="10dp"
+            android:rotation="270"
+
+            android:src="@drawable/ic_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_layout"
         android:layout_width="match_parent"

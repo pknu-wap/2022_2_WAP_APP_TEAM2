@@ -10,7 +10,7 @@ import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.ReceiptDTO
 import org.joda.time.DateTime
 
-class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>> ,beginDateText: String, context: Context) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
+class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>> ,beginDateText: String, context: Context, val receiptItemClickListener: ReceiptItemClickListener) : RecyclerView.Adapter<DialogViewPagerAdapter.ViewHolder>
 () {
     private val layoutInflater: LayoutInflater
     private val dateFormat = "MM.dd E요일"
@@ -37,14 +37,13 @@ class DialogViewPagerAdapter(val hashMap: HashMap<String, ArrayList<ReceiptDTO>>
             copiedDateTime = DateTime.parse(beginDate.toString())
             copiedDateTime = copiedDateTime.plusDays(position - FIRST_VIEW_PAGER_POSITION)
 
-            receiptListAdapter = ReceiptListForADayAdapter(ArrayList (hashMap[copiedDateTime.toString("yyyyMMdd")] ?: listOf() ))
+            receiptListAdapter = ReceiptListForADayAdapter(ArrayList (hashMap[copiedDateTime.toString("yyyyMMdd")] ?: listOf() ), receiptItemClickListener)
             binding.receiptList.adapter = receiptListAdapter
 
 
             binding.date.text = copiedDateTime.toString(dateFormat)
             binding.year.text = copiedDateTime.year.toString()
 
-            binding.fab.setOnClickListener {  }
         }
 
         fun clear() {

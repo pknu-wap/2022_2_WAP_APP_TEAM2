@@ -9,6 +9,9 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.notifications.MultipleRecipientsPushNotificationDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
@@ -131,9 +134,9 @@ class CurrentCalcRoomViewModel : ViewModel() {
         //방 나가기
         //calcRoom문서 내 participantIds에서 내 id삭제
         exitFromRoom = true
-        FcmRepositoryImpl.unSubscribeToCalcRoomChat(roomId)
+        FcmRepositoryImpl.unSubscribeToCalcRoom(roomId)
 
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
             userRepository.removeCalcRoomId(roomId)
             calcRoomRepository.exitFromCalcRoom(roomId)
@@ -142,10 +145,36 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     fun inviteFriends(list: MutableList<FriendDTO>, roomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result = async { calcRoomRepository.inviteFriends(list, roomId) }
-            result.await()
+            //선택된 친구들의 fcm토큰 가져오기
+            val ids = mutableListOf<String>()
+            for (f in list) {
+                ids.add(f.friendUserId)
+            }
 
+            val usersResult = async {
+                userRepository.getUsers(ids)
+            }
+            usersResult.await()
+
+            val tokens = mutableListOf<String>()
+            val users = usersResult.await()
+
+            for (user in users) {
+                tokens.add(user.fcmToken)
+            }
+
+            calcRoomRepository.inviteFriends(list, roomId)
             //초대받은 친구들에게 초대 알림 보내기
+            sendNewCalcRoomFcm(roomId, tokens)
         }
     }
+
+    /**
+     * 정산방 초대 알림
+     */
+    private suspend fun sendNewCalcRoomFcm(calcRoomId: String, recipientTokens: MutableList<String>) {
+        FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.NewCalcRoom, recipientTokens, SendFcmCalcRoomDTO(calcRoomId))
+    }
+
+
 }

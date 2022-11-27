@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 
 
 import androidx.core.content.ContextCompat.getColor
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
+import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
@@ -30,6 +32,7 @@ import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import java.text.DecimalFormat
+import java.util.*
 
 
 class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
@@ -55,7 +58,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         roomId = if (arguments == null) {
             savedInstanceState?.getString("roomId")
         } else {
-            arguments!!.getString("roomId")!!
+            requireArguments().getString("roomId")!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
@@ -74,6 +77,11 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
+
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
+            binding.topAppBar.title = it.name
+            binding.roomTitle.text = it.name
+        }
 
         val chatFragment = ChatFragment()
         chatFragment.setViewHeightCallback { height ->
@@ -100,15 +108,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onStart() {
         super.onStart()
-        FcmRepositoryImpl.unSubscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
-        // 방에서 나간 경우 -> 채팅 알림 구독 해제
-        if (!currentCalcRoomViewModel.exitFromRoom)
-            FcmRepositoryImpl.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
-
     }
 
     override fun onDestroyView() {
@@ -197,12 +200,15 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .setMessage(R.string.msg_exit_from_calc_room)
                     .setPositiveButton(R.string.exit) { dialog, which ->
                         dialog.dismiss()
-                        currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                        if (currentCalcRoomViewModel.calcRoom.value!!.calculationStatus)
+                            Toast.makeText(context, "진행중인 정산이 존재합니다!", Toast.LENGTH_SHORT).show()
+                        else {
+                            currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
                     }.setNegativeButton(R.string.close) { dialog, which ->
                         dialog.dismiss()
                     }.create().show()
-
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()

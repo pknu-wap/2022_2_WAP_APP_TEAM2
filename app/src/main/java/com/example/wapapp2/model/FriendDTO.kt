@@ -15,6 +15,9 @@ data class FriendDTO(
         var friendUserId: String,
         @PropertyName("alias")
         var alias: String,
+
+        @PropertyName("email")
+        var email: String,
 ) : Parcelable {
-    constructor() : this("", "")
+    constructor() : this("", "", "")
 }

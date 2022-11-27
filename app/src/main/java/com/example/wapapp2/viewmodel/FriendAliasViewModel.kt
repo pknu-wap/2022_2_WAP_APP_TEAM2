@@ -13,12 +13,12 @@ class FriendAliasViewModel : ViewModel() {
     private val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
     var friendDTO: FriendDTO? = null
 
-    fun setAliasToMyFriend(alias: String, friendId: String) {
+    fun setAliasToMyFriend(alias: String, friendId: String, email: String) {
         CoroutineScope(Dispatchers.IO).launch {
             //서버에 저장
             friendsRepositoryImpl.setAliasToMyFriend(alias, friendId)
             //로컬에 저장
-            friendsLocalRepository.update(FriendDTO(friendId, alias))
+            friendsLocalRepository.update(FriendDTO(friendId, alias, email))
         }
     }
 }

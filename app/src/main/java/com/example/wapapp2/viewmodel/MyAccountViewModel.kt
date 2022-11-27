@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.UserRepositoryImpl
@@ -19,7 +20,7 @@ class MyAccountViewModel : ViewModel() {
     val myProfileData = MutableLiveData<UserDTO>()
 
     fun initMyProfile() {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val result = async {
                 userRepositoryImpl.getUser(auth.currentUser!!.uid)
             }
@@ -28,5 +29,33 @@ class MyAccountViewModel : ViewModel() {
                 myProfileData.value = result.await()
             }
         }
+    }
+
+    fun checkFcmToken() {
+        CoroutineScope(Dispatchers.IO).launch {
+            MyDataStore.getINSTANCE().checkFcmToken()
+        }
+    }
+
+    fun init() {
+        initMyProfile()
+        checkFcmToken()
+    }
+
+    /**
+     * 로그인 여부 확인
+     * 로그인 된 상태 -> true
+     * else -> false
+     **/
+    fun onSignIn(): Boolean {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null)
+            init()
+
+        return auth.currentUser != null
+    }
+
+    fun signIn() {
+
     }
 }

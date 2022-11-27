@@ -1,11 +1,13 @@
 package com.example.wapapp2.view.friends.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.databinding.CheckedFriendItemviewBinding
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
+import okhttp3.internal.notify
 
 class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFriendListener) :
         RecyclerView.Adapter<CheckedFriendsListAdapter.ViewHolder>() {
@@ -22,9 +24,7 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
             itemBinding.removeBtn.setOnClickListener {
                 onRemovedFriendListener.onRemoved(friendDTO)
             }
-
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -50,7 +50,11 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
                 break
             }
         }
+    }
 
-
+    fun getParticipantIDs(myId : String) : ArrayList<String>{
+        val result = arrayListOf<String>(myId)
+        friends.forEach { result.add(it.friendUserId) }
+        return result
     }
 }

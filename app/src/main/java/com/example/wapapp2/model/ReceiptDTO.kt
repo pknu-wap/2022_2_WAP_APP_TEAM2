@@ -23,13 +23,17 @@ data class ReceiptDTO(
         @PropertyName("createdTime")
         var createdTime: Date? = null,
         @PropertyName("imgUrl")
-        var imgUrl: String?,
+        var imgUrl: String,
         @get:Exclude
         var imgUriInMyPhone: Uri?,
         @PropertyName("name")
         var name: String,
         @PropertyName("payersId")
         var payersId: String,
+
+        @PropertyName("payersName")
+        var payersName: String,
+
         @field:JvmField
         @PropertyName("status")
         var status: Boolean,
@@ -45,14 +49,16 @@ data class ReceiptDTO(
 
         @get:Exclude
         public val date: DateTime = DateTime.now(),
-
-        ) : Parcelable {
-    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now())
+) : Parcelable {
+    constructor() : this("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)
         totalMoney += receiptProductDTO.price
     }
+
+    @get:Exclude
+    var roomID: String? = null
 
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
@@ -69,5 +75,6 @@ data class ReceiptDTO(
         }
         throw Exception("no data")
     }
+
 
 }

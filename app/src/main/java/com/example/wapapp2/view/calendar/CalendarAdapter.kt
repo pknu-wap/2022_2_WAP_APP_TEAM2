@@ -1,12 +1,10 @@
 package com.example.wapapp2.view.calendar
 
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridLayout
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
@@ -71,9 +69,12 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
 
         inner class DayMarkingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
             fun bind(pos : Int){
-                Log.d("markingitems",markingItems.toString())
                 inner_item_binding.marking.text = markingItems!![pos].name
-                //inner_item_binding.marking.setBackgroundColor(if (markingItems!![pos].status) 0x333333 else 0x000000)
+                inner_item_binding.marking.setBackgroundColor(
+                    if (markingItems!![pos].status)
+                        ContextCompat.getColor(itemView.context ,R.color.dutch_done)
+                    else
+                        ContextCompat.getColor(itemView.context, R.color.dutch_yet))
             }
 
 
@@ -91,7 +92,7 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
         }
 
         override fun getItemCount(): Int {
-            return markingItems.size
+            return if(markingItems.size <= 4) markingItems.size else 4
         }
 
     }

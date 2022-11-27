@@ -83,13 +83,5 @@ class ReceiptViewModel : ViewModel() {
         }
     }
 
-    fun calcTotalPrice(): String {
-        var price = 0
-        for (product in products.value!!) {
-            price += product.price
-        }
-
-        return price.toString()
-    }
 
 }

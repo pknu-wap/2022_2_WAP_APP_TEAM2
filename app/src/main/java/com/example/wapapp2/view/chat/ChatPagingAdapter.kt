@@ -22,10 +22,9 @@ import org.joda.time.format.ISODateTimeFormat
 class ChatPagingAdapter(
         private val myId: String,
         private val option: FirestorePagingOptions<ChatDTO>,
-) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount {
+) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount, ChatDataObserver.CheckMyMessage {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
-
 
     private enum class ItemViewType {
         SENDED, RECEVEIED
@@ -62,8 +61,9 @@ class ChatPagingAdapter(
             binding.userName.text = model.userName
         }
 
+        // for reverse
         private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
-            return if (currentPosition - 1 < 0) false else getItem(currentPosition - 1)?.get("senderId") == userId
+            return if (currentPosition >= itemCount) false else getItem(currentPosition + 1)?.get("senderId") == userId
         }
     }
 
@@ -83,5 +83,15 @@ class ChatPagingAdapter(
 
 
     override fun getAdapterItemCount(): Int = itemCount
+
+    override fun checkLastMessageMine(): Boolean {
+        return if (itemCount > 0) {
+            getLastChatDTO().senderId == myId
+        } else false
+    }
+
+    fun getLastChatDTO(): ChatDTO {
+        return getItem(0)!!.toObject(ChatDTO::class.java)!!
+    }
 
 }
