@@ -136,7 +136,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
         exitFromRoom = true
         FcmRepositoryImpl.unSubscribeToCalcRoom(roomId)
 
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
             userRepository.removeCalcRoomId(roomId)
             calcRoomRepository.exitFromCalcRoom(roomId)
