@@ -8,28 +8,29 @@ import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.DutchCheckFragmentBinding
-import com.example.wapapp2.dummy.DummyData
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.view.bankaccount.BankTransferDialogFragment
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
 
-class DutchPriceFragment(onUpdateMoneyCallback: OnUpdateMoneyCallback) : Fragment() {
-    lateinit var binding: DutchCheckFragmentBinding
+class DutchPriceFragment : Fragment() {
+    private var _binding: DutchCheckFragmentBinding? = null
+    private val binding get() = _binding!!
 
-    private var onUpdateMoneyCallback: OnUpdateMoneyCallback
-
-    init {
-        this.onUpdateMoneyCallback = onUpdateMoneyCallback
+    companion object {
+        const val TAG = "DutchPriceFragment"
     }
+
 
     private val onClickedBankAccountListener =
             ListOnClickListener<BankAccountDTO> { bankAccountDTO, position ->
                 onClickedBankAccount(bankAccountDTO)
             }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DutchCheckFragmentBinding.inflate(inflater)
+        _binding = DutchCheckFragmentBinding.inflate(inflater)
         binding.btnAdd.setOnClickListener(View.OnClickListener {
             TODO(" 영수증 추가 화면 연결 ")
         })
@@ -42,12 +43,18 @@ class DutchPriceFragment(onUpdateMoneyCallback: OnUpdateMoneyCallback) : Fragmen
 
             }
         })
+        /*
         binding.viewReceipts.adapter =
                 FixedPriceAdapter(DummyData.getFixedDTOs(), onClickedBankAccountListener, onUpdateMoneyCallback)
 
+
+         */
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
 
     /** show Bank App dialog **/
     private fun onClickedBankAccount(account: BankAccountDTO) {

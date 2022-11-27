@@ -1,78 +1,101 @@
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wapapp2.commons.classes.DataTypeConverter
+import com.example.wapapp2.commons.classes.DelayCheckBoxListener
 import com.example.wapapp2.databinding.ViewReceiptItemBinding
-import com.example.wapapp2.databinding.ViewRecentCalcItemBinding
+import com.example.wapapp2.databinding.ViewRecentCalcProductBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
-import com.example.wapapp2.viewmodel.ReceiptViewModel
-import org.joda.time.DateTime
+import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
 import java.text.DecimalFormat
 
 /** 영수증 Adapter **/
-class ReceiptAdapter(private val context: Context?, private val receipts: ArrayList<ReceiptDTO>, receiptViewModel: ReceiptViewModel, onUpdateSummaryCallback: OnUpdateSummaryCallback)
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ReceiptAdapter(
+        private val iProductCheckBox: IProductCheckBox,
+) : RecyclerView.Adapter<ReceiptAdapter.ReceiptVM>() {
 
-    val receiptViewModel = receiptViewModel
-    val onUpdateSummaryCallback : OnUpdateSummaryCallback = onUpdateSummaryCallback
+    class ReceiptVM(
+            private val binding: ViewReceiptItemBinding,
+            private val iProductCheckBox: IProductCheckBox,
+    ) : RecyclerView.ViewHolder(binding.root) {
+        private var productsAdapter: ProductsAdapter? = null
 
-    inner class ReceiptVM(val binding: ViewReceiptItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.recentCalcItem.addItemDecoration(DividerItemDecoration(binding.root.context, DividerItemDecoration.VERTICAL))
+        }
+
         fun bind(receipt: ReceiptDTO) {
-            binding.description.text = "[ " + receipt.name + " ] - 김진우"
-            binding.recentCalcItem.adapter = ReceiptItemAdapter(context, receipt.getProducts())
-            binding.dateTime.text = receipt.date.toString("yyyy-MM-dd")
+            val description = "${receipt.name} - ${receipt.payersName}"
+            binding.description.text = description
+
+            productsAdapter = null
+            productsAdapter = ProductsAdapter(receipt.getProducts(), iProductCheckBox)
+            binding.recentCalcItem.adapter = productsAdapter
+
+            binding.dateTime.text = receipt.date.toString("yyyy-MM-dd E a hh:mm")
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return ReceiptVM(ViewReceiptItemBinding.inflate(LayoutInflater.from(context)))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptVM =
+            ReceiptVM(ViewReceiptItemBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
+
+    override fun onBindViewHolder(holder: ReceiptVM, position: Int) {
+        TODO("Not yet implemented")
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        return (holder as ReceiptVM).bind(receipts[position])
-    }
-
-    override fun getItemCount(): Int {
-        return receipts.size
-    }
+    override fun getItemCount(): Int = 0
 
     /** 영수증 세부 항목 Adapter **/
-    private inner class ReceiptItemAdapter(private val context: Context?, private val items: ArrayList<ReceiptProductDTO>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private class ProductsAdapter(
+            private val items: ArrayList<ReceiptProductDTO>,
+            private val iProductCheckBox: IProductCheckBox,
+    ) : RecyclerView.Adapter<ProductsAdapter.ProductVH>() {
 
-        inner class ReceiptMenuVH(val binding: ViewRecentCalcItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        class ProductVH(
+                private val binding: ViewRecentCalcProductBinding,
+                private val iProductCheckBox: IProductCheckBox,
+        ) :
+                RecyclerView.ViewHolder(binding.root) {
+            private var delayCheckBoxListener: DelayCheckBoxListener? = null
 
             fun bind(product: ReceiptProductDTO) {
                 binding.receiptMenu.text = product.name
-                binding.receiptTotalMoney.text = DecimalFormat("#,###").format(product.price)
-                binding.receiptMyMoney.text = DecimalFormat("#,###").format(calcMyMoney(product))
+                binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
+                binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMyMoney(product))
 
+                iProductCheckBox.updateSummaryForNewProduct(product)
 
-                receiptViewModel.updateSummary_forNewProduct(product)
-
-                binding.recentCalcCkbox.setOnCheckedChangeListener { _, isChecked ->
-                    if (isChecked) {
-                        receiptViewModel.product_checked(product)
-                        binding.receiptMyMoney.text = DecimalFormat("#,###").format(calcMyMoney(product))
-                        binding.receiptPersonCount.text = product.personCount.toString() + "/3"
-                        onUpdateSummaryCallback.updateSummaryUI(receiptViewModel.getCurrentSummary)
-                    } else {
-                        receiptViewModel.product_unchecked(product)
-                        binding.receiptMyMoney.text = "0"
-                        binding.receiptPersonCount.text = product.personCount.toString() + "/3"
-                        onUpdateSummaryCallback.updateSummaryUI(receiptViewModel.getCurrentSummary)
-                    }
-
+                delayCheckBoxListener?.run {
+                    binding.recentCalcCkbox.removeOnCheckedStateChangedListener(this)
+                    null
                 }
 
-                binding.receiptPersonCount.text = "${product.personCount}/3"
+                delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
+                    override fun onCheckedChanged(isChecked: Boolean) {
+                        if (isChecked) {
+                            iProductCheckBox.onProductChecked(product)
+                            val newMoney = calcMyMoney(product)
+                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(newMoney)
+                        } else {
+                            iProductCheckBox.onProductUnchecked(product)
+                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
+                        }
+
+                        val numOfPeopleSelected = "${product.personCount}/3"
+                        binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
+                    }
+                }
+
+                binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
+
+                val numOfPeopleSelected = "${product.personCount}/3"
+                binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
                 binding.recentCalcCkbox.isChecked = true
-
-
             }
-            fun calcMyMoney(product: ReceiptProductDTO) : Int{
+
+            private fun calcMyMoney(product: ReceiptProductDTO): Int {
                 return try {
                     product.price / product.personCount
                 } catch (e: ArithmeticException) {
@@ -82,18 +105,15 @@ class ReceiptAdapter(private val context: Context?, private val receipts: ArrayL
 
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return ReceiptMenuVH(ViewRecentCalcItemBinding.inflate(LayoutInflater.from(context)))
+        override fun onCreateViewHolder(
+                parent: ViewGroup, viewType: Int,
+        ): ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
+
+        override fun onBindViewHolder(holder: ProductVH, position: Int) {
+            holder.bind(items[position])
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            return (holder as ReceiptMenuVH).bind(items[position])
-        }
-
-        override fun getItemCount(): Int {
-            return items.size
-        }
-
+        override fun getItemCount(): Int = items.size
     }
 
 }

@@ -16,9 +16,8 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
-import com.example.wapapp2.model.CalcRoomDTO
-import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
@@ -31,12 +30,10 @@ import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-import java.text.DecimalFormat
 import java.util.*
 
 
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
-        ParticipantsInCalcRoomFragment.OnNavDrawerListener {
+class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerListener {
     private var _binding: FragmentCalcMainBinding? = null
     private val binding get() = _binding!!
     private var roomId: String? = null
@@ -46,23 +43,20 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     }
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
+    private val calculationViewModel by viewModels<CalculationViewModel>()
 
-    /** summary of FixedPay **/
-    private var paymoney = 0
     private var chatInputLayoutHeight = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        roomId = if (arguments == null) {
-            savedInstanceState?.getString("roomId")
-        } else {
-            requireArguments().getString("roomId")!!
+        arguments?.apply {
+            roomId = getString("roomId")!!
+            currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
-        currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,6 +71,16 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
+
+        calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
+            if (transferMoney >= 0) {
+                val value = "+ ${DataTypeConverter.toKRW(transferMoney)}"
+                binding.calculationSimpleInfo.summary.text = value
+            } else {
+                binding.calculationSimpleInfo.summary.text = DataTypeConverter.toKRW(transferMoney)
+                binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext().applicationContext, R.color.payMinus))
+            }
+        }
 
         currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
             binding.topAppBar.title = it.name
@@ -119,14 +123,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         _binding = null
     }
 
-    private fun updateFixedPay() {
-        if (paymoney >= 0) {
-            binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
-        } else {
-            binding.calculationSimpleInfo.summary.text = paymoney.toString()
-            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
-        }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -136,8 +132,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt,
-                        this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
+                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
                 .commit()
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
@@ -149,7 +144,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 expanded = !expanded
                 binding.calculationSimpleInfo.expandBtn.setImageResource(if (expanded) R.drawable.ic_baseline_expand_less_24 else
                     R.drawable.ic_baseline_expand_more_24)
-                binding.calculationSimpleInfo.fragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
+                binding.calculationSimpleInfo.calculationFragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
                         if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
 
@@ -220,21 +215,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     fun interface ViewHeightCallback {
         fun height(height: Int)
-    }
-
-    override fun onUpdateMoney(money: Int) {
-        paymoney += money
-        updateFixedPay() //마지막에 최종 업데이트 되도록 수정 필요
-    }
-
-    override fun onFixOngoingReceipt() {
-        childFragmentManager.beginTransaction()
-                .replace(binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
-                .commitAllowingStateLoss()
-    }
-
-    override fun updateSummaryUI(summary: Int) {
-        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
     }
 
     override fun closeDrawer() {

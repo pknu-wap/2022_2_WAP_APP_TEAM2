@@ -123,5 +123,7 @@
     <string name="unit_price">단가</string>
     <string name="product_name">항목</string>
     <string name="invited_to_new_calc_room">정산방에 초대되었습니다.</string>
+    <string name="estimated_amount">예상 금액</string>
+    <string name="num_of_people_selected">선택 인원</string>
 
 </resources>
