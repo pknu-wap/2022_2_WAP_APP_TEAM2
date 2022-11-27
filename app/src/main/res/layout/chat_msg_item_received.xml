@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
     <Space
         android:id="@+id/space_header"
@@ -44,7 +45,7 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintTop_toBottomOf="@id/user_name"
         app:layout_constraintWidth_max="wrap"
-        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintWidth_percent="0.75"
         app:layout_constraintStart_toStartOf="parent"
         />
 
