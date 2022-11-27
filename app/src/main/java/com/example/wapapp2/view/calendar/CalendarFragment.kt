@@ -1,16 +1,19 @@
 package com.example.wapapp2.view.calendar
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalendarFragmentBinding
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
 import com.example.wapapp2.view.calendar.dialog.ReceiptItemClickListener
@@ -56,29 +59,29 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
         // Inflate the layout for this fragment
         binding = CalendarFragmentBinding.inflate(layoutInflater)
         binding.calendarRv.layoutManager = object : GridLayoutManager(context,7) { override fun canScrollVertically() = false }
-        updateCal()
+        updateCal(hashMapOf())
 
         calendarViewModel.myReceiptMap.observe(viewLifecycleOwner){
-            updateCal()
+            updateCal(calendarViewModel.myReceiptMap.value!!)
         }
 
         //unscrollable
 
         binding.calendarBtnBack.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.minusMonths(1)
-            updateCal()
+            updateCal(calendarViewModel.myReceiptMap.value ?: hashMapOf())
         })
         binding.calendarBtnNext.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.plusMonths(1)
-            updateCal()
+            updateCal(calendarViewModel.myReceiptMap.value ?: hashMapOf())
         })
 
 
         return binding.root
     }
 
-    fun updateCal() {
-        val hashMap = calendarViewModel.myReceiptMap.value ?: hashMapOf()
+    fun updateCal(hashMap: HashMap<String, ArrayList<ReceiptDTO>>) {
+        Log.d("hasmap",hashMap.toString())
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
         binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener)
     }

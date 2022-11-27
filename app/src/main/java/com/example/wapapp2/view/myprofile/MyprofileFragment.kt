@@ -14,6 +14,8 @@ import com.example.wapapp2.view.bankaccount.EditMyBankAccountFragment
 import com.example.wapapp2.view.login.LoginFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyBankAccountsViewModel
+import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 
@@ -21,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth
 class MyprofileFragment : Fragment() {
     private val myBankAccountsViewModel by activityViewModels<MyBankAccountsViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
+    private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
     private var _binding: FragmentMyprofileBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MyBankAccountsAdapter
@@ -90,6 +94,9 @@ class MyprofileFragment : Fragment() {
         binding.btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             val loginFragment = LoginFragment()
+
+            myCalendarViewModel.listenerRemove()
+            myCalcRoomViewModel.listenerRemove()
 
             parentFragmentManager
                     .beginTransaction()
