@@ -73,7 +73,8 @@ class FriendProfileFragment : DialogFragment() {
                         .setNegativeButton(R.string.cancel) { dialog, which ->
                             dialog.dismiss()
                         }.setPositiveButton(R.string.check) { dialog, which ->
-                            friendAliasViewModel.setAliasToMyFriend(alias, friendAliasViewModel.friendDTO!!.friendUserId)
+                            friendAliasViewModel.setAliasToMyFriend(alias, friendAliasViewModel.friendDTO!!.friendUserId,
+                                    friendAliasViewModel.friendDTO!!.email)
                             dialog.dismiss()
                             dismiss()
                         }.create().show()

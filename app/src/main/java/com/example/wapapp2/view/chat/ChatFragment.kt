@@ -113,7 +113,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
                                 snapshot.getString("userName")!!
 
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
-                                    snapshot.getString("msg").toString(), id)
+                                    snapshot.getString("msg").toString(), id, false)
                         }
                         .build()
 
@@ -165,7 +165,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
                 val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
-                        .toString(), myAccountViewModel.myProfileData.value!!.id)
+                        .toString(), myAccountViewModel.myProfileData.value!!.id, false)
 
                 // 전송
                 chatViewModel.sendMsg(newChat) { Toast.makeText(context, "네트워크 연결을 확인하세요!", Toast.LENGTH_SHORT).show() }
