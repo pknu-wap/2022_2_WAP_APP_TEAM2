@@ -63,7 +63,7 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                         val dto = it.result.toObject<CalcRoomDTO>()!!
                         continuation.resume(dto.ongoingReceiptIds.size)
                     } else
-                        continuation.re
+                        continuation.resume(0)
                 }
     }
 
