@@ -10,7 +10,6 @@ import com.example.wapapp2.databinding.ReceiptProductInfoViewBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptProductParticipantDTO
-import okhttp3.internal.notify
 
 class ReceiptProductsAdapter(
         private val productOnClickListener: ListOnClickListener<ReceiptProductDTO>,

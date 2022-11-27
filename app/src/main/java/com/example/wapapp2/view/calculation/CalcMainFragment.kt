@@ -202,7 +202,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     }.setNegativeButton(R.string.close) { dialog, which ->
                         dialog.dismiss()
                     }.create().show()
-
         }
 
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
