@@ -29,17 +29,16 @@
             android:layout_marginLeft="10dp"
             android:layout_alignParentLeft="true"
             android:textSize="14sp"
-
             />
+
         <TextView
-            android:text="+- 얼마?"
             android:id="@+id/pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
             android:layout_alignParentRight="true"
-            android:textSize="14sp"
-            />
+            android:layout_marginRight="20dp"
+            android:text="+- 얼마?"
+            android:textSize="14sp" />
 
     </RelativeLayout>
 
@@ -51,8 +50,7 @@
         android:layout_marginVertical="10dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/bank_item_view"
         tools:itemCount="3"
-        />
+        tools:listitem="@layout/bank_item_view" />
 
 </RelativeLayout>
