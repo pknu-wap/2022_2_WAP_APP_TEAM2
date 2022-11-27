@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.commons.interfaces.ListOnLongClickListener
 import com.example.wapapp2.databinding.FragmentCheckReceiptBinding
@@ -29,6 +30,7 @@ class ReceiptsFragment : Fragment() {
         const val TAG = "ReceiptsFragment"
     }
 
+    private lateinit var adapter: ReceiptsAdapter
     private var roomId: String? = null
     private val receiptViewModel by viewModels<ReceiptViewModel>()
     private val modifyReceiptViewModel by viewModels<ModifyReceiptViewModel>()
@@ -96,18 +98,13 @@ class ReceiptsFragment : Fragment() {
                 .create().show()
     }
 
-    private lateinit var adapter: ReceiptsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.apply {
             roomId = getString("roomId")
+            receiptViewModel.currentRoomId = roomId
         }
-        roomId?.run {
-            savedInstanceState?.getString("roomId")
-        }
-
-        receiptViewModel.currentRoomId = roomId
         adapter =
                 ReceiptsAdapter(receiptOnClickListener, receiptOnLongClickListener, receiptViewModel.getReceiptsRecyclerOptions(receiptViewModel
                         .currentRoomId!!))
@@ -122,12 +119,12 @@ class ReceiptsFragment : Fragment() {
         }
 
         dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
-                LinearLayoutManager, adapter)
+                WrapContentLinearLayoutManager, adapter)
         dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
+
         adapter.registerAdapterDataObserver(dataObserver!!)
 
         binding.rvEditreceipt.adapter = adapter
-
         return binding.root
     }
 
@@ -142,7 +139,6 @@ class ReceiptsFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("roomId", roomId)
     }
 
     override fun onDestroyView() {
@@ -151,8 +147,9 @@ class ReceiptsFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        dataObserver?.apply {
+        dataObserver?.run {
             adapter.unregisterAdapterDataObserver(this)
+            null
         }
         super.onDestroy()
     }
