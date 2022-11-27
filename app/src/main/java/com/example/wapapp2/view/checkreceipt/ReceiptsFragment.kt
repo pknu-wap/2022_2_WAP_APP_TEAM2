@@ -121,7 +121,7 @@ class ReceiptsFragment : Fragment() {
         dataObserver = ListAdapterDataObserver(binding.rvEditreceipt, binding.rvEditreceipt.layoutManager as
                 WrapContentLinearLayoutManager, adapter)
         dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_receipts))
-
+        dataObserver!!.onChanged()
         adapter.registerAdapterDataObserver(dataObserver!!)
 
         binding.rvEditreceipt.adapter = adapter
