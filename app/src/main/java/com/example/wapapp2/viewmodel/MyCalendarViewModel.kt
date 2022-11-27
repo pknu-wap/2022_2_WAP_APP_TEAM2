@@ -25,8 +25,8 @@ class MyCalendarViewModel : ViewModel() {
             viewModelScope.launch {
                 val pairOf_map_rl = async {
                     myCalendarRepository.getMyReceipts_with_addSnapshot(myCalcRoomID, EventListener { value, error ->
-                        value?.documentChanges.apply {
-                            for (dc in this!!) {
+                        value?.documentChanges?.apply {
+                            for (dc in this) {
                                 if (dc.type == DocumentChange.Type.ADDED) {
                                     receiptAdded(dc.document.toObject(ReceiptDTO::class.java))
                                 } else {
@@ -46,12 +46,17 @@ class MyCalendarViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        listenerRemove()
+    }
+
+    fun listenerRemove(){
         if (myCalcRoomReceiptListeners != null) {
             for (register in myCalcRoomReceiptListeners!!) {
                 register.remove()
             }
         }
     }
+
 
 
     fun receiptAdded(newReceiptDTO: ReceiptDTO) {

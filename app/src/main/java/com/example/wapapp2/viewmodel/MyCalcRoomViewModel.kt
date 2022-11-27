@@ -44,6 +44,10 @@ class MyCalcRoomViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        listenerRemove()
+    }
+
+    fun listenerRemove(){
         myCalcRoomIdsListener?.remove()
     }
 

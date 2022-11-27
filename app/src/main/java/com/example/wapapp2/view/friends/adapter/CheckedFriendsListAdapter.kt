@@ -52,14 +52,6 @@ class CheckedFriendsListAdapter(private val onRemovedFriendListener: OnRemovedFr
         }
     }
 
-    fun resetItem(){
-        val count = list.size
-        list.clear()
-        notifyItemRangeRemoved(0,count)
-        
-        //미완료 -> 수정필요
-    }
-
     fun getParticipantIDs(myId : String) : ArrayList<String>{
         val result = arrayListOf<String>(myId)
         friends.forEach { result.add(it.friendUserId) }

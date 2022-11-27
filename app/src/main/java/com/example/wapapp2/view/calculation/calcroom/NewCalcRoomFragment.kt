@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
@@ -34,8 +35,8 @@ class NewCalcRoomFragment : Fragment() {
     }
 
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
-    private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val friendsViewModel by viewModels<FriendsViewModel>()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
             OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
@@ -47,10 +48,6 @@ class NewCalcRoomFragment : Fragment() {
 
     private var listAdapterDataObserver: ListAdapterDataObserver? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -153,11 +150,6 @@ class NewCalcRoomFragment : Fragment() {
         friendsViewModel.findFriend("")
     }
 
-
-    override fun onPause() {
-        checkedFriendsListAdapter.resetItem()
-        super.onPause()
-    }
     override fun onDestroyView() {
         super.onDestroyView()
         listAdapterDataObserver?.apply {
