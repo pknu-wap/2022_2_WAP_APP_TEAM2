@@ -29,7 +29,6 @@
         <ToggleButton
             android:id="@+id/btn_done"
             android:background="@drawable/bg_btn"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
@@ -45,20 +44,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_add"
-            android:background="@drawable/bg_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
             android:layout_marginRight="15dp"
+            android:background="@drawable/bg_btn"
             android:paddingHorizontal="30dp"
             android:text="정산 추가"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
-            app:layout_constraintRight_toRightOf="@id/guideline1"
             app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintRight_toRightOf="@id/guideline1" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline1"

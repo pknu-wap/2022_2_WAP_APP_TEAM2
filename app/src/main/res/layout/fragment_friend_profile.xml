@@ -89,7 +89,7 @@
 
     <Button
         android:id="@+id/remove_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/teal_200"
@@ -102,11 +102,12 @@
 
     <Button
         android:id="@+id/alias_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
         android:text="@string/set_alias"
+        android:backgroundTint="@color/purple_200"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toRightOf="@id/remove_btn"
         app:layout_constraintRight_toRightOf="parent"
