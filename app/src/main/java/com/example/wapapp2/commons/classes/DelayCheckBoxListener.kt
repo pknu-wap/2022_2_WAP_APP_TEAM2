@@ -5,7 +5,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import kotlinx.coroutines.*
 
 abstract class DelayCheckBoxListener(
-        private val delayMillis: Long = 3500L,
+        private val delayMillis: Long = 3000L,
 ) : CompoundButton.OnCheckedChangeListener, MaterialCheckBox.OnCheckedStateChangedListener {
     private var lastState = false
     private var debounceJob: Job? = null
@@ -13,31 +13,25 @@ abstract class DelayCheckBoxListener(
 
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        debounceJob?.cancel()
+        buttonView?.isClickable = false
 
-        if (lastState != isChecked) {
-            lastState = isChecked
-
-            debounceJob = uiScope.launch {
-                delay(delayMillis)
-                onCheckedChanged(lastState)
-            }
+        debounceJob = uiScope.launch {
+            delay(delayMillis)
+            buttonView?.isClickable = true
         }
+        onCheckedChanged(isChecked)
     }
 
 
     override fun onCheckedStateChangedListener(checkBox: MaterialCheckBox, state: Int) {
-        debounceJob?.cancel()
-        val isChecked = state == MaterialCheckBox.STATE_CHECKED
+        checkBox.isClickable = false
 
-        if (lastState != isChecked) {
-            lastState = isChecked
-
-            debounceJob = uiScope.launch {
-                delay(delayMillis)
-                onCheckedChanged(lastState)
-            }
+        debounceJob = uiScope.launch {
+            delay(delayMillis)
+            checkBox.isClickable = true
         }
+        val isChecked = state == MaterialCheckBox.STATE_CHECKED
+        onCheckedChanged(isChecked)
     }
 
     /**

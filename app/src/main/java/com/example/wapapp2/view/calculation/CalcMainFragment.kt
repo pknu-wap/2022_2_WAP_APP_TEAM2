@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation
 
+
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -9,28 +10,21 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
-
-
 import androidx.core.content.ContextCompat.getColor
-
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.add
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
-import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
-import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.chat.ChatFragment
-
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
-import com.example.wapapp2.viewmodel.*
+import com.example.wapapp2.viewmodel.CalculationViewModel
+import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
+import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-
-import java.util.*
 
 
 class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerListener {
@@ -54,6 +48,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
         arguments?.apply {
             roomId = getString("roomId")!!
             currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
+            calculationViewModel.calcRoomId = roomId!!
         }
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
@@ -132,7 +127,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
+                .replace(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
                 .commit()
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {

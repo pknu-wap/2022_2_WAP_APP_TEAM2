@@ -1,6 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
-import ReceiptAdapter
+import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +21,7 @@ class DutchCheckFragment() : Fragment() {
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
     private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
 
-    private val receiptsAdapter = ReceiptAdapter(calculationViewModel)
+    private lateinit var receiptsAdapter: OngoingReceiptsAdapter
 
     companion object {
         const val TAG = "DutchCheckFragment"
@@ -29,11 +29,11 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
-
         binding.viewReceipts.adapter = receiptsAdapter
 
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -63,6 +63,12 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        calculationViewModel.loadOngoingReceiptIds()
+        calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
+            receiptsAdapter.receiptMap.clear()
+            receiptsAdapter.receiptMap.putAll(result.toMutableMap())
+            receiptsAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroyView() {

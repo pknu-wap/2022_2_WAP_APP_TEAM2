@@ -99,7 +99,8 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun modifyReceipt(map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String,
+    override suspend fun modifyReceipt(
+            map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
@@ -118,9 +119,9 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 .document(receiptId).delete()
 
         // calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
-        fireStore.collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomId)
-                .update(FieldPath.of("endReceiptIds", "ongoingReceiptIds"), FieldValue.arrayRemove(receiptId))
+        val document = fireStore.collection(FireStoreNames.calc_rooms.name).document(calcRoomId)
+        document.update("endReceiptIds", FieldValue.arrayRemove(receiptId))
+        document.update("ongoingReceiptIds", FieldValue.arrayRemove(receiptId))
     }
 
 
@@ -176,6 +177,31 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    override suspend fun getReceipts(
+            calcRoomId: String,
+            receiptIds: List<String>,
+    ) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+        receiptCollection.whereIn(FieldPath.documentId(), receiptIds).get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val list = it.result.documents.toMutableList()
+                var dto: ReceiptDTO? = null
+                val dtoList = mutableListOf<ReceiptDTO>()
+
+                for (v in list) {
+                    dto = v.toObject<ReceiptDTO>()!!
+                    dto.id = v.id
+                    dtoList.add(dto)
+                }
+                continuation.resume(dtoList)
+            } else {
+                continuation.resume(mutableListOf())
+            }
+        }
+
+    }
+
     override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
             fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
@@ -204,4 +230,5 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
             }
         }
     }
+
 }

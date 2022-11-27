@@ -10,7 +10,6 @@
         android:id="@+id/description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sep_line"
         android:layout_marginTop="8dp"
         android:text="[ Title ] - 결제자"
         android:textSize="14sp"
@@ -66,7 +65,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/name"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toRightOf="@id/total_money"
-            app:layout_constraintRight_toLeftOf="num_of_people_selected"
+            app:layout_constraintRight_toLeftOf="@id/num_of_people_selected"
             app:layout_constraintWidth_percent="0.25"
             />
 
@@ -80,7 +79,7 @@
             app:layout_constraintBaseline_toBaselineOf="@id/name"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toRightOf="@id/estimated_amount"
-            app:layout_constraintRight_toLeftOf="check"
+            app:layout_constraintRight_toLeftOf="@id/check"
             app:layout_constraintWidth_percent="0.2"
             />
 

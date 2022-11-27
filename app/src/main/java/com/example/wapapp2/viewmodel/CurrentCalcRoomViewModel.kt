@@ -114,6 +114,8 @@ class CurrentCalcRoomViewModel : ViewModel() {
                 return@EventListener
             }
 
+
+
             //성공, 정산방 정보 가져옴
             val calcRoomDTO = value.toObject<CalcRoomDTO>()!!
             calcRoomDTO.id = value.id
