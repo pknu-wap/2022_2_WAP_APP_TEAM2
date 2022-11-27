@@ -33,7 +33,7 @@
         android:id="@+id/new_msg_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparent"
+        android:background="@color/white"
         android:padding="5dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/text_input_layout"
