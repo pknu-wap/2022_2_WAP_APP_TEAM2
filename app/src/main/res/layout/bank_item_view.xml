@@ -8,12 +8,13 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp"
     >
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginRight="16dp"
         android:src="@drawable/ic_launcher_foreground"
         />
