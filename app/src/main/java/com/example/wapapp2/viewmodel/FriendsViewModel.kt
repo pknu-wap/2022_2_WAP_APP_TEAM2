@@ -87,7 +87,7 @@ class FriendsViewModel : ViewModel() {
         CoroutineScope(Dispatchers.Default).launch {
             val result = async {
                 friendsRepositoryImpl.addToMyFriend(
-                        FriendDTO( userDTO.id, userDTO.name)
+                        FriendDTO(userDTO.id, userDTO.name, userDTO.email)
                 )
             }
             result.await()
@@ -142,16 +142,17 @@ class FriendsViewModel : ViewModel() {
                     val myFriends = async {
                         friendsRepositoryImpl.loadMyFriends()
                     }
+                    
                     for (friend in myFriends.await()) {
                         MY_FRIEND_MAP[friend.friendUserId] = friend
-                        friendsLocalRepository.insert(FriendDTO(friend.friendUserId, friend.alias))
+                        friendsLocalRepository.insert(FriendDTO(friend.friendUserId, friend.alias, friend.email))
                     }
                 }
             }
         }
     }
 
-    fun reset(){
+    fun reset() {
         friendsListLiveData.value = arrayListOf()
     }
 
