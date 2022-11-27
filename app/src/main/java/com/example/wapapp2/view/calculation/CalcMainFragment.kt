@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
+import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
@@ -31,6 +32,7 @@ import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import java.text.DecimalFormat
+import java.util.*
 
 
 class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
@@ -75,6 +77,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
+
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner){
+            binding.topAppBar.title = it.name
+        }
 
         val chatFragment = ChatFragment()
         chatFragment.setViewHeightCallback { height ->
