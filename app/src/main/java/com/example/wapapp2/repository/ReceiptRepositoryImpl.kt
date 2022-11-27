@@ -53,11 +53,18 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    /**
+     * 진행 중 정산 id추가, 정산상태 변경
+     */
     override suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId)
 
-        calcRoomDocument.update("ongoingReceiptIds", FieldValue.arrayUnion(receiptId)).addOnCompleteListener {
+        val writeBatch = fireStore.batch()
+        writeBatch.update(calcRoomDocument, "ongoingReceiptIds", FieldValue.arrayUnion(receiptId))
+        writeBatch.update(calcRoomDocument, "calculationStatus", true)
+
+        writeBatch.commit().addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
@@ -92,9 +99,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 }
     }
 
-    override suspend fun modifyReceipt(
-            map: MutableMap<String, Any?>, calcRoomId: String,
-            receiptId: String,
+    override suspend fun modifyReceipt(map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)

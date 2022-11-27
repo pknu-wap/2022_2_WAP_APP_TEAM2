@@ -32,6 +32,9 @@ class NewReceiptViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 새로운 영수증을 추가
+     */
     private fun addReceipt(receiptList: MutableList<ReceiptDTO>, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             var count = 0
