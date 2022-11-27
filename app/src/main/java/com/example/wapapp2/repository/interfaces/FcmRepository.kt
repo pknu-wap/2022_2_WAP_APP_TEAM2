@@ -1,10 +1,14 @@
 package com.example.wapapp2.repository.interfaces
 
-import com.example.wapapp2.model.notifications.PushNotificationDTO
+import com.example.wapapp2.model.notifications.MultipleRecipientsPushNotificationDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.TopicPushNotificationDTO
+import com.google.gson.JsonObject
 
 interface FcmRepository {
-    suspend fun sendMessage(notificaiton: PushNotificationDTO)
-    suspend fun sendCalculation(notificaiton: PushNotificationDTO)
-    fun subscribeToCalcRoomChat(roomId: String)
-    fun unSubscribeToCalcRoomChat(roomId: String)
+    suspend fun sendFcmToTopic(notificationType: NotificationType, topic: String, data: Any)
+    suspend fun sendFcmToMultipleDevices(notificationType: NotificationType, tokens: MutableList<String>, data: Any)
+
+    fun subscribeToCalcRoom(roomId: String)
+    fun unSubscribeToCalcRoom(roomId: String)
 }

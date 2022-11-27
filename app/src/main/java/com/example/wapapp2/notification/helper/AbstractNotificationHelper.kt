@@ -2,12 +2,15 @@ package com.example.wapapp2.notification.helper
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
-import androidx.core.app.NotificationChannelCompat
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import com.example.wapapp2.main.MainActivity
 import com.example.wapapp2.model.notifications.NotificationObj
+import com.example.wapapp2.model.notifications.NotificationType
 
 
 abstract class AbstractNotificationHelper
@@ -49,5 +52,11 @@ protected constructor(
         notificationManager.notify(notificationObj.notificationId, notificationObj.notificationBuilder.build())
     }
 
-
+    fun createActivityIntent(context: Context, arguments: Bundle): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtras(arguments)
+        }
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 }

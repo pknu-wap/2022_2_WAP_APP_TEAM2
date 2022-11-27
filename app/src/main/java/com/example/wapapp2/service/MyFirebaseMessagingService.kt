@@ -4,13 +4,14 @@ import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.datastore.FcmTokenDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
 import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
-import com.example.wapapp2.notification.helper.CalcNotificationHelper
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
+import com.example.wapapp2.notification.helper.NewCalcRoomNotificationHelper
 import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
-import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -30,16 +31,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (!body.isNullOrEmpty()) {
             //영수증, 채팅, 정산 구분
             val receivedDTO = Gson().fromJson(body, ReceivedPushNotificationDTO::class.java)
+            FcmRepositoryImpl.subscribeToCalcRoom(receivedDTO.calcRoomId)
+
             when (receivedDTO.type) {
                 NotificationType.Chat -> chat(receivedDTO)
                 NotificationType.Receipt -> receipt(receivedDTO)
-                NotificationType.Calculation -> calculation(receivedDTO)
+                NotificationType.NewCalcRoom -> newCalcRoom(receivedDTO)
                 else -> {}
             }
         }
     }
 
-    /** 토큰 생성시 서버에 등록 과정 필요 **/
+    /** 토큰 변경 시 서버에 토큰 변경 등록 **/
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         CoroutineScope(Dispatchers.IO).launch {
@@ -47,8 +50,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * 새로운 채팅 알림
+     */
     private fun chat(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-
         CoroutineScope(Dispatchers.IO).launch {
             val sendFcmChatDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmChatDTO::class.java)
             val senderId = sendFcmChatDTO.chatDTO.senderId
@@ -69,14 +74,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     }
 
+    /**
+     * 영수증 추가 알림
+     */
     private fun receipt(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-        val receiptNotificationHelper = ReceiptNotificationHelper.getINSTANCE(applicationContext)
-    }
-
-    private fun calculation(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
-        val calcNotificationHelper = CalcNotificationHelper.getINSTANCE(applicationContext)
+        val notificationHelper = ReceiptNotificationHelper.getINSTANCE(applicationContext)
         val sendFcmReceiptDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmReceiptDTO::class.java)
 
-        calcNotificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
+        notificationHelper.notifyNotification(applicationContext, sendFcmReceiptDTO)
+    }
+
+    /**
+     * 새로운 정산방 알림
+     */
+    private fun newCalcRoom(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val notificationHelper = NewCalcRoomNotificationHelper.getINSTANCE(applicationContext)
+        val sendFcmCalcRoomDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmCalcRoomDTO::class.java)
+
+        notificationHelper.notifyNotification(applicationContext, sendFcmCalcRoomDTO)
     }
 }

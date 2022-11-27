@@ -18,11 +18,11 @@ import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.view.NewLoadingView
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
-import com.example.wapapp2.viewmodel.fcm.FcmViewModel
 import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentChange
 import kotlinx.coroutines.launch
@@ -40,7 +40,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val fcmViewModel by viewModels<FcmViewModel>()
 
     private var chatDataObserver: ChatDataObserver? = null
 
@@ -55,13 +54,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fcmViewModel.subscribeToCalcRoomChat(currentCalcRoomViewModel.roomId!!)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.chatList)
 
@@ -69,10 +64,12 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
                 //스크롤이 끝으로 이동한 경우 하단 채팅알림 지우기
+                if (!isVisible)
+                    return@setOnScrollChangeListener
+
                 if (binding.newMsgFrame.visibility == View.VISIBLE) {
                     chatDataObserver?.apply {
                         if (atBottom(0)) {
-                            binding.newMsgFrame.clearAnimation()
                             resetNewMsgView()
                         }
                     }
@@ -172,7 +169,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
                 // 전송
                 chatViewModel.sendMsg(newChat) { Toast.makeText(context, "네트워크 연결을 확인하세요!", Toast.LENGTH_SHORT).show() }
-                fcmViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
+                chatViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
                 //입력 초기화
                 binding.textInputEditText.text?.clear()
             } else {
@@ -183,10 +180,17 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onStart() {
         super.onStart()
+        //채팅방이 화면에 띄워진 상태 -> 알림 구독 해제
+        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -207,17 +211,18 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
      * 리스트 스크롤이 끝이 아니면서 새 메시지를 받았을때 -> 화면에 표시
      */
     override fun onReceived() {
+        if (!isVisible)
+            return
+
         chatAdapter?.getLastChatDTO()?.apply {
             val alias = if (currentCalcRoomViewModel.participantMap.containsKey(senderId))
                 currentCalcRoomViewModel.participantMap[senderId]!!.userName
-            else
-                userName
+            else userName
 
             val msg = "$alias : $msg"
             binding.newMsgTv.text = msg
             binding.newMsgFrame.visibility = View.VISIBLE
 
-            binding.newMsgFrame.clearAnimation()
             val anim = binding.newMsgFrame.animate()
             anim.apply {
                 duration = 3000
@@ -230,17 +235,19 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             //레이아웃 클릭 시 리스트 스크롤 끝으로 이동
             binding.newMsgFrame.setOnClickListener {
                 chatDataObserver?.scrollToBottom(0)
-                binding.newMsgFrame.clearAnimation()
                 resetNewMsgView()
             }
-
         }
 
     }
 
     private fun resetNewMsgView() {
-        binding.newMsgTv.text = ""
-        binding.newMsgFrame.visibility = View.GONE
+        if (isVisible) {
+            binding.newMsgFrame.clearAnimation()
+
+            binding.newMsgTv.text = ""
+            binding.newMsgFrame.visibility = View.GONE
+        }
     }
 
     override fun onDestroy() {

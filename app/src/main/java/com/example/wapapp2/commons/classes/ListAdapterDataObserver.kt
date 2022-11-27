@@ -61,7 +61,7 @@ open class ListAdapterDataObserver(
      * 리스트가 비어있으면 메시지 표시하고 리스트 숨김
      * 비어있지 않으면 리스트 표시
      */
-    protected fun onChangedList() {
+    private fun onChangedList() {
         loadingView?.apply {
             if (iAdapterItemCount.getAdapterItemCount() > 0)
                 onSuccessful()

@@ -54,12 +54,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/chat_msg_item_time_margin"
-        android:layout_marginRight="@dimen/chat_msg_item_time_margin"
         android:text="time"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@+id/msg"
-        app:layout_constraintStart_toEndOf="@id/msg"
-        />
+        app:layout_constraintStart_toEndOf="@id/msg" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

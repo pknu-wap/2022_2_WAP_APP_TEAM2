@@ -6,19 +6,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
+    <!-- Button Frame -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/view_receipts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_above="@id/btn_frame"
-        tools:listitem="@layout/view_dutch_item"
+        android:layout_marginBottom="1dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="3"
-        />
+        tools:listitem="@layout/view_dutch_item" />
 
-
-
-    <!-- Button Frame -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/btn_frame"
         android:layout_alignParentBottom="true"

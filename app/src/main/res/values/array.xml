@@ -62,29 +62,29 @@
     </string-array>
 
     <integer-array name="bank_icon_list">
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
-        <item>@drawable/ic_launcher_foreground</item>
+        <item>@drawable/logo_kb</item>
+        <item>@drawable/logo_nh</item>
+        <item>@drawable/logo_ibk</item>
+        <item>@drawable/logo_mg</item>
+        <item>@drawable/logo_busan_kyongnam</item>
+        <item>@drawable/logo_busan_kyongnam</item>
+        <item>@drawable/logo_kwangju_jeonbuk</item>
+        <item>@drawable/logo_kwangju_jeonbuk</item>
+        <item>@drawable/logo_shinhyop</item>
+        <item>@drawable/logo_sc</item>
+        <item>@drawable/logo_kdb</item>
+        <item>@drawable/logo_dgb</item>
+        <item>@drawable/logo_shinhan_jeju</item>
+        <item>@drawable/logo_hana</item>
+        <item>@drawable/logo_koreapost</item>
+        <item>@drawable/logo_sh</item>
+        <item>@drawable/logo_citi</item>
+        <item>@drawable/logo_woori</item>
+        <item>@drawable/logo_shinhan_jeju</item>
+        <item>@drawable/logo_kbank</item>
+        <item>@drawable/logo_kakao</item>
+        <item>@drawable/logo_sanlim</item>
+        <item>@drawable/logo_toss</item>
     </integer-array>
 
 
