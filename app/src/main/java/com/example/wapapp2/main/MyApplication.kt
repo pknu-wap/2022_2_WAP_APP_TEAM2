@@ -5,7 +5,7 @@ import androidx.collection.arrayMapOf
 import com.example.wapapp2.R
 import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.BankDTO
-import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
+import com.example.wapapp2.repository.*
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -30,6 +30,16 @@ class MyApplication : Application() {
         JodaTimeAndroid.init(applicationContext)
         initBanks()
         FriendsLocalRepositoryImpl.initialize(applicationContext)
+
+        CalendarRepositoryImpl.initialize()
+        ReceiptImgRepositoryImpl.initialize()
+        ReceiptRepositoryImpl.initialize()
+        AppCheckRepository.initialize()
+        FriendsRepositoryImpl.initialize()
+        ChatRepositorylmpl.initialize()
+        UserRepositoryImpl.initialize()
+        MyBankAccountRepositoryImpl.initialize()
+        CalcRoomRepositorylmpl.initialize()
     }
 
     private fun initBanks() {

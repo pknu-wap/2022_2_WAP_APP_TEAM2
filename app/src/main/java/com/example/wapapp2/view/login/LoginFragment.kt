@@ -23,11 +23,15 @@ import kotlinx.coroutines.launch
 
 
 class LoginFragment : Fragment() {
-
-
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
-    private lateinit var binding: FragmentLoginBinding
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
     var auth: FirebaseAuth? = null
+
+    companion object {
+        const val TAG = "LoginFragment"
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (!parentFragmentManager.popBackStackImmediate()) {
@@ -43,8 +47,7 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
-        moveMainPage(auth?.currentUser)
+        //moveMainPage(auth?.currentUser)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,22 +80,6 @@ class LoginFragment : Fragment() {
         if (user != null) {
             val rootTransactionFragment = RootTransactionFragment()
 
-            CalendarRepositoryImpl.initialize()
-            ReceiptImgRepositoryImpl.initialize()
-            ReceiptRepositoryImpl.initialize()
-            AppCheckRepository.initialize()
-            FriendsRepositoryImpl.initialize()
-            ChatRepositorylmpl.initialize()
-            UserRepositoryImpl.initialize()
-            MyBankAccountRepositoryImpl.initialize()
-            CalcRoomRepositorylmpl.initialize()
-
-            myAccountViewModel.initMyProfile()
-
-            CoroutineScope(Dispatchers.IO).launch {
-                MyDataStore.getINSTANCE().checkFcmToken()
-            }
-
             parentFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment.TAG)
@@ -116,7 +103,7 @@ class LoginFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
@@ -132,6 +119,11 @@ class LoginFragment : Fragment() {
     override fun onDestroy() {
         onBackPressedCallback.remove()
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

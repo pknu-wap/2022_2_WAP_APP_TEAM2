@@ -29,8 +29,7 @@ class MainHostFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentMainHostBinding.inflate(inflater, container, false)
         return binding.root
@@ -79,7 +78,6 @@ class MainHostFragment : Fragment() {
         binding.bottomNavigationView.setOnItemReselectedListener {
             val currentSelectedItemId = binding.bottomNavigationView.selectedItemId
         }
-
 
         binding.bottomNavigationView.selectedItemId = R.id.calculation
     }
