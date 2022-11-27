@@ -53,7 +53,7 @@ class RootTransactionFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        _binding = FragmentRootTransactionBinding.inflate(inflater)
+        _binding = FragmentRootTransactionBinding.inflate(inflater, container, false)
         return binding.root
     }
 

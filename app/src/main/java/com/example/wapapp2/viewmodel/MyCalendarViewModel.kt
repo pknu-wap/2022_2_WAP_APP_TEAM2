@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 
 class MyCalendarViewModel : ViewModel() {
-    private val myCalendarRepository : CalendarRepository = CalendarRepositoryImpl.getINSTANCE()
+    private val myCalendarRepository: CalendarRepository = CalendarRepositoryImpl.getINSTANCE()
     private var myCalcRoomReceiptListeners: ArrayList<ListenerRegistration>? = null
 
     /** Hashmap of my ReceiptDTOs <DateString ISO8610, ReceiptDTO> **/
@@ -56,8 +56,6 @@ class MyCalendarViewModel : ViewModel() {
             }
         }
     }
-
-
 
     fun receiptAdded(newReceiptDTO: ReceiptDTO) {
         val keyDateString = DateTime.parse(newReceiptDTO.date.toString()).toString("yyyyMMdd")

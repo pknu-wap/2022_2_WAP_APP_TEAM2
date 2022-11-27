@@ -60,14 +60,12 @@ class FriendsFragment : Fragment() {
                     .commit()
         }
 
-
-
         val dataObserver = ListAdapterDataObserver(binding.myFriendsList, binding.myFriendsList.layoutManager as
                 LinearLayoutManager, myFriendsAdapter)
         dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_my_friends))
         dataObserver.onChanged()
-        myFriendsAdapter.registerAdapterDataObserver(dataObserver)
 
+        myFriendsAdapter.registerAdapterDataObserver(dataObserver)
         binding.myFriendsList.adapter = myFriendsAdapter
 
         return binding.root

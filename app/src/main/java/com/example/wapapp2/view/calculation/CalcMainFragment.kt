@@ -78,8 +78,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
 
-        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner){
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
             binding.topAppBar.title = it.name
+            binding.roomTitle.text = it.name
         }
 
         val chatFragment = ChatFragment()
