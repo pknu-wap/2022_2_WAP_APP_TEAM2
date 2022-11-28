@@ -11,7 +11,6 @@ abstract class DelayCheckBoxListener(
     private var debounceJob: Job? = null
     private val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
         buttonView?.isClickable = false
 

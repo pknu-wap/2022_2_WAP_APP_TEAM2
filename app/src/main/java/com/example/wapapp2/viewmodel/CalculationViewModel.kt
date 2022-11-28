@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.ReceiptProductParticipantDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
@@ -34,6 +35,10 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     override fun onCleared() {
         super.onCleared()
         onGoingReceiptIdsListener?.remove()
+        for (listener in productsListenerMap.values) {
+            listener.remove()
+        }
+        productsListenerMap.clear()
     }
 
     override fun updateSummaryForNewProduct(productDTO: ReceiptProductDTO) {
@@ -62,22 +67,22 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     override fun onProductChecked(productDTO: ReceiptProductDTO) {
         updateSettlementAmount(isChecked = true, productDTO)
-        /*
-        CoroutineScope(Dispatchers.IO).launch {
-            receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
-        }
-         */
 
+        CoroutineScope(Dispatchers.IO).launch {
+            receiptRepository.updateMyIdFromProductParticipantIds(true,
+                    calcRoomId, productDTO.receiptId!!, productDTO.id,
+                    ReceiptProductParticipantDTO(myUid, myUserName, false, ""))
+        }
     }
 
     override fun onProductUnchecked(productDTO: ReceiptProductDTO) {
         updateSettlementAmount(isChecked = false, productDTO)
 
-        /*
         CoroutineScope(Dispatchers.IO).launch {
-            receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
+            receiptRepository.updateMyIdFromProductParticipantIds(false,
+                    calcRoomId, productDTO.receiptId!!, productDTO.id,
+                    ReceiptProductParticipantDTO(myUid, myUserName, false, ""))
         }
-         */
     }
 
     /**
@@ -150,6 +155,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                             productDto.numOfPeopleSelected = productDto.participants.size
                             productDto.id = dc.document.id
                             productDto.payersId = receipt.payersId
+                            productDto.receiptId = receipt.id
 
                             productMap[productDto.id] = productDto
                         } else {
@@ -172,6 +178,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     receiptMap.value = modifiedReceiptMap
                 }
 
+                productsListenerMap[receiptId]?.apply {
+                    remove()
+                }
                 productsListenerMap[receiptId] = productListener
             }
 

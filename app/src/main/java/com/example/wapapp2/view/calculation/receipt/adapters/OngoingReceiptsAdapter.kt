@@ -79,11 +79,6 @@ class OngoingReceiptsAdapter(
 
                 iProductCheckBox.updateSummaryForNewProduct(product)
 
-                delayCheckBoxListener?.run {
-                    binding.recentCalcCkbox.removeOnCheckedStateChangedListener(this)
-                    null
-                }
-
                 delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
                     override fun onCheckedChanged(isChecked: Boolean) {
                         if (isChecked) {

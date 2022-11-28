@@ -30,6 +30,9 @@ data class ReceiptProductDTO(
     @get:Exclude
     var payersId: String? = null
 
+    @get:Exclude
+    var receiptId: String? = null
+
     fun equalsSimple(other: ReceiptProductDTO): Boolean =
             !(name != other.name || count != other.count || price != other.price)
 

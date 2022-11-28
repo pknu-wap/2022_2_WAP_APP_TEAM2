@@ -15,8 +15,6 @@ data class ReceiptProductParticipantDTO(
         var myFriend: Boolean,
         @get:Exclude
         var fcmToken: String,
-        @PropertyName("price")
-        var price: Int,
 ) : Parcelable {
-    constructor() : this("", "", false, "", 0)
+    constructor() : this("", "", false, "")
 }

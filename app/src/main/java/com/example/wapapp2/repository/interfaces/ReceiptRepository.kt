@@ -2,6 +2,7 @@ package com.example.wapapp2.repository.interfaces
 
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.ReceiptProductParticipantDTO
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.model.DocumentCollections
 
@@ -19,6 +20,8 @@ interface ReceiptRepository {
     suspend fun getProducts(receiptId: String, calcRoomId: String): MutableList<ReceiptProductDTO>
     suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String): Boolean
 
-    suspend fun addMyID_fromProductParticipantIDs(product_id: String)
-    suspend fun subMyID_fromProductParticipantIDs(product_id: String)
+    suspend fun updateMyIdFromProductParticipantIds(
+            add: Boolean, calcRoomId: String, receiptId: String, productId: String,
+            participantDTO: ReceiptProductParticipantDTO,
+    )
 }
