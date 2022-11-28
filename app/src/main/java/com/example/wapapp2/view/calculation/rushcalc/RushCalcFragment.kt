@@ -53,6 +53,10 @@ class RushCalcFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.topAppBar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
         binding.participants.adapter = participantsAdapter
         binding.rushCalcBtn.setOnClickListener {
             if (rushCalcRoomViewModel.selectedRecipients.isEmpty()) {
