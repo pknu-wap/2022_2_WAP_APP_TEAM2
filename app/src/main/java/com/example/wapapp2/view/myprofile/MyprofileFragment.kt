@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.model.BankAccountDTO
@@ -87,6 +89,7 @@ class MyprofileFragment : Fragment() {
         binding.bankList.adapter = adapter
 
         binding.btnEdit.setOnClickListener {
+            //프로필 수정 화면
             val dialog = DialogEditDetailFragment()
             dialog.show(parentFragmentManager, DialogEditDetailFragment.TAG)
         }
@@ -119,6 +122,13 @@ class MyprofileFragment : Fragment() {
         }
 
         myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
+            if(it.imgUri.isEmpty().not())
+                Glide.with(binding.root).load(it.imgUri).circleCrop().into(binding.myProfileImg)
+            else if(it.gender == "man")
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.man))
+            else
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.girl))
+
             binding.myProfileName.text = it.name
             binding.myAccountId.text = it.email
         }
