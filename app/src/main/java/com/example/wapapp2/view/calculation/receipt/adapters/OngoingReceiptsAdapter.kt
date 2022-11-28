@@ -82,15 +82,17 @@ class OngoingReceiptsAdapter(
                 delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
                     override fun onCheckedChanged(isChecked: Boolean) {
                         if (isChecked) {
+                            ++product.numOfPeopleSelected
+
                             iProductCheckBox.onProductChecked(product)
-                            // val newMoney = calcMyMoney(product)
-                            // binding.receiptMyMoney.text = DataTypeConverter.toKRW(newMoney)
+                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMoney(product))
                         } else {
+                            --product.numOfPeopleSelected
+
                             iProductCheckBox.onProductUnchecked(product)
-                            // binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
+                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
                         }
-                        // val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
-                        // binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
+                        showNumOfPeopleSelected(product)
                     }
                 }
                 binding.receiptMenu.text = product.name
@@ -98,20 +100,17 @@ class OngoingReceiptsAdapter(
                 binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMoney(product))
                 binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
 
-                val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
-                binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
-
+                showNumOfPeopleSelected(product)
                 binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
             }
 
-            private fun calcMoney(product: ReceiptProductDTO): Int {
-                return try {
-                    product.price / product.numOfPeopleSelected
-                } catch (e: ArithmeticException) {
-                    0
-                }
-            }
+            private fun calcMoney(product: ReceiptProductDTO): Int = if (product.numOfPeopleSelected == 0) 0
+            else product.price / product.numOfPeopleSelected
 
+            private fun showNumOfPeopleSelected(product: ReceiptProductDTO) {
+                val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
+                binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
+            }
         }
 
         override fun onCreateViewHolder(

@@ -90,7 +90,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             } else {
                 binding.calculationSimpleInfo.title.text = getString(R.string.my_settlement_amount)
                 binding.calculationSimpleInfo.summary.visibility = View.VISIBLE
-                updateMySettlementAmount(calculationViewModel.mySettlementAmount.value!!)
             }
         }
 
