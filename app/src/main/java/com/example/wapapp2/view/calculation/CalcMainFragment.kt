@@ -20,6 +20,7 @@ import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
+import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
@@ -205,6 +206,20 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                     .addToBackStack("CheckReceiptFragment")
                     .commit()
         }
+
+        binding.rushCalcBtn.setOnClickListener {
+            if (calculationViewModel.receiptMap.value!!.isEmpty) {
+                Toast.makeText(requireContext().applicationContext, R.string.no_available_rush_calc, Toast.LENGTH_SHORT).show()
+            } else {
+                val rushCalcFragment = RushCalcFragment()
+                val fragmentManager = parentFragmentManager
+                fragmentManager.beginTransaction().hide(this@CalcMainFragment)
+                        .add(R.id.fragment_container_view, rushCalcFragment, RushCalcFragment.TAG)
+                        .addToBackStack(RushCalcFragment.TAG)
+                        .commit()
+            }
+        }
+
         binding.exitRoom.setOnClickListener {
             //방 나가기
             MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.exit_from_room)

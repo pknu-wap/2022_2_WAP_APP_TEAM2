@@ -129,5 +129,8 @@
     <string name="my_settlement_amount">나의 정산금액</string>
     <string name="calc_rush">정산 요청</string>
     <string name="msg_calc_rush">정산 부탁드립니다!</string>
+    <string name="no_available_rush_calc">정산 요청이 불가합니다.</string>
+    <string name="not_selected_recipients">요청을 받을 사람을 선택해주세요</string>
+    <string name="msg_request_rush_calc">정산 요청을 하시겠습니까?</string>
 
 </resources>

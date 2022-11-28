@@ -166,17 +166,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
                 productsListenerMap[receiptId] = productListener
             }
-            
+
         }
     }
 
-
-    /**
-     * 정산 재촉 알림 보내기
-     */
-    private suspend fun sendNewCalcRoomFcm(calcRoomId: String, recipientTokens: MutableList<String>) {
-        FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.CalcRush, recipientTokens, SendFcmCalcRushDTO(calcRoomId,
-                myUserName, myUid))
-    }
 
 }
