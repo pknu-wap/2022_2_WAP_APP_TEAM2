@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.collection.arrayMapOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.DutchCheckFragmentBinding
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
@@ -29,12 +31,11 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
+        OngoingReceiptsAdapter.MY_UID = calculationViewModel.myUid
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
-        binding.viewReceipts.adapter = receiptsAdapter
 
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -63,12 +64,20 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        calculationViewModel.loadOngoingReceiptIds()
+        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+            currentCalcRoomViewModel.participants.removeObservers(viewLifecycleOwner)
+            OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
+            calculationViewModel.loadOngoingReceiptIds()
+        }
+        receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
+        binding.viewReceipts.adapter = receiptsAdapter
+
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
             receiptsAdapter.receiptMap.clear()
-            receiptsAdapter.receiptMap.putAll(result.toMutableMap())
+            receiptsAdapter.receiptMap.putAll(result.toMap())
             receiptsAdapter.notifyDataSetChanged()
         }
+
     }
 
     override fun onDestroyView() {

@@ -13,6 +13,7 @@ class ParticipantsAdapter(private val iCheckedRecipient: ICheckedRecipient<CalcR
 
     val participants = mutableListOf<CalcRoomParticipantDTO>()
 
+
     class ViewHolder(
             private val binding: ParticipantItemViewBinding,
             private val iCheckedRecipient: ICheckedRecipient<CalcRoomParticipantDTO>,

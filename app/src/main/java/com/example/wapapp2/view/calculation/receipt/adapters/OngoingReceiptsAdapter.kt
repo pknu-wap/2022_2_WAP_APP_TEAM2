@@ -2,6 +2,7 @@ package com.example.wapapp2.view.calculation.receipt.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.collection.ArrayMap
 import androidx.collection.arrayMapOf
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -12,16 +13,19 @@ import com.example.wapapp2.databinding.ViewRecentCalcProductBinding
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 /** 영수증 Adapter **/
 class OngoingReceiptsAdapter(
         private val iProductCheckBox: IProductCheckBox,
 ) : RecyclerView.Adapter<OngoingReceiptsAdapter.ReceiptVM>() {
     val receiptMap = arrayMapOf<String, ReceiptDTO>()
+
+    companion object {
+        var PARTICIPANT_COUNT = 0
+        lateinit var MY_UID: String
+    }
 
     class ReceiptVM(
             private val binding: ViewReceiptItemBinding,
@@ -39,10 +43,8 @@ class OngoingReceiptsAdapter(
             binding.description.text = description
 
             productsAdapter = null
-            productsAdapter = ProductsAdapter(receipt.getProducts(), iProductCheckBox)
+            productsAdapter = ProductsAdapter(receipt.productMap, iProductCheckBox)
             binding.recentCalcItem.adapter = productsAdapter
-
-
             binding.dateTime.text = dateTimeFormat.format(receipt.createdTime!!)
         }
     }
@@ -58,7 +60,7 @@ class OngoingReceiptsAdapter(
 
     /** 영수증 세부 항목 Adapter **/
     private class ProductsAdapter(
-            private val items: ArrayList<ReceiptProductDTO>,
+            private val items: ArrayMap<String, ReceiptProductDTO>,
             private val iProductCheckBox: IProductCheckBox,
     ) : RecyclerView.Adapter<ProductsAdapter.ProductVH>() {
 
@@ -73,6 +75,7 @@ class OngoingReceiptsAdapter(
                 binding.receiptMenu.text = product.name
                 binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
                 binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMyMoney(product))
+                binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
 
                 iProductCheckBox.updateSummaryForNewProduct(product)
 
@@ -92,21 +95,21 @@ class OngoingReceiptsAdapter(
                             binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
                         }
 
-                        val numOfPeopleSelected = "${product.personCount}/3"
+                        val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
                         binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
                     }
                 }
 
                 binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
 
-                val numOfPeopleSelected = "${product.personCount}/3"
+                val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
                 binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
-                binding.recentCalcCkbox.isChecked = true
+
             }
 
             private fun calcMyMoney(product: ReceiptProductDTO): Int {
                 return try {
-                    product.price / product.personCount
+                    product.price / product.numOfPeopleSelected
                 } catch (e: ArithmeticException) {
                     0
                 }
@@ -119,7 +122,7 @@ class OngoingReceiptsAdapter(
         ): ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
 
         override fun onBindViewHolder(holder: ProductVH, position: Int) {
-            holder.bind(items[position])
+            holder.bind(items.valueAt(position))
         }
 
         override fun getItemCount(): Int = items.size

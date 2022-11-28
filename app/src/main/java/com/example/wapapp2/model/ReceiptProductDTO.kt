@@ -21,7 +21,7 @@ data class ReceiptProductDTO(
         @PropertyName("count")
         var count: Int,
         @get:Exclude
-        var personCount: Int = 0,
+        var numOfPeopleSelected: Int = 0,
         @PropertyName("participants")
         val participants: MutableMap<String, ReceiptProductParticipantDTO>,
 ) : Parcelable {

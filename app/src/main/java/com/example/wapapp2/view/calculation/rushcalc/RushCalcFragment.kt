@@ -35,7 +35,17 @@ class RushCalcFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         participantsAdapter = ParticipantsAdapter(rushCalcRoomViewModel)
-        participantsAdapter!!.participants.addAll(currentCalcRoomViewModel.participants.value!!.toMutableList())
+        currentCalcRoomViewModel.participants.value!!.toMutableList().apply {
+            val list = this
+            val myUid = myAccountViewModel.myProfileData.value!!.id
+            for (p in list) {
+                if (p.userId == myUid) {
+                    list.remove(p)
+                    break
+                }
+            }
+            participantsAdapter!!.participants.addAll(list)
+        }
 
         rushCalcRoomViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
         rushCalcRoomViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
@@ -71,7 +81,8 @@ class RushCalcFragment : Fragment() {
                         }.setPositiveButton(R.string.check) { dialog, which ->
                             dialog.dismiss()
                             rushCalcRoomViewModel.sendRushCalcFcm()
-                        }
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }.create().show()
             }
         }
     }

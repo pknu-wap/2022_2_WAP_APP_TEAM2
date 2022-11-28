@@ -154,7 +154,7 @@ class NewReceiptViewModel : ViewModel() {
     /**
      * 새로운 영수증 추가 알림
      */
-    fun sendNewReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+    fun sendNewReceiptFcm(receiptDTO: ReceiptDTO, calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
             receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)

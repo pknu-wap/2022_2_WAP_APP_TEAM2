@@ -12,10 +12,8 @@ abstract class MyCheckBoxListener<T>(
         onCheckedChanged(data, isChecked)
     }
 
-
     override fun onCheckedStateChangedListener(checkBox: MaterialCheckBox, state: Int) {
-        val isChecked = state == MaterialCheckBox.STATE_CHECKED
-        onCheckedChanged(data, isChecked)
+        onCheckedChanged(data, state == MaterialCheckBox.STATE_CHECKED)
     }
 
     abstract fun onCheckedChanged(e: T, isChecked: Boolean)

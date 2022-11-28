@@ -85,7 +85,7 @@ class NewReceiptFragment : Fragment() {
         newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
             //영수증 추가 FCM전송
             for (receipt in newReceiptViewModel.getReceipts()) {
-                newReceiptViewModel.sendNewReceipt(receipt, newReceiptViewModel.calcRoomId!!)
+                newReceiptViewModel.sendNewReceiptFcm(receipt, newReceiptViewModel.calcRoomId!!)
             }
 
             LoadingDialogView.clearDialogs()
