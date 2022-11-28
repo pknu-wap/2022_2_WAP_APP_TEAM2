@@ -6,9 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRushDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
@@ -25,6 +30,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     //내 정산 금액
     val mySettlementAmount = MutableLiveData(0)
     val receiptMap = MutableLiveData(arrayMapOf<String, ReceiptDTO>())
+
+    lateinit var myUid: String
+    lateinit var myUserName: String
 
     lateinit var calcRoomId: String
 
@@ -158,9 +166,17 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
                 productsListenerMap[receiptId] = productListener
             }
-
-
+            
         }
+    }
+
+
+    /**
+     * 정산 재촉 알림 보내기
+     */
+    private suspend fun sendNewCalcRoomFcm(calcRoomId: String, recipientTokens: MutableList<String>) {
+        FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.CalcRush, recipientTokens, SendFcmCalcRushDTO(calcRoomId,
+                myUserName, myUid))
     }
 
 }

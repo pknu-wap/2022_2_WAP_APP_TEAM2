@@ -50,7 +50,7 @@ class ReceiptProductsAdapter(
         @SuppressLint("NotifyDataSetChanged")
         fun createParticipants(model: ReceiptProductDTO) {
             participantsAdapter.participants.clear()
-            participantsAdapter.participants.addAll(model.participants.toMutableList())
+            participantsAdapter.participants.addAll(model.participants.values)
             binding.participants.adapter?.notifyDataSetChanged()
         }
     }

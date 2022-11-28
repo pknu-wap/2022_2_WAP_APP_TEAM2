@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.add
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
@@ -24,6 +25,7 @@ import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
@@ -38,6 +40,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
     private val calculationViewModel by viewModels<CalculationViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     private var chatInputLayoutHeight = 0
 
@@ -50,6 +53,9 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
             calculationViewModel.calcRoomId = roomId!!
         }
+
+        calculationViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
+        calculationViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
     }
@@ -68,18 +74,23 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
         setSideMenu()
 
         calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
-            if (transferMoney >= 0) {
-                val value = "+ ${DataTypeConverter.toKRW(transferMoney)}"
-                binding.calculationSimpleInfo.summary.text = value
-            } else {
-                binding.calculationSimpleInfo.summary.text = DataTypeConverter.toKRW(transferMoney)
-                binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext().applicationContext, R.color.payMinus))
-            }
+            updateMySettlementAmount(transferMoney)
         }
 
         currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
             binding.topAppBar.title = it.name
             binding.roomTitle.text = it.name
+        }
+
+        calculationViewModel.receiptMap.observe(viewLifecycleOwner) {
+            if (it.isEmpty) {
+                binding.calculationSimpleInfo.title.text = getString(R.string.empty_ongoing_receipts)
+                binding.calculationSimpleInfo.summary.visibility = View.GONE
+            } else {
+                binding.calculationSimpleInfo.title.text = getString(R.string.my_settlement_amount)
+                binding.calculationSimpleInfo.summary.visibility = View.VISIBLE
+                updateMySettlementAmount(calculationViewModel.mySettlementAmount.value!!)
+            }
         }
 
         val chatFragment = ChatFragment()
@@ -122,6 +133,16 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("roomId", roomId)
+    }
+
+    private fun updateMySettlementAmount(transferMoney: Int) {
+        if (transferMoney >= 0) {
+            val value = "+ ${DataTypeConverter.toKRW(transferMoney)}"
+            binding.calculationSimpleInfo.summary.text = value
+        } else {
+            binding.calculationSimpleInfo.summary.text = DataTypeConverter.toKRW(transferMoney)
+            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext().applicationContext, R.color.payMinus))
+        }
     }
 
     private fun setOngoingFolderView() {
