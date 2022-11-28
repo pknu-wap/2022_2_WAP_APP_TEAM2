@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -20,12 +21,16 @@ import com.google.android.material.tabs.TabLayoutMediator
 import org.joda.time.DateTime
 import org.joda.time.Days
 import java.time.temporal.ChronoUnit
+import java.util.HashMap
 import kotlin.math.abs
 
 
-class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>>, val receiptItemClickListener: ReceiptItemClickListener) : DialogFragment() {
+class CalendarDialogFragment( val receiptItemClickListener: ReceiptItemClickListener) : DialogFragment() {
     private lateinit var binding: FragmentCalendarDialogBinding
-    private val calendarDialogViewModel: CalendarDialogViewModel by viewModels()
+    private val calendarDialogViewModel by viewModels<CalendarDialogViewModel>()
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
+
+    lateinit var hashMap : HashMap<String, ArrayList<ReceiptDTO>>
     private val FIRST_VIEW_PAGER_POSITION = Int.MAX_VALUE / 2
 
     private lateinit var viewPagerAdapter: DialogViewPagerAdapter
@@ -37,6 +42,7 @@ class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hashMap = myCalendarViewModel.myReceiptMap ?: hashMapOf()
         calendarDialogViewModel.arguments = arguments ?: savedInstanceState
         calendarDialogViewModel.firstSelectedDay = calendarDialogViewModel.arguments!!.getString("selectedDayISO8601", "")
         val dstKey = DateTime.parse(calendarDialogViewModel.firstSelectedDay).toString("yyyyMMdd")
@@ -51,6 +57,7 @@ class CalendarDialogFragment(val hashMap : HashMap<String, ArrayList<ReceiptDTO>
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentCalendarDialogBinding.inflate(inflater)
+
 
         binding.viewPager.apply {
             val margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, resources.displayMetrics).toInt()
