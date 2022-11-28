@@ -20,14 +20,12 @@ data class ReceiptProductDTO(
         var price: Int,
         @PropertyName("count")
         var count: Int,
-        @PropertyName("checkedUserIds")
-        var checkedUserIds: ArrayList<String> = ArrayList<String>(),
         @get:Exclude
         var personCount: Int = 0,
         @PropertyName("participants")
-        val participants: MutableList<ReceiptProductParticipantDTO>,
+        val participants: MutableMap<String, ReceiptProductParticipantDTO>,
 ) : Parcelable {
-    constructor() : this("", "", 0, 0, arrayListOf(), 0, mutableListOf())
+    constructor() : this("", "", 0, 0, 0, mutableMapOf())
 
     fun equalsSimple(other: ReceiptProductDTO): Boolean =
             !(name != other.name || count != other.count || price != other.price)

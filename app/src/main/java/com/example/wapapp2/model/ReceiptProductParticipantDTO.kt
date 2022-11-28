@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ReceiptProductParticipantDTO(
-        @PropertyName("userId")
+        @get:Exclude
         val userId: String,
         @PropertyName("userName")
         val userName: String,

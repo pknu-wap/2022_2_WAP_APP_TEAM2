@@ -1,6 +1,5 @@
 package com.example.wapapp2.viewmodel
 
-import android.util.ArrayMap
 import androidx.collection.arrayMapOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +9,7 @@ import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
@@ -20,6 +20,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     private val calcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
 
     private var onGoingReceiptIdsListener: ListenerRegistration? = null
+    private val productsListenerMap = mutableMapOf<String, ListenerRegistration>()
 
     //내 정산 금액
     val mySettlementAmount = MutableLiveData(0)
@@ -114,24 +115,51 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
         CoroutineScope(Dispatchers.IO).launch {
             val receiptListResult = async { receiptRepository.getReceipts(calcRoomId, receiptIds.toList()) }
             val receiptList = receiptListResult.await()
-            //영수증 항목 로드
-            val productMap = arrayMapOf<String, MutableList<ReceiptProductDTO>>()
-            val modifiedMap = receiptMap.value!!
 
             for (receipt in receiptList) {
-                val productsResult = async {
-                    receiptRepository.getProducts(receipt.id, calcRoomId)
+                val receiptId = receipt.id
+                if (productsListenerMap.containsKey(receiptId))
+                    continue
+
+                val productListener = receiptRepository.snapshotProducts(calcRoomId, receiptId) { value, error ->
+                    if (value == null)
+                        return@snapshotProducts
+
+                    //영수증 항목 로드, key = receiptId, value : map   key = productId
+                    val productMap = mutableMapOf<String, ReceiptProductDTO>()
+                    val modifiedReceiptMap = receiptMap.value!!
+                    val removedIds = mutableSetOf<String>()
+
+                    for (dc in value.documentChanges) {
+                        if (dc.type == DocumentChange.Type.ADDED || dc.type == DocumentChange.Type.MODIFIED) {
+                            val productDto = dc.document.toObject<ReceiptProductDTO>()
+                            productDto.id = dc.document.id
+
+                            productMap[productDto.id] = productDto
+                        } else {
+                            val removedProductId = dc.document.id
+                            removedIds.add(removedProductId)
+                        }
+
+                    }
+
+                    if (!modifiedReceiptMap.containsKey(receiptId))
+                        modifiedReceiptMap[receipt.id] = receipt
+
+                    modifiedReceiptMap[receiptId]!!.apply {
+                        if (removedIds.isNotEmpty())
+                            this.productMap.removeAll(removedIds)
+
+                        this.productMap.putAll(productMap.toMutableMap())
+                    }
+
+                    receiptMap.value = modifiedReceiptMap
                 }
-                productsResult.await()
-                productMap[receipt.id] = productsResult.await()
-                modifiedMap[receipt.id] = receipt
-                modifiedMap[receipt.id]!!.getProducts().clear()
-                modifiedMap[receipt.id]!!.getProducts().addAll(productMap[receipt.id]!!.toList())
+
+                productsListenerMap[receiptId] = productListener
             }
 
-            withContext(Main) {
-                receiptMap.value = modifiedMap
-            }
+
         }
     }
 

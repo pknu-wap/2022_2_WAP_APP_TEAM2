@@ -206,6 +206,10 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
             fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
 
+    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+            fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
+                    .collection(FireStoreNames.products.name).addSnapshotListener(eventListener)
 
     override suspend fun getProducts(
             receiptId: String,
