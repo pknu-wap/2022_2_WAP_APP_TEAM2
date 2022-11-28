@@ -1,5 +1,6 @@
 package com.example.wapapp2.viewmodel
 
+import android.util.Log
 import androidx.collection.arrayMapOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -52,37 +53,39 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     }
 
     private fun updateSettlementAmount(isChecked: Boolean, productDTO: ReceiptProductDTO) {
+        // 로그인한 사람이 결제자 -> 체크박스 체크 : - , unchecked : +
         val payersIsMe = productDTO.payersId == myUid
         val increase = if (isChecked) !payersIsMe else payersIsMe
 
-        if (isChecked) ++productDTO.numOfPeopleSelected
+        val newAmount = if (increase) mySettlementAmount.value!! + (productDTO.price / ++productDTO.numOfPeopleSelected)
+        else mySettlementAmount.value!! - (productDTO.price / productDTO.numOfPeopleSelected)
 
-        val value = if (increase)
-            mySettlementAmount.value!! + productDTO.price / productDTO.numOfPeopleSelected else
-            mySettlementAmount.value!! - productDTO.price / productDTO.numOfPeopleSelected
+        if (!isChecked) productDTO.numOfPeopleSelected--
 
-        if (!isChecked) --productDTO.numOfPeopleSelected
-        mySettlementAmount.value = value
+        mySettlementAmount.value = newAmount
+        Log.e("금액 변경됨", "체크여부 : $isChecked , 항목명 : ${productDTO.name} , 체크 인원 수 : ${productDTO.numOfPeopleSelected} " +
+                ", 금액 : ${productDTO.price} , 계산 금액 : $newAmount")
     }
 
     override fun onProductChecked(productDTO: ReceiptProductDTO) {
         updateSettlementAmount(isChecked = true, productDTO)
-
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             receiptRepository.updateMyIdFromProductParticipantIds(true,
-                    calcRoomId, productDTO.receiptId!!, productDTO.id,
-                    ReceiptProductParticipantDTO(myUid, myUserName, false, ""))
+                    calcRoomId, productDTO.receiptId!!, productDTO.id, ReceiptProductParticipantDTO(myUid, myUserName, false, ""))
         }
+         */
     }
 
     override fun onProductUnchecked(productDTO: ReceiptProductDTO) {
         updateSettlementAmount(isChecked = false, productDTO)
-
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             receiptRepository.updateMyIdFromProductParticipantIds(false,
                     calcRoomId, productDTO.receiptId!!, productDTO.id,
                     ReceiptProductParticipantDTO(myUid, myUserName, false, ""))
         }
+         */
     }
 
     /**

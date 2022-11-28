@@ -27,6 +27,7 @@ class OngoingReceiptsAdapter(
         lateinit var MY_UID: String
     }
 
+
     class ReceiptVM(
             private val binding: ViewReceiptItemBinding,
             private val iProductCheckBox: IProductCheckBox,
@@ -71,38 +72,39 @@ class OngoingReceiptsAdapter(
                 RecyclerView.ViewHolder(binding.root) {
             private var delayCheckBoxListener: DelayCheckBoxListener? = null
 
-            fun bind(product: ReceiptProductDTO) {
-                binding.receiptMenu.text = product.name
-                binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
-                binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMyMoney(product))
-                binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
 
-                iProductCheckBox.updateSummaryForNewProduct(product)
+            fun bind(product: ReceiptProductDTO) {
+                delayCheckBoxListener?.run {
+                    binding.recentCalcCkbox.removeOnCheckedStateChangedListener(this)
+                    null
+                }
 
                 delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
                     override fun onCheckedChanged(isChecked: Boolean) {
                         if (isChecked) {
                             iProductCheckBox.onProductChecked(product)
-                            val newMoney = calcMyMoney(product)
-                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(newMoney)
+                            // val newMoney = calcMyMoney(product)
+                            // binding.receiptMyMoney.text = DataTypeConverter.toKRW(newMoney)
                         } else {
                             iProductCheckBox.onProductUnchecked(product)
-                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
+                            // binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
                         }
-
-                        val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
-                        binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
+                        // val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
+                        // binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
                     }
                 }
-
-                binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
+                binding.receiptMenu.text = product.name
+                binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
+                binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMoney(product))
+                binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
 
                 val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
                 binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
 
+                binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
             }
 
-            private fun calcMyMoney(product: ReceiptProductDTO): Int {
+            private fun calcMoney(product: ReceiptProductDTO): Int {
                 return try {
                     product.price / product.numOfPeopleSelected
                 } catch (e: ArithmeticException) {
