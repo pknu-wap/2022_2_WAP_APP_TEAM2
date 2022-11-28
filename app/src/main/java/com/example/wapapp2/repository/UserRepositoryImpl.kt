@@ -99,4 +99,10 @@ class UserRepositoryImpl : UserRepository {
         return dtoSet
     }
 
+    override suspend fun updateMyName(newName: String) = suspendCoroutine<Boolean> { continuation ->
+        fireStore.collection(FireStoreNames.users.name)
+            .document(auth.currentUser!!.uid)
+            .update("name", newName).addOnCompleteListener { continuation.resume(it.isSuccessful) }
+    }
+
 }

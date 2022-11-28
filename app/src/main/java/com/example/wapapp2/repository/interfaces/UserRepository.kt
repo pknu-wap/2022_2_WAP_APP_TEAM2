@@ -10,4 +10,5 @@ interface UserRepository {
     suspend fun getUser(userId: String): UserDTO?
     suspend fun removeCalcRoomId(roomId: String)
     suspend fun setMyProfileUrl(url: String): Boolean
+    suspend fun updateMyName(name : String) : Boolean
 }

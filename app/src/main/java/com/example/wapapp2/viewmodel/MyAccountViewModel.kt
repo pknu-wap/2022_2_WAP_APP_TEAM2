@@ -18,6 +18,8 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MyAccountViewModel : ViewModel() {
     private val userRepository : UserRepository = UserRepositoryImpl.getINSTANCE()
@@ -69,7 +71,7 @@ class MyAccountViewModel : ViewModel() {
 
 
     //있으면 지우고 해야함
-    fun SetMyProfileUri(uri : Uri){
+    suspend fun SetMyProfileUri(uri : Uri) = suspendCoroutine<Boolean>{ continuation ->
         CoroutineScope(Default).launch {
             if(myProfileData.value!!.imgUri.isEmpty().not())
                 async { userImgRepository.deleteProfileUri(myProfileData.value!!.imgUri)}
@@ -78,30 +80,49 @@ class MyAccountViewModel : ViewModel() {
             url.await()?.apply {
                 val resultCode = async { userRepository.setMyProfileUrl(this@apply) }
                 resultCode.await()?.let{
-                    withContext(Main){
+                    if(it) withContext(Main) {
                         val tmp = myProfileData.value!!
                         tmp.imgUri = this@apply
                         myProfileData.value = tmp
                     }
+                    continuation.resume(it)
                 }
             }
         }
     }
 
-    fun DeleteMyProfileUrl(){
+    suspend fun DeleteMyProfileUrl() = suspendCoroutine<Boolean>{ continuation->
         CoroutineScope(Default).launch {
             val result = async { userImgRepository.deleteProfileUri(myProfileData.value!!.imgUri)}
             result.await()?.apply {
                 if(this){
                     val resultCode = async { userRepository.setMyProfileUrl("") }
                     resultCode.await()?.let{
-                        withContext(Main){
+                        if(it) withContext(Main){
                             val tmp = myProfileData.value!!
                             tmp.imgUri = ""
                             myProfileData.value = tmp
                         }
+                        continuation.resume(it)
+
                     }
                 }
+            }
+        }
+    }
+
+    suspend fun UpdatePassword(passsword : String) = suspendCoroutine<Boolean> { continuation ->
+        CoroutineScope(Default).launch {
+            auth.currentUser!!.updatePassword(passsword).addOnCompleteListener { continuation.resume(it.isSuccessful) }
+        }
+    }
+
+    suspend fun UpdateName(newName : String) = suspendCoroutine<Boolean> { continuation ->
+        CoroutineScope(Default).launch {
+            val resultCode = async { userRepository.updateMyName(newName) }
+            resultCode.await()?.apply {
+                if(this) withContext(Main){myProfileData.value!!.name = newName}
+                continuation.resume(this)
             }
         }
     }
