@@ -4,10 +4,8 @@ import android.util.Log
 import androidx.collection.arrayMapOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wapapp2.model.CalcRoomDTO
-import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.model.ReceiptProductDTO
-import com.example.wapapp2.model.ReceiptProductParticipantDTO
+import com.example.wapapp2.model.*
+import com.example.wapapp2.repository.BankAccountRepositoryImpl
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import com.example.wapapp2.view.calculation.receipt.interfaces.IProductCheckBox
@@ -20,6 +18,7 @@ import kotlinx.coroutines.Dispatchers.Main
 class CalculationViewModel : ViewModel(), IProductCheckBox {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
     private val calcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
+    private val bankAccountsRepository = BankAccountRepositoryImpl.getINSTANCE()
 
     private var onGoingReceiptIdsListener: ListenerRegistration? = null
     private val productsListenerMap = mutableMapOf<String, ListenerRegistration>()
@@ -27,11 +26,16 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     //내 정산 금액
     val mySettlementAmount = MutableLiveData(0)
     val receiptMap = MutableLiveData(arrayMapOf<String, ReceiptDTO>())
+    val verifiedParticipantIds = mutableSetOf<String>()
+    val calcRoomParticipantIds = mutableSetOf<String>()
+
+    val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
     lateinit var myUid: String
     lateinit var myUserName: String
 
     lateinit var calcRoomId: String
+
 
     override fun onCleared() {
         super.onCleared()
@@ -179,8 +183,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
                             productMap[productDto.id] = productDto
 
-                            if (dc.type == DocumentChange.Type.MODIFIED)
+                            if (dc.type == DocumentChange.Type.MODIFIED) {
                                 firstLoadedData = false
+                            }
                         } else {
                             val removedProductId = dc.document.id
                             removedProductIds.add(removedProductId)
@@ -205,6 +210,8 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                         val myMoney = updateMyTransferMoney()
                         mySettlementAmount.value = myMoney
                     }
+
+                    checkVerifiedParticipants()
                 }
 
                 productsListenerMap[receiptId]?.apply {
@@ -216,5 +223,53 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
         }
     }
 
+    private fun checkVerifiedParticipants() {
+        val receiptMap = receiptMap.value!!
+        verifiedParticipantIds.clear()
 
+        for (receipt in receiptMap.values) {
+            for (product in receipt.productMap.values) {
+                verifiedParticipantIds.addAll(product.participants.keys)
+            }
+        }
+    }
+
+    fun endCalculation(): Boolean = verifiedParticipantIds == calcRoomParticipantIds
+
+    fun loadFinalTransferData() {
+        //계좌 번호 로드
+        CoroutineScope(Dispatchers.IO).launch {
+            val receipts = receiptMap.value!!
+            val finalTransferDataList = mutableListOf<FinalTransferDTO>()
+
+            for (receipt in receipts.values) {
+                val payersId = receipt.payersId
+                val payersIsMe = payersId == myUid
+
+                val bankAccountsResult = async {
+                    bankAccountsRepository.getBankAccounts(payersId)
+                }
+                val bankAccounts = bankAccountsResult.await()
+
+                var mySettlementAmount = 0
+                for (product in receipt.productMap.values) {
+                    for (participantId in product.participants.keys) {
+                        if (participantId == myUid) {
+                            mySettlementAmount += product.price / product.participants.size
+                            break
+                        }
+                    }
+                }
+
+                if (payersIsMe)
+                    mySettlementAmount = -mySettlementAmount
+
+                finalTransferDataList.add(FinalTransferDTO(payersId = receipt.payersId, payersName = receipt.payersName,
+                        transferMoney = mySettlementAmount, accounts = bankAccounts))
+            }
+            withContext(Main) {
+                finalTransferData.value = finalTransferDataList
+            }
+        }
+    }
 }

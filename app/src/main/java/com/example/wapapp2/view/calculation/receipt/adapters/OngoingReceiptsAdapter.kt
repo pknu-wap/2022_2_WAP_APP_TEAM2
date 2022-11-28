@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.collection.ArrayMap
@@ -72,14 +73,13 @@ class OngoingReceiptsAdapter(
                 RecyclerView.ViewHolder(binding.root) {
             private var delayCheckBoxListener: DelayCheckBoxListener? = null
 
-
             fun bind(product: ReceiptProductDTO) {
                 delayCheckBoxListener?.run {
                     binding.recentCalcCkbox.removeOnCheckedStateChangedListener(this)
                     null
                 }
 
-                delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
+                delayCheckBoxListener = object : DelayCheckBoxListener(3000L) {
                     override fun onCheckedChanged(isChecked: Boolean) {
                         if (isChecked) {
                             ++product.numOfPeopleSelected
@@ -115,7 +115,7 @@ class OngoingReceiptsAdapter(
 
         override fun onCreateViewHolder(
                 parent: ViewGroup, viewType: Int,
-        ): ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
+        ): ProductsAdapter.ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
 
         override fun onBindViewHolder(holder: ProductVH, position: Int) {
             holder.bind(items.valueAt(position))

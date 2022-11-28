@@ -93,6 +93,11 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
         }
 
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            calculationViewModel.calcRoomParticipantIds.clear()
+            calculationViewModel.calcRoomParticipantIds.addAll(it.keys.toMutableSet())
+        }
+
         val chatFragment = ChatFragment()
         chatFragment.setViewHeightCallback { height ->
             // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경

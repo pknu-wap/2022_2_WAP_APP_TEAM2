@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.Toast
 import androidx.collection.arrayMapOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -39,11 +40,20 @@ class DutchCheckFragment() : Fragment() {
 
         binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
+                if (calculationViewModel.endCalculation()) {
+                    parentFragmentManager.beginTransaction()
+                            .replace(R.id.calculation_fragment_container_view, DutchPriceFragment(), DutchPriceFragment.TAG)
+                            .addToBackStack(DutchPriceFragment.TAG)
+                            .commitAllowingStateLoss()
+                } else {
+                    Toast.makeText(requireContext().applicationContext, R.string.participants_who_have_not_been_verified, Toast
+                            .LENGTH_SHORT).show()
+                    binding.btnDone.isChecked = false
+                }
             } else {
-                //임시로 구현 -> 팀 인원 다 체크후 해야함
-                parentFragmentManager.beginTransaction()
-                        .replace(R.id.calculation_fragment_container_view, DutchPriceFragment(), DutchPriceFragment.TAG)
-                        .commitAllowingStateLoss()
+                val fragmentManager = parentFragmentManager
+                if (fragmentManager.findFragmentByTag(DutchPriceFragment.TAG) != null)
+                    fragmentManager.popBackStack()
             }
         })
 
@@ -64,8 +74,8 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
-            currentCalcRoomViewModel.participants.removeObservers(viewLifecycleOwner)
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            currentCalcRoomViewModel.participantMap.removeObservers(viewLifecycleOwner)
             OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
             calculationViewModel.loadOngoingReceiptIds()
         }

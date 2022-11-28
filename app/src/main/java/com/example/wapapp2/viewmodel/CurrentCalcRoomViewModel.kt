@@ -31,9 +31,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     var roomId: String? = null
     val myFriendMap = mutableMapOf<String, FriendDTO>()
-    val participants = MutableLiveData<MutableList<CalcRoomParticipantDTO>>()
-    val participantMap = mutableMapOf<String, CalcRoomParticipantDTO>()
-    val participantIds = mutableSetOf<String>()
+    val participantMap = MutableLiveData(mutableMapOf<String, CalcRoomParticipantDTO>())
     val receipts = MutableLiveData<ArrayMap<String, ReceiptDTO>>(arrayMapOf())
     val calcRoom = MutableLiveData<CalcRoomDTO>()
 
@@ -58,11 +56,11 @@ class CurrentCalcRoomViewModel : ViewModel() {
         addSnapshotReceipts()
     }
 
-    private fun onChangedParticipants() {
+    private fun onChangedParticipants(participantIds: MutableList<String>) {
         // 정산방 참여자 목록 가져오기
         viewModelScope.launch {
             val downloadedParticipantList = async {
-                userRepository.getUsers(participantIds.toMutableList())
+                userRepository.getUsers(participantIds)
             }
             // 받아온 유저 목록에서 친구 추가 여부 확인
             val participantList = mutableListOf<CalcRoomParticipantDTO>()
@@ -70,18 +68,19 @@ class CurrentCalcRoomViewModel : ViewModel() {
             var isMyFriend = false
             var dto: CalcRoomParticipantDTO? = null
 
+            val _participantMap = participantMap.value!!
+
             for (v in downloadedParticipantList.await()) {
                 //내 친구인지 확인
                 isMyFriend = myFriendMap.containsKey(v.id)
                 name = if (isMyFriend) myFriendMap[v.id]!!.alias else v.name
 
                 dto = CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email, v.fcmToken)
-                participantList.add(dto)
-                participantMap[v.id] = dto
+                _participantMap[v.id] = dto
             }
 
             withContext(Main) {
-                participants.value = participantList
+                participantMap.value = _participantMap
             }
         }
     }
@@ -114,18 +113,15 @@ class CurrentCalcRoomViewModel : ViewModel() {
                 return@EventListener
             }
 
-
-
             //성공, 정산방 정보 가져옴
             val calcRoomDTO = value.toObject<CalcRoomDTO>()!!
             calcRoomDTO.id = value.id
 
             //참여자 변화 확인
-            if (calcRoomDTO.participantIds.toMutableSet() != participantIds) {
+            if (calcRoomDTO.participantIds.toMutableSet() != participantMap.value!!.keys) {
                 //참여자 변화 생김
-                participantIds.clear()
-                participantIds.addAll(calcRoomDTO.participantIds.toMutableSet())
-                onChangedParticipants()
+                val participantIds = calcRoomDTO.participantIds.toMutableList()
+                onChangedParticipants(participantIds)
             }
 
             calcRoom.value = calcRoomDTO

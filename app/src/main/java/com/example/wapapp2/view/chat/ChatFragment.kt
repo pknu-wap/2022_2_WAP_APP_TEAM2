@@ -100,17 +100,17 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             }
         }
 
-        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
             if (chatAdapter == null) {
                 val config = PagingConfig(20, 10, false)
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
                         .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
                             val id = snapshot.getString("senderId").toString()
-                            val userName: String = if (currentCalcRoomViewModel.participantMap.containsKey(id))
-                                currentCalcRoomViewModel.participantMap[id]!!.userName
+                            val userName: String = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(id))
+                                currentCalcRoomViewModel.participantMap.value!![id]!!.userName
                             else
-                                snapshot.getString("userName")!!
+                            snapshot.getString("userName")!!
 
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
                                     snapshot.getString("msg").toString(), id, false)
@@ -215,8 +215,8 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             return
 
         chatAdapter?.getLastChatDTO()?.apply {
-            val alias = if (currentCalcRoomViewModel.participantMap.containsKey(senderId))
-                currentCalcRoomViewModel.participantMap[senderId]!!.userName
+            val alias = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(senderId))
+                currentCalcRoomViewModel.participantMap.value!![senderId]!!.userName
             else userName
 
             val msg = "$alias : $msg"

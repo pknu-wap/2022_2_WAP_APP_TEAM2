@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="4"
-        tools:listitem="@layout/view_receipt_item"
+        tools:listitem="@layout/view_dutch_item"
         />
 
     <!-- Button Frame -->

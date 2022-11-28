@@ -132,5 +132,6 @@
     <string name="no_available_rush_calc">정산 요청이 불가합니다.</string>
     <string name="not_selected_recipients">요청을 받을 사람을 선택해주세요</string>
     <string name="msg_request_rush_calc">정산 요청을 하시겠습니까?</string>
+    <string name="participants_who_have_not_been_verified">확인하지 않은 친구가 있습니다</string>
 
 </resources>
