@@ -46,10 +46,22 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
         mySettlementAmount.value = value
     }
 
-    override fun onProductChecked(productDTO: ReceiptProductDTO) {
-        val value = mySettlementAmount.value!! + productDTO.price / ++productDTO.numOfPeopleSelected
-        mySettlementAmount.value = value
+    private fun updateSettlementAmount(isChecked: Boolean, productDTO: ReceiptProductDTO) {
+        val payersIsMe = productDTO.payersId == myUid
+        val increase = if (isChecked) !payersIsMe else payersIsMe
 
+        if (isChecked) ++productDTO.numOfPeopleSelected
+
+        val value = if (increase)
+            mySettlementAmount.value!! + productDTO.price / productDTO.numOfPeopleSelected else
+            mySettlementAmount.value!! - productDTO.price / productDTO.numOfPeopleSelected
+
+        if (!isChecked) --productDTO.numOfPeopleSelected
+        mySettlementAmount.value = value
+    }
+
+    override fun onProductChecked(productDTO: ReceiptProductDTO) {
+        updateSettlementAmount(isChecked = true, productDTO)
         /*
         CoroutineScope(Dispatchers.IO).launch {
             receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
@@ -59,8 +71,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     }
 
     override fun onProductUnchecked(productDTO: ReceiptProductDTO) {
-        val value = mySettlementAmount.value!! - productDTO.price / productDTO.numOfPeopleSelected--
-        mySettlementAmount.value = value
+        updateSettlementAmount(isChecked = false, productDTO)
 
         /*
         CoroutineScope(Dispatchers.IO).launch {
@@ -138,6 +149,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                             val productDto = dc.document.toObject<ReceiptProductDTO>()
                             productDto.numOfPeopleSelected = productDto.participants.size
                             productDto.id = dc.document.id
+                            productDto.payersId = receipt.payersId
 
                             productMap[productDto.id] = productDto
                         } else {

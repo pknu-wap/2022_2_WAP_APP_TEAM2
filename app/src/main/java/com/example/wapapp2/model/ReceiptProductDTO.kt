@@ -27,6 +27,9 @@ data class ReceiptProductDTO(
 ) : Parcelable {
     constructor() : this("", "", 0, 0, 0, mutableMapOf())
 
+    @get:Exclude
+    var payersId: String? = null
+
     fun equalsSimple(other: ReceiptProductDTO): Boolean =
             !(name != other.name || count != other.count || price != other.price)
 
