@@ -53,21 +53,27 @@ class DialogEditDetailFragment : DialogFragment() {
 
         binding.username.text = myUserDTO.name.toEditable()
 
-        if(myUserDTO.imgUri.isEmpty().not())
+        if(myUserDTO.imgUri.isEmpty().not()) {
             Glide.with(binding.root).load(myUserDTO.imgUri).circleCrop().into(binding.myProfileImg)
-        else if (myUserDTO.gender == "man")
+            currentUri= Uri.EMPTY // 이미지가 있음을 empty로 표시 ( 없으면 널)
+        }else if (myUserDTO.gender == "man")
             binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.man))
         else
             binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.girl))
 
         binding.buttonDone.setOnClickListener {
-
             //정보가 변경됨
             if(
                 myUserDTO.name.equals(binding.username.text.toString()).not() ||
-                currentUri != null || ((currentUri == null) && (myUserDTO.imgUri.isEmpty().not())) ||
+                (currentUri != null && currentUri != Uri.EMPTY) ||
+                ((currentUri == null) && (myUserDTO.imgUri.isEmpty().not()))  ||
                 binding.password.text.isEmpty().not()
             ) {
+                if (binding.username.text.toString().isEmpty()){
+                    Toast.makeText(requireContext(),"이름은 빈 값이 될 수 없습니다.",Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("변경된 정보로 수정하시겠습니까?")
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, which ->
@@ -155,7 +161,5 @@ class DialogEditDetailFragment : DialogFragment() {
 
             }.create().show()
     }
-
-
 
 }
