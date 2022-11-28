@@ -63,9 +63,11 @@ class DialogEditDetailFragment : DialogFragment() {
         binding.buttonDone.setOnClickListener {
 
             //정보가 변경됨
-            if(myUserDTO.name.equals(binding.username.text).not() ||
-                currentUri != null ||
-                binding.password.text.isEmpty().not()) {
+            if(
+                myUserDTO.name.equals(binding.username.text.toString()).not() ||
+                currentUri != null || ((currentUri == null) && (myUserDTO.imgUri.isEmpty().not())) ||
+                binding.password.text.isEmpty().not()
+            ) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("변경된 정보로 수정하시겠습니까?")
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, which ->
@@ -73,8 +75,7 @@ class DialogEditDetailFragment : DialogFragment() {
                         CoroutineScope(Dispatchers.Default).launch {
                             val tasks : ArrayList<Deferred<Boolean>> = arrayListOf()
                             //프로필사진 변경
-                            tasks.add(
-                                async {
+                            tasks.add(async {
                                     if (currentUri != null) myAccountViewModel.SetMyProfileUri(currentUri!!)
                                     else myAccountViewModel.DeleteMyProfileUrl() })
                             //이름 변경
