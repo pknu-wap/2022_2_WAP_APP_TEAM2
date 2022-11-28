@@ -25,33 +25,13 @@ class CalendarRepositoryImpl private constructor() : CalendarRepository{
         }
     }
 
+
+
     /** 각 방에 대해 수행 **/
-    override suspend fun getMyReceipts_with_addSnapshot(myCalcRoomID: String, snapshotlistener : EventListener<QuerySnapshot>)
-    = suspendCoroutine <Pair<HashMap<String, ArrayList<ReceiptDTO>>, ArrayList<ListenerRegistration>>> { continuation ->
-        val tmpHashMap = HashMap<String, ArrayList<ReceiptDTO>>()
-        val tmpListRegisteration = ArrayList<ListenerRegistration>()
-        val receiptCollection = firestore.collection(FireStoreNames.calc_rooms.name)
-                .document(myCalcRoomID)
-                .collection(FireStoreNames.receipts.name)
+    override fun addSnapShotListner(myCalcRoomID: String, eventListener: EventListener<QuerySnapshot>) :ListenerRegistration =
+        firestore.collection(FireStoreNames.calc_rooms.name)
+            .document(myCalcRoomID)
+            .collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
 
-        // snapshot 연결
-        tmpListRegisteration.plus(receiptCollection.addSnapshotListener(snapshotlistener))
-
-        //receipt hashmap 연결
-        receiptCollection.get()
-            .addOnSuccessListener {
-                for (dc in it.documents.toMutableList()) {
-                    val receiptDTO = dc.toObject<ReceiptDTO>()!!
-                    receiptDTO.roomID = myCalcRoomID
-                    val dstKey = DateTime.parse(receiptDTO.date.toString()).toString("yyyyMMdd")
-                    if (tmpHashMap.containsKey(dstKey)) {
-                        tmpHashMap[dstKey]!!.add(receiptDTO)
-                    } else {
-                        tmpHashMap[dstKey] = arrayListOf(receiptDTO)
-                    }
-                }
-                continuation.resume(Pair( tmpHashMap ,tmpListRegisteration))
-            }
-        }
 
 }

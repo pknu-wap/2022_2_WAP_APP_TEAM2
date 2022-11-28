@@ -31,6 +31,7 @@ class FriendsViewModel : ViewModel() {
     val searchResultFriendsLiveData = MutableLiveData<MutableList<FriendDTO>>()
     val participantsInCalcRoom = mutableListOf<CalcRoomParticipantDTO>()
 
+    /** ID : friendDTO **/
     companion object {
         val MY_FRIEND_MAP = mutableMapOf<String, FriendDTO>()
     }
@@ -150,10 +151,6 @@ class FriendsViewModel : ViewModel() {
                 }
             }
         }
-    }
-
-    fun reset() {
-        friendsListLiveData.value = arrayListOf()
     }
 
 
