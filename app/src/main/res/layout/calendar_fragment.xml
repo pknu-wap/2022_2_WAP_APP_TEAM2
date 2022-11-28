@@ -22,24 +22,24 @@
             android:layout_centerHorizontal="true"
             android:textSize="20sp"
             />
+
         <ImageView
             android:id="@+id/calendar_btnBack"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:clickable="true"
-            android:src="@drawable/ic_back"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            />
+            android:clickable="true"
+            android:src="@drawable/ic_back" />
 
         <ImageView
             android:id="@+id/calendar_btnNext"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:src="@drawable/ic_back"
-            android:rotation="180"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:rotation="180"
+            android:src="@drawable/ic_back"
 
             />
 

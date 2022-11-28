@@ -5,5 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 enum class NotificationType(val channelId: String) : Parcelable {
-    NewCalcRoom("100"), Receipt("200"), Chat("300")
+    NewCalcRoom("100"), Receipt("200"), Chat("300"),
+    CalcRush("400")
 }

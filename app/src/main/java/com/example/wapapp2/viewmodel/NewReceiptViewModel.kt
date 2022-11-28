@@ -34,6 +34,9 @@ class NewReceiptViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 새로운 영수증을 추가
+     */
     private fun addReceipt(receiptList: MutableList<ReceiptDTO>, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             var count = 0
@@ -104,7 +107,7 @@ class NewReceiptViewModel : ViewModel() {
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0, mutableListOf())
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, 0, mutableMapOf())
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }
@@ -153,7 +156,7 @@ class NewReceiptViewModel : ViewModel() {
     /**
      * 새로운 영수증 추가 알림
      */
-    fun sendNewReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+    fun sendNewReceiptFcm(receiptDTO: ReceiptDTO, calcRoomId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
             receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)

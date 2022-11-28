@@ -22,41 +22,11 @@ import kotlin.coroutines.resume
 class ReceiptViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
-    private var currentMySummary = 0
     var currentRoomId: String? = null
     var currentReceiptId: String? = null
     var currentReceiptDTO: ReceiptDTO? = null
 
-    val getCurrentSummary get() = currentMySummary
-
     val products = MutableLiveData<MutableList<ReceiptProductDTO>>()
-
-    fun updateSummary_forNewProduct(productDTO: ReceiptProductDTO) {
-        currentMySummary += try {
-            productDTO.price / productDTO.personCount
-        } catch (e: ArithmeticException) {
-            0
-        }
-    }
-
-    fun product_checked(productDTO: ReceiptProductDTO) {
-        currentMySummary += productDTO.price / ++productDTO.personCount
-        CoroutineScope(Dispatchers.Default).launch {
-            receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
-        }
-    }
-
-    fun product_unchecked(productDTO: ReceiptProductDTO) {
-        currentMySummary -= productDTO.price / productDTO.personCount--
-        CoroutineScope(Dispatchers.Default).launch {
-            receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
-        }
-    }
-
-    fun getCurrentSummary(): Int {
-        return currentMySummary
-    }
-
 
     fun getReceiptsRecyclerOptions(calcRoomId: String): FirestoreRecyclerOptions<ReceiptDTO> {
         val query = fireStore.collection(FireStoreNames.calc_rooms.name)
