@@ -1,8 +1,10 @@
 package com.example.wapapp2.repository
 
+import android.provider.SyncStateContract.Helpers.update
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.model.ReceiptProductParticipantDTO
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -24,18 +26,23 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
 
     }
 
-    /** receipt_product 컬렉션의 참여 유저 id에서 자기 아이디 추가
-     * when : checked
-     * **/
-    override suspend fun addMyID_fromProductParticipantIDs(product_id: String) {
+    override suspend fun updateMyIdFromProductParticipantIds(
+            add: Boolean, calcRoomId: String, receiptId: String, productId: String,
+            participantDTO: ReceiptProductParticipantDTO,
+    ) {
+        val myUid = participantDTO.userId
+        val productDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+                .document(productId)
 
-    }
-
-    /** receipt_product 컬렉션의 참여 유저 id에서 자기 아이디 제외
-     * when : unchecked
-     * **/
-    override suspend fun subMyID_fromProductParticipantIDs(product_id: String) {
-
+        if (add) {
+            val updateMap = mapOf("participants" to mapOf(myUid to participantDTO))
+            productDocument.update(updateMap)
+        } else {
+            val updateMap = mapOf("participants.$myUid" to FieldValue.delete())
+            productDocument.update(updateMap)
+        }
     }
 
 
@@ -53,11 +60,18 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    /**
+     * 진행 중 정산 id추가, 정산상태 변경
+     */
     override suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
         val calcRoomDocument = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId)
 
-        calcRoomDocument.update("ongoingReceiptIds", FieldValue.arrayUnion(receiptId)).addOnCompleteListener {
+        val writeBatch = fireStore.batch()
+        writeBatch.update(calcRoomDocument, "ongoingReceiptIds", FieldValue.arrayUnion(receiptId))
+        writeBatch.update(calcRoomDocument, "calculationStatus", true)
+
+        writeBatch.commit().addOnCompleteListener {
             continuation.resume(it.isSuccessful)
         }
     }
@@ -93,8 +107,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
     }
 
     override suspend fun modifyReceipt(
-            map: MutableMap<String, Any?>, calcRoomId: String,
-            receiptId: String,
+            map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String,
     ) = suspendCoroutine<Boolean> { continuation ->
         val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
                 .document(calcRoomId).collection(FireStoreNames.receipts.name)
@@ -113,9 +126,9 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 .document(receiptId).delete()
 
         // calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
-        fireStore.collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomId)
-                .update(FieldPath.of("endReceiptIds", "ongoingReceiptIds"), FieldValue.arrayRemove(receiptId))
+        val document = fireStore.collection(FireStoreNames.calc_rooms.name).document(calcRoomId)
+        document.update("endReceiptIds", FieldValue.arrayRemove(receiptId))
+        document.update("ongoingReceiptIds", FieldValue.arrayRemove(receiptId))
     }
 
 
@@ -171,10 +184,39 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    override suspend fun getReceipts(
+            calcRoomId: String,
+            receiptIds: List<String>,
+    ) = suspendCoroutine<MutableList<ReceiptDTO>> { continuation ->
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+        receiptCollection.whereIn(FieldPath.documentId(), receiptIds).get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val list = it.result.documents.toMutableList()
+                var dto: ReceiptDTO? = null
+                val dtoList = mutableListOf<ReceiptDTO>()
+
+                for (v in list) {
+                    dto = v.toObject<ReceiptDTO>()!!
+                    dto.id = v.id
+                    dtoList.add(dto)
+                }
+                continuation.resume(dtoList)
+            } else {
+                continuation.resume(mutableListOf())
+            }
+        }
+
+    }
+
     override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
             fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
 
+    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+            fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
+                    .collection(FireStoreNames.products.name).addSnapshotListener(eventListener)
 
     override suspend fun getProducts(
             receiptId: String,
@@ -199,4 +241,5 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
             }
         }
     }
+
 }

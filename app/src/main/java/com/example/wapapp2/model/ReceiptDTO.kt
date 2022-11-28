@@ -3,6 +3,7 @@ package com.example.wapapp2.model
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
+import androidx.collection.arrayMapOf
 import com.google.firebase.firestore.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.parcelize.Parcelize
@@ -63,6 +64,8 @@ data class ReceiptDTO(
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
 
+    @get:Exclude
+    val productMap = arrayMapOf<String, ReceiptProductDTO>()
 
     fun removeProduct(receiptProductDTO: ReceiptProductDTO): Int {
         for ((index, value) in productList.withIndex()) {

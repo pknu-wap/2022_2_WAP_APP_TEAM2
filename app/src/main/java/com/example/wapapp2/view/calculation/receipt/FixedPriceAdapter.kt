@@ -22,7 +22,7 @@ ListOnClickListener<BankAccountDTO>, val onUpdateMoneyCallback: OnUpdateMoneyCal
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-    private class FixedPayVH(val binding: ViewDutchItemBinding, val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
+     class FixedPayVH(val binding: ViewDutchItemBinding, val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
                              val onUpdateMoneyCallback: OnUpdateMoneyCallback
     ) :
         RecyclerView.ViewHolder(binding.root) {
