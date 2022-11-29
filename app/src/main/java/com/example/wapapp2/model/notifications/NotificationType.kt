@@ -1,5 +1,10 @@
 package com.example.wapapp2.model.notifications
 
-enum class NotificationType(val channelId: String) {
-    Calculation("1"), Receipt("2"), Chat("3")
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class NotificationType(val channelId: String) : Parcelable {
+    NewCalcRoom("100"), Receipt("200"), Chat("300"),
+    CalcRush("400")
 }

@@ -8,5 +8,5 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 
 interface ChatRepository {
-    suspend fun sendMsg(roomId: String, chatDTO: ChatDTO)
+    suspend fun sendMsg(roomId: String, chatDTO: ChatDTO) : Boolean
 }

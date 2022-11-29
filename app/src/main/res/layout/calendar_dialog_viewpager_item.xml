@@ -55,17 +55,5 @@
         tools:listitem="@layout/dialog_calculation_item"
         />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        style="?attr/floatingActionButtonSmallStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="정산추가"
-        android:src="@drawable/ic_baseline_add_24"
-        app:backgroundTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

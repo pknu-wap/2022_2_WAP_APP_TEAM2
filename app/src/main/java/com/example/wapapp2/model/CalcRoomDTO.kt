@@ -28,14 +28,17 @@ data class CalcRoomDTO(
         var recentMsg: RecentMsg,
         @PropertyName("name")
         var name: String,
+        @field:JvmField
+        @PropertyName("calculationStatus")
+        var calculationStatus: Boolean,   // true if "정산진행중..", false if "정산 완료/ 정산항목 없음"
         @get:Exclude
-        val people: ArrayList<CalcRoomParticipantDTO>
+        val people: ArrayList<CalcRoomParticipantDTO>,
 ) : Parcelable {
     constructor() : this(null, null, "", arrayListOf(), arrayListOf(), arrayListOf(), RecentMsg(msg = "", msgId = "", sendedTime = null,
-            senderId = ""), "", arrayListOf())
+            senderId = ""), "", false, arrayListOf())
 
     @get:Exclude
-    var id: String? = "LvJY5fz6TjlTDaHHX53l"
+    var id: String? = null
 
 
     @Parcelize
@@ -47,7 +50,7 @@ data class CalcRoomDTO(
             @PropertyName("sendedTime")
             var sendedTime: Date? = null,
             @PropertyName("senderId")
-            var senderId: String
+            var senderId: String,
     ) : Parcelable {
         constructor() : this("", "", null, "")
     }

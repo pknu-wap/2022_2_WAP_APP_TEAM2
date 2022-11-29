@@ -1,7 +1,9 @@
 package com.example.wapapp2.model
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
+import androidx.collection.arrayMapOf
 import com.google.firebase.firestore.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.parcelize.Parcelize
@@ -22,18 +24,23 @@ data class ReceiptDTO(
         @PropertyName("createdTime")
         var createdTime: Date? = null,
         @PropertyName("imgUrl")
-        var imgUrl: String?,
+        var imgUrl: String,
         @get:Exclude
         var imgUriInMyPhone: Uri?,
         @PropertyName("name")
         var name: String,
         @PropertyName("payersId")
         var payersId: String,
+
+        @PropertyName("payersName")
+        var payersName: String,
+
         @field:JvmField
         @PropertyName("status")
         var status: Boolean,
-        @get:Exclude
-        public var totalMoney: Int = 0,
+
+        @PropertyName("totalMoney")
+        var totalMoney: Int = 0,
 
         @get:Exclude
         private val productList: ArrayList<ReceiptProductDTO>,
@@ -42,18 +49,23 @@ data class ReceiptDTO(
         public var myMoney: Int = 0,
 
         @get:Exclude
-        public val date: String = DateTime.now().toString(),
+        public val date: DateTime = DateTime.now(),
 ) : Parcelable {
-    constructor() : this("", null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+    constructor() : this("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)
         totalMoney += receiptProductDTO.price
     }
 
+    @get:Exclude
+    var roomID: String? = null
+
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
 
+    @get:Exclude
+    val productMap = arrayMapOf<String, ReceiptProductDTO>()
 
     fun removeProduct(receiptProductDTO: ReceiptProductDTO): Int {
         for ((index, value) in productList.withIndex()) {
@@ -66,5 +78,6 @@ data class ReceiptDTO(
         }
         throw Exception("no data")
     }
+
 
 }

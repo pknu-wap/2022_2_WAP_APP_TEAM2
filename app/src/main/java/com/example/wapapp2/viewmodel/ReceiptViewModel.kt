@@ -22,40 +22,11 @@ import kotlin.coroutines.resume
 class ReceiptViewModel : ViewModel() {
     private val fireStore = FirebaseFirestore.getInstance()
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
-    private val imgRepository = ReceiptImgRepositoryImpl.INSTANCE
-    private var currentMySummary = 0
-    var roomId: String? = null
-
-    val getCurrentSummary get() = currentMySummary
+    var currentRoomId: String? = null
+    var currentReceiptId: String? = null
+    var currentReceiptDTO: ReceiptDTO? = null
 
     val products = MutableLiveData<MutableList<ReceiptProductDTO>>()
-
-    fun updateSummary_forNewProduct(productDTO: ReceiptProductDTO) {
-        currentMySummary += try {
-            productDTO.price / productDTO.personCount
-        } catch (e: ArithmeticException) {
-            0
-        }
-    }
-
-    fun product_checked(productDTO: ReceiptProductDTO) {
-        currentMySummary += productDTO.price / ++productDTO.personCount
-        CoroutineScope(Dispatchers.Default).launch {
-            receiptRepository.addMyID_fromProductParticipantIDs(productDTO.id)
-        }
-    }
-
-    fun product_unchecked(productDTO: ReceiptProductDTO) {
-        currentMySummary -= productDTO.price / productDTO.personCount--
-        CoroutineScope(Dispatchers.Default).launch {
-            receiptRepository.subMyID_fromProductParticipantIDs(productDTO.id)
-        }
-    }
-
-    fun getCurrentSummary(): Int {
-        return currentMySummary
-    }
-
 
     fun getReceiptsRecyclerOptions(calcRoomId: String): FirestoreRecyclerOptions<ReceiptDTO> {
         val query = fireStore.collection(FireStoreNames.calc_rooms.name)
@@ -71,7 +42,7 @@ class ReceiptViewModel : ViewModel() {
     }
 
     fun getProducts(receiptId: String, calcRoomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val result = async {
                 receiptRepository.getProducts(receiptId, calcRoomId)
             }
@@ -82,13 +53,5 @@ class ReceiptViewModel : ViewModel() {
         }
     }
 
-    fun calcTotalPrice(): String {
-        var price = 0
-        for (product in products.value!!) {
-            price += product.price
-        }
-
-        return price.toString()
-    }
 
 }

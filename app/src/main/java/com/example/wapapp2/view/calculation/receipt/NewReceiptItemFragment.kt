@@ -98,11 +98,10 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
         }
 
         binding.removeBtn.setOnClickListener {
-            if (newReceiptViewModel.removeReceipt(receiptId!!)) {
+            if (newReceiptViewModel.removeReceipt(receiptId!!))
                 Toast.makeText(requireActivity(), R.string.removed_receipt, Toast.LENGTH_SHORT).show()
-            } else {
+            else
                 Toast.makeText(requireActivity(), R.string.unable_to_remove_receipt, Toast.LENGTH_SHORT).show()
-            }
         }
 
         binding.receiptImage.setOnClickListener {
@@ -124,7 +123,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             if (newReceiptViewModel.getReceiptDTO(receiptId!!)?.imgUriInMyPhone == null) {
                 MaterialAlertDialogBuilder(requireActivity())
                         .setTitle(R.string.add_img)
-                        .setNegativeButton(R.string.exit) { dialog, which ->
+                        .setNegativeButton(R.string.close) { dialog, which ->
                             dialog.dismiss()
                         }
                         .setNegativeButton(R.string.shoot_camera) { dialog, which ->
@@ -144,7 +143,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
             } else {
                 MaterialAlertDialogBuilder(requireActivity())
                         .setTitle(R.string.modify_img)
-                        .setNegativeButton(R.string.exit) { dialog, which ->
+                        .setNegativeButton(R.string.close) { dialog, which ->
                             dialog.dismiss()
                         }
                         .setNegativeButton(R.string.delete_img) { dialog, which ->
@@ -189,12 +188,11 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
     private fun addProduct() {
         val itemBinding = ProductItemLayoutInNewCalcBinding.inflate(layoutInflater)
         val productDTO = newReceiptViewModel.addProduct(receiptId!!)
-        itemBinding.root.tag = productDTO
         val addedPosition = binding.productsList.childCount - 1
 
         itemBinding.priceEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
-                if (text.isNotEmpty()) {
+                if (isInt(text)) {
                     productDTO.price = text.toInt()
                 } else {
                     itemBinding.priceEditText.text = "0".toEditable()
@@ -217,7 +215,7 @@ class NewReceiptItemFragment : Fragment(), NewReceiptFragment.ReceiptDataGetter 
 
         itemBinding.countEditText.addTextChangedListener(object : DelayTextWatcher() {
             override fun onFinalText(text: String) {
-                if (text.isNotEmpty()) {
+                if (isInt(text)) {
                     productDTO.count = text.toInt()
                 } else {
                     itemBinding.countEditText.text = "1".toEditable()

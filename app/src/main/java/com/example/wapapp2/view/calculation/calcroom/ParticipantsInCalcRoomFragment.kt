@@ -27,6 +27,10 @@ class ParticipantsInCalcRoomFragment : Fragment() {
 
     }
 
+    companion object {
+        const val TAG = "ParticipantsInCalcRoomFragment"
+    }
+
     private val adapter = ParticipantsInCalcRoomAdapter(participantOnClickListener)
     var onNavDrawerListener: OnNavDrawerListener? = null
 
@@ -49,8 +53,8 @@ class ParticipantsInCalcRoomFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        calcRoomViewModel.participants.observe(viewLifecycleOwner) {
-            adapter.participants = it
+        calcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            adapter.participants = it.values.toMutableList()
         }
 
         binding.addFriend.root.setOnClickListener {

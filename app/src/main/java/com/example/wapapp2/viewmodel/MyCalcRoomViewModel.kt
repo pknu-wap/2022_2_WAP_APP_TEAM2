@@ -1,15 +1,19 @@
 package com.example.wapapp2.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
-import com.example.wapapp2.repository.MyCalcRoomRepositoryImpl
+import com.example.wapapp2.repository.CalcRoomRepositorylmpl
+import com.example.wapapp2.repository.interfaces.CalcRoomRepository
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
-import com.google.firebase.firestore.*
+
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.MetadataChanges
+
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MyCalcRoomViewModel : ViewModel() {
-    private val myCalcRoomRepositoryImpl = MyCalcRoomRepositoryImpl.getINSTANCE()
+    private val myCalcRoomRepository : CalcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
     private val fireStore = FirebaseFirestore.getInstance()
     val myCalcRoomIds = MutableLiveData<MutableSet<String>>(mutableSetOf())
 
@@ -37,24 +41,20 @@ class MyCalcRoomViewModel : ViewModel() {
 
     }
 
-    fun exitFromCalcRoom(roomId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = async {
-                myCalcRoomRepositoryImpl.exitFromCalcRoom(roomId)
-            }
-            result.await()
-        }
-    }
 
     override fun onCleared() {
         super.onCleared()
+        listenerRemove()
+    }
+
+    fun listenerRemove(){
         myCalcRoomIdsListener?.remove()
     }
 
 
     fun loadMyCalcRoomIds() {
         if (myCalcRoomIdsListener == null) {
-            myCalcRoomIdsListener = myCalcRoomRepositoryImpl.getMyCalcRoomIds { event, error ->
+            myCalcRoomIdsListener = myCalcRoomRepository.getMyCalcRoomIds { event, error ->
                 if (event != null) {
                     val userDTO = event!!.toObject<UserDTO>()
                     userDTO?.also {
@@ -66,9 +66,22 @@ class MyCalcRoomViewModel : ViewModel() {
                         }
                     }
                 }
-
             }
         }
+    }
+
+    fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO, newCalcRoomAddedCallback: NewCalcRoomAddedCallback ){
+        CoroutineScope(Dispatchers.Main).launch {
+            val result = async{ myCalcRoomRepository.addNewCalcRoom(calcRoomDTO) }
+            //방 생성 완료
+            if( result.await() ){
+                newCalcRoomAddedCallback.newCalcRoomAdded(calcRoomDTO)
+            }
+        }
+    }
+
+    fun interface NewCalcRoomAddedCallback{
+        fun newCalcRoomAdded(calcRoomDTO: CalcRoomDTO)
     }
 
 }

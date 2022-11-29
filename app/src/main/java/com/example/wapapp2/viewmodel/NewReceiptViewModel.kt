@@ -4,15 +4,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
+import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
+import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import org.joda.time.DateTime
 
 class NewReceiptViewModel : ViewModel() {
-    private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
-    private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
+    private val receiptRepository : ReceiptRepository = ReceiptRepositoryImpl.INSTANCE
+    private val receiptImgRepository : ReceiptImgRepository = ReceiptImgRepositoryImpl.INSTANCE
     private val receiptMap = HashMap<String, ReceiptDTO>()
 
     val removeReceiptLiveData: MutableLiveData<String> = MutableLiveData<String>()
@@ -20,6 +24,7 @@ class NewReceiptViewModel : ViewModel() {
     val addReceiptResult = MutableLiveData<Boolean>()
 
     var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
+    lateinit var myName: String
 
     fun removeProduct(receiptId: String, receiptProductDTO: ReceiptProductDTO): Int {
         try {
@@ -29,66 +34,80 @@ class NewReceiptViewModel : ViewModel() {
         }
     }
 
-    private fun addReceipt(receiptDTO: ReceiptDTO, calcRoomId: String) {
+    /**
+     * 새로운 영수증을 추가
+     */
+    private fun addReceipt(receiptList: MutableList<ReceiptDTO>, calcRoomId: String) {
         CoroutineScope(Dispatchers.Default).launch {
-            //영수증 사진 있는 경우 추가
-            receiptDTO.imgUriInMyPhone?.also {
-                val imgFileName = async {
-                    receiptImgRepositoryImpl.uploadReceiptImg(it, calcRoomId)
-                }
+            var count = 0
 
-                imgFileName.await()?.apply {
-                    receiptDTO.imgUrl = this
-                }
-            }
-
-            //영수증 추가
-            val addReceiptResult = async {
-                receiptRepository.addReceipt(receiptDTO, calcRoomId)
-            }
-
-            if (addReceiptResult.await()) {
-                //정산방 영수증 문서들중 마지막 아이템을 가져오기
-                val lastDocumentId = async {
-                    receiptRepository.getLastDocumentId(calcRoomId)
-                }
-
-                if (lastDocumentId.await() != null) {
-                    //영수증 항목 추가
-                    val addProductsResult = async {
-                        receiptRepository
-                                .addProducts(lastDocumentId.await().toString(), receiptDTO.getProducts(), calcRoomId)
+            for (receipt in receiptList) {
+                //영수증 사진 있는 경우 추가
+                receipt.imgUriInMyPhone?.also {
+                    val imgFileName = async {
+                        receiptImgRepository.uploadReceiptImg(it, calcRoomId)
                     }
 
-                    addProductsResult.await()
-                    withContext(Main) {
-                        this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
+                    imgFileName.await()?.apply {
+                        receipt.imgUrl = this
+                    }
+                }
+
+                //영수증 추가
+                val addReceiptResult = async {
+                    receiptRepository.addReceipt(receipt, calcRoomId)
+                }
+
+                if (addReceiptResult.await()) {
+                    //정산방 영수증 문서들중 마지막 아이템을 가져오기
+                    val lastDocumentId = async {
+                        receiptRepository.getLastDocumentId(calcRoomId)
+                    }
+
+                    if (lastDocumentId.await() != null) {
+                        //ongoingReceiptIds에 추가
+                        receiptRepository.addOngoingReceipt(lastDocumentId.await()!!, calcRoomId)
+
+                        //영수증 항목 추가
+                        val addProductsResult = async {
+                            receiptRepository.addProducts(lastDocumentId.await().toString(), receipt.getProducts()
+                                    .toMutableList(), calcRoomId)
+                        }
+
+                        addProductsResult.await()
+                        withContext(Main) {
+                            if (++count == receiptList.size)
+                                this@NewReceiptViewModel.addReceiptResult.value = addProductsResult.await()
+                        }
+                    } else {
+                        withContext(Main) {
+                            if (++count == receiptList.size)
+                                this@NewReceiptViewModel.addReceiptResult.value = false
+                        }
                     }
                 } else {
-                    withContext(MainScope().coroutineContext) {
-                        this@NewReceiptViewModel.addReceiptResult.value = false
+                    withContext(Main) {
+                        if (++count == receiptList.size)
+                            this@NewReceiptViewModel.addReceiptResult.value = false
                     }
-                }
-            } else {
-                withContext(MainScope().coroutineContext) {
-                    this@NewReceiptViewModel.addReceiptResult.value = false
                 }
             }
         }
     }
 
     fun addAllReceipts() {
-        for (receipt in receiptMap.values) {
-            addReceipt(receipt, calcRoomId!!)
-        }
+        addReceipt(receiptMap.values.toMutableList(), calcRoomId!!)
     }
 
     fun addReceipt(receiptId: String) {
-        receiptMap[receiptId] = ReceiptDTO(receiptId, null, "", null, "", "", false, 0, arrayListOf(), 0, DateTime.now().toString())
+        receiptMap[receiptId] = ReceiptDTO().apply {
+            id = receiptId
+            payersName = myName
+        }
     }
 
     fun addProduct(receiptId: String): ReceiptProductDTO {
-        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, arrayListOf(), 0)
+        val receiptProductDTO = ReceiptProductDTO("", "", 0, 1, 0, mutableMapOf())
         receiptMap[receiptId]!!.addProduct(receiptProductDTO)
         return receiptProductDTO
     }
@@ -131,6 +150,19 @@ class NewReceiptViewModel : ViewModel() {
         }
 
         return price.toString()
+    }
+
+
+    /**
+     * 새로운 영수증 추가 알림
+     */
+    fun sendNewReceiptFcm(receiptDTO: ReceiptDTO, calcRoomId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val sendFcmReceiptDTO = SendFcmReceiptDTO(createdTime = receiptDTO.date.toString(), payersId = receiptDTO.payersId, name =
+            receiptDTO.name, totalMoney = receiptDTO.totalMoney, imgUrl = receiptDTO.imgUrl, roomId = calcRoomId, receiptImgBitmap = null)
+
+            FcmRepositoryImpl.sendFcmToTopic(NotificationType.Receipt, calcRoomId, sendFcmReceiptDTO)
+        }
     }
 
 

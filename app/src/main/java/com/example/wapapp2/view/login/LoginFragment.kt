@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
+import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
@@ -24,14 +25,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class LoginFragment : Fragment() {
     private val myAccountViewModel by viewModels<MyAccountViewModel>({ requireActivity() })
-    private lateinit var binding: FragmentLoginBinding
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
     var auth: FirebaseAuth? = null
     var googleSignInClient: GoogleSignInClient? = null
     val GOOGLE_LOGIN_CODE = 9001
+
+
+    companion object {
+        const val TAG = "LoginFragment"
+    }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -49,12 +59,11 @@ class LoginFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        moveMainPage(auth?.currentUser)
+        //moveMainPage(auth?.currentUser)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         auth = FirebaseAuth.getInstance()
 
         var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -90,18 +99,6 @@ class LoginFragment : Fragment() {
         if (user != null) {
             val rootTransactionFragment = RootTransactionFragment()
 
-            ReceiptImgRepositoryImpl.initialize()
-            ReceiptRepositoryImpl.initialize()
-            AppCheckRepository.initialize()
-            FriendsRepositoryImpl.initialize()
-            ChatRepositorylmpl.initialize()
-            UserRepositoryImpl.initialize()
-            MyBankAccountRepositoryImpl.initialize()
-            MyCalcRoomRepositoryImpl.initialize()
-            CalcRoomRepositorylmpl.initialize()
-
-            myAccountViewModel.initMyProfile()
-
             parentFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, rootTransactionFragment, RootTransactionFragment.TAG)
@@ -119,6 +116,10 @@ class LoginFragment : Fragment() {
                 .add(R.id.fragment_container_view, signUpFragment, tag)
                 .addToBackStack(tag)
                 .commitAllowingStateLoss()
+    }
+
+    fun moveEditPassword() {
+
     }
 
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
@@ -153,11 +154,12 @@ class LoginFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
         binding.btnGoogleLogin.setOnClickListener { googleLogin() }
+        binding.btnEditPassword.setOnClickListener {  }
 
         return binding.root
     }
@@ -171,4 +173,11 @@ class LoginFragment : Fragment() {
         onBackPressedCallback.remove()
         super.onDestroy()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
 }

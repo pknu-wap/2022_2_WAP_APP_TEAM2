@@ -5,15 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
-import com.example.wapapp2.view.calendar.CalenderFragment
+import com.example.wapapp2.view.calendar.CalendarFragment
 import com.example.wapapp2.view.calculation.GrouplistFragment
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentMainHostBinding
 import com.example.wapapp2.view.friends.FriendsFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.MyAccountViewModel
 
 
 class MainHostFragment : Fragment() {
@@ -31,8 +29,7 @@ class MainHostFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentMainHostBinding.inflate(inflater, container, false)
         return binding.root
@@ -55,7 +52,7 @@ class MainHostFragment : Fragment() {
             if (newFragment == null) {
                 when (item.itemId) {
                     R.id.calendar -> {
-                        newFragment = CalenderFragment()
+                        newFragment = CalendarFragment()
                         true
                     }
                     R.id.calculation -> {
@@ -81,7 +78,6 @@ class MainHostFragment : Fragment() {
         binding.bottomNavigationView.setOnItemReselectedListener {
             val currentSelectedItemId = binding.bottomNavigationView.selectedItemId
         }
-
 
         binding.bottomNavigationView.selectedItemId = R.id.calculation
     }

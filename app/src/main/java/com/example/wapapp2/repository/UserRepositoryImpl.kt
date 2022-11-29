@@ -1,14 +1,23 @@
 package com.example.wapapp2.repository
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.interfaces.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+import org.joda.time.DateTime
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class UserRepositoryImpl : UserRepository {
@@ -55,6 +64,18 @@ class UserRepositoryImpl : UserRepository {
         }
     }
 
+    override suspend fun removeCalcRoomId(roomId: String) {
+        fireStore.collection(FireStoreNames.users.name).document(auth.currentUser!!.uid)
+                .update("myCalcRoomIds", FieldValue.arrayRemove(roomId))
+    }
+
+
+    override suspend fun setMyProfileUrl(url: String) = suspendCoroutine<Boolean> { continuation ->
+        fireStore.collection(FireStoreNames.users.name)
+            .document(auth.currentUser!!.uid)
+            .update("imgUri", url).addOnCompleteListener { continuation.resume(it.isSuccessful) }
+    }
+
 
     private fun convertToUserDTOSet(documents: List<DocumentSnapshot>, ignoreMyId: Boolean): MutableSet<UserDTO> {
         val dtoSet = mutableSetOf<UserDTO>()
@@ -76,6 +97,12 @@ class UserRepositoryImpl : UserRepository {
 
         }
         return dtoSet
+    }
+
+    override suspend fun updateMyName(newName: String) = suspendCoroutine<Boolean> { continuation ->
+        fireStore.collection(FireStoreNames.users.name)
+            .document(auth.currentUser!!.uid)
+            .update("name", newName).addOnCompleteListener { continuation.resume(it.isSuccessful) }
     }
 
 }

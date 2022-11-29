@@ -1,8 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
 import android.app.Dialog
-import android.content.res.Resources
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,44 +10,50 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DataTypeConverter
+import com.example.wapapp2.commons.classes.DialogSize
 import com.example.wapapp2.commons.classes.LoadingDialogView
-import com.example.wapapp2.databinding.FinalConfirmationNewReceiptLayoutBinding
-import com.example.wapapp2.databinding.FragmentNewReceiptBinding
-import com.example.wapapp2.databinding.ReceiptProductViewBinding
-import com.example.wapapp2.databinding.SummaryReceiptViewBinding
+import com.example.wapapp2.databinding.*
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.observer.MyLifeCycleObserver
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.NewReceiptViewModel
-import java.util.concurrent.atomic.AtomicInteger
 
 
 class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var currentCalcRoomID : String
     companion object {
         const val TAG = "NewReceiptFragment"
     }
 
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val newReceiptViewModel: NewReceiptViewModel by viewModels()
     private lateinit var adapter: NewReceiptViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
+
+        arguments?.apply {
+            currentCalcRoomID = getString("currentRoomId")!!
+            newReceiptViewModel.calcRoomId = currentCalcRoomID
+        }
+
+        newReceiptViewModel.myName = myAccountViewModel.myProfileData.value!!.name
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentNewReceiptBinding.inflate(inflater, container, false)
 
         binding.topAppBar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.viewPager.also {
@@ -82,6 +86,17 @@ class NewReceiptFragment : Fragment() {
                 binding.viewPager.setCurrentItem(adapter.itemCount - 1, true)
                 binding.receiptCount.text = adapter.itemCount.toString()
             }
+        }
+
+        newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
+            //영수증 추가 FCM전송
+            for (receipt in newReceiptViewModel.getReceipts()) {
+                newReceiptViewModel.sendNewReceiptFcm(receipt, newReceiptViewModel.calcRoomId!!)
+            }
+
+            LoadingDialogView.clearDialogs()
+            Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         adapter.addFragment()
@@ -117,15 +132,6 @@ class NewReceiptFragment : Fragment() {
             return dialog
         }
 
-        private fun setWidthPercent(widthPercentage: Int, heightPercentage: Int) {
-            val widthPercent = widthPercentage.toFloat() / 100
-            val heightPercent = heightPercentage.toFloat() / 100
-            val dm = Resources.getSystem().displayMetrics
-            val rect = dm.run { Rect(0, 0, widthPixels, heightPixels) }
-            val percentWidth = rect.width() * widthPercent
-            val percentHeight = rect.height() * heightPercent
-            dialog?.window?.setLayout(percentWidth.toInt(), percentHeight.toInt())
-        }
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             _confirmBinding = FinalConfirmationNewReceiptLayoutBinding.inflate(inflater, container, false)
@@ -148,32 +154,14 @@ class NewReceiptFragment : Fragment() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            setWidthPercent(90, 75)
-
-            newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner, object : Observer<Boolean> {
-                private val count = AtomicInteger(0)
-                private val totalCount = newReceiptViewModel.getReceiptCount()
-
-                override fun onChanged(t: Boolean?) {
-                    if (count.incrementAndGet() == totalCount) {
-                        //추가 종료
-                        LoadingDialogView.clearDialogs()
-                        Toast.makeText(context, R.string.success_add_receipts, Toast.LENGTH_SHORT).show()
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            })
+            DialogSize.setDialogSize(dialog!!, 95, 80)
 
             confirmBinding.saveBtn.setOnClickListener {
                 //파이어베이스 서버에 등록하는 로직
                 newReceiptViewModel.addAllReceipts()
-                dismiss()
                 LoadingDialogView.showDialog(requireActivity(), getString(R.string.adding_receipts))
+                dismiss()
             }
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
         }
 
         override fun onDestroyView() {
@@ -185,19 +173,21 @@ class NewReceiptFragment : Fragment() {
                 RecyclerView.Adapter<ReceiptsAdapter.ViewHolder>() {
 
             private class ViewHolder(private val viewBinding: SummaryReceiptViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
-                private val layoutInflater = LayoutInflater.from(viewBinding.root.context)
 
                 fun bind(receiptDTO: ReceiptDTO) {
                     viewBinding.productsList.removeAllViews()
                     viewBinding.receiptName.text = receiptDTO.name
-
-                    viewBinding.totalMoney.text = receiptDTO.totalMoney.toString()
-                    var productItemBinding: ReceiptProductViewBinding? = null
+                    val layoutInflater = LayoutInflater.from(viewBinding.root.context)
+                    viewBinding.totalMoney.text = DataTypeConverter.toKRW(receiptDTO.totalMoney)
+                    var productItemBinding: ReceiptProductInfoViewBinding? = null
 
                     for (product in receiptDTO.getProducts()) {
-                        productItemBinding = ReceiptProductViewBinding.inflate(layoutInflater, viewBinding.productsList, false)
-                        productItemBinding.productName.text = product.name
-                        productItemBinding.productPrice.text = product.price.toString()
+                        productItemBinding = ReceiptProductInfoViewBinding.inflate(layoutInflater, viewBinding.productsList, false)
+                        productItemBinding.participantGroup.visibility = View.GONE
+
+                        productItemBinding.name.text = product.name
+                        productItemBinding.count.text = product.count.toString()
+                        productItemBinding.totalPrice.text = DataTypeConverter.toKRW(product.price)
 
                         viewBinding.productsList.addView(productItemBinding.root)
                     }
@@ -205,9 +195,9 @@ class NewReceiptFragment : Fragment() {
 
             }
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-                return ViewHolder(SummaryReceiptViewBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            }
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(SummaryReceiptViewBinding.inflate(LayoutInflater
+                    .from(parent.context), parent, false))
+
 
             override fun onBindViewHolder(holder: ViewHolder, position: Int) {
                 holder.bind(receiptList[position])

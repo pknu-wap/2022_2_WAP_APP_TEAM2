@@ -19,7 +19,7 @@ import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
 import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
-import com.example.wapapp2.viewmodel.CalenderViewModel
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
@@ -32,7 +32,14 @@ class GrouplistFragment : Fragment() {
 
     private var adapter: GroupAdapter? = null
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
+
+    var dataObserver: CalcRoomDataObserver? = null
+
+    companion object {
+        const val TAG = "GrouplistFragment"
+    }
 
     /** Enter Group **/
     private val onGroupItemOnClickListener = ListOnClickListener<CalcRoomDTO> { item, pos ->
@@ -50,33 +57,15 @@ class GrouplistFragment : Fragment() {
     }
 
 
-    /** Add Group **/
+    /** Add Room **/
     private val addOnClickedItemListener = View.OnClickListener {
-        MaterialAlertDialogBuilder(requireActivity())
-                .setTitle(R.string.add)
-                .setNeutralButton(R.string.new_calculation) { dialog, which ->
-                    //정산 추가
-                    val fragment = NewReceiptFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
+        val fragment = NewCalcRoomFragment()
+        val fragmentManager = requireParentFragment().parentFragmentManager
 
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                            .addToBackStack(NewReceiptFragment.TAG).commit()
-                }.setPositiveButton(R.string.new_calc_room) { dialog, which ->
-                    //정산방 추가
-                    val fragment = NewCalcRoomFragment()
-                    val fragmentManager = requireParentFragment().parentFragmentManager
-                    dialog.dismiss()
-
-                    fragmentManager.beginTransaction()
-                            .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as
-                                    Fragment)
-                            .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
-                            .addToBackStack(NewCalcRoomFragment.TAG).commit()
-                }.create().show()
+        fragmentManager.beginTransaction()
+                .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+                .add(R.id.fragment_container_view, fragment, NewCalcRoomFragment.TAG)
+                .addToBackStack(NewCalcRoomFragment.TAG).commit()
     }
 
 
@@ -84,11 +73,7 @@ class GrouplistFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
         binding.loadingView.setContentView(binding.groupRV)
         return binding.root
@@ -102,7 +87,7 @@ class GrouplistFragment : Fragment() {
             override fun onGlobalLayout() {
                 if (binding.addBtn.height > 0) {
                     binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    binding.groupRV.addItemDecoration(RecyclerViewItemDecoration(requireContext().applicationContext, true,
+                    binding.groupRV.addItemDecoration(RecyclerViewItemDecoration(requireContext(), true,
                             binding.root.height - binding.addBtn.top - binding.addBtn.height / 2))
                 }
             }
@@ -115,21 +100,30 @@ class GrouplistFragment : Fragment() {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
                     binding.groupRV.adapter = adapter
-                    val dataObserver = ListAdapterDataObserver(binding.groupRV, binding.groupRV.layoutManager as
+                    dataObserver = CalcRoomDataObserver(binding.groupRV, binding.groupRV.layoutManager as
                             LinearLayoutManager, adapter!!)
-                    dataObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
-                    adapter!!.registerAdapterDataObserver(dataObserver)
+                    dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
+                    adapter!!.registerAdapterDataObserver(dataObserver!!)
                 } else {
                     adapter!!.updateOptions(myCalcRoomViewModel.getMyCalcRoomsOptions())
                 }
                 adapter!!.startListening()
             }
+            myCalendarViewModel.loadCalendarReceipts(it)
         }
         myCalcRoomViewModel.loadMyCalcRoomIds()
-
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
     }
 
+    override fun onStart() {
+        super.onStart()
+        adapter?.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        adapter?.stopListening()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -138,6 +132,9 @@ class GrouplistFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        adapter?.stopListening()
+        dataObserver?.apply {
+            adapter!!.unregisterAdapterDataObserver(this)
+        }
+
     }
 }

@@ -96,6 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_img"
+            android:backgroundTint="@color/purple_200"
             app:layout_constraintBottom_toBottomOf="@id/receipt_image"
             app:layout_constraintLeft_toRightOf="@id/receipt_image"
             app:layout_constraintRight_toRightOf="parent"
@@ -121,7 +122,6 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="24dp"
             android:orientation="vertical"
-            android:paddingHorizontal="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/products_label"
             >
@@ -138,6 +138,7 @@
                 android:text="@string/add_calculation_item"
                 android:textColor="@color/white"
                 android:textSize="13sp"
+                android:backgroundTint="@color/purple_200"
                 />
         </LinearLayout>
 

@@ -1,21 +1,23 @@
 package com.example.wapapp2.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.model.notifications.NotificationType
+import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.repository.ChatRepositorylmpl
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.interfaces.ChatRepository
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.SnapshotParser
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
@@ -33,51 +35,15 @@ class ChatViewModel : ViewModel() {
     }
 
 
-    fun sendMsg(chatDTO: ChatDTO) {
+    fun sendMsg(chatDTO: ChatDTO, sendMsgOnFailCallback: SendMsgOnFailCallback) {
         CoroutineScope(Dispatchers.Default).launch {
-            chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO)
-        }
-    }
-
-    fun getOptions(calcRoomDTO: CalcRoomDTO): FirestoreRecyclerOptions<ChatDTO> {
-        val query = Firebase.firestore
-                .collection("calc_rooms")
-                .document(calcRoomDTO.id!!)
-                .collection("chats")
-                .orderBy("sendedTime")
-
-        val recyclerOption = FirestoreRecyclerOptions.Builder<ChatDTO>()
-                .setQuery(query, SnapshotParser {
-                    //id로부터 사람이름
-                    ChatDTO(it.getString("userName").toString(), it.getTimestamp("sendedTime")?.toDate(), it.getString("msg").toString(), it.getString("senderId").toString())
-                })
-                .build()
-
-        return recyclerOption
-    }
-
-
-    inner class ChatLiveData(val documentReference: DocumentReference) : LiveData<ChatDTO>(), EventListener<DocumentSnapshot> {
-        private var snapshotListener: ListenerRegistration? = null
-
-        override fun onActive() {
-            super.onActive()
-            snapshotListener = documentReference.addSnapshotListener(this)
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-            snapshotListener?.remove()
-        }
-
-
-        override fun onEvent(result: DocumentSnapshot?, error: FirebaseFirestoreException?) {
-            val item = result?.let { document ->
-                document.toObject(ChatDTO::class.java)
+            val result = async { chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO) }
+            if (result.await().not()) {
+                sendMsgOnFailCallback.OnFail()
             }
-            value = item!!
         }
     }
+
 
     fun getQueryForOption(roomId: String): Query {
         val query = Firebase.firestore
@@ -85,12 +51,6 @@ class ChatViewModel : ViewModel() {
                 .document(roomId)
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
-
-        /*
-        query.addSnapshotListener(snapshotListener)
-        //scroll 관련 구현 필요 snapshotlistener ??
-
-         */
         return query
     }
 
@@ -101,5 +61,21 @@ class ChatViewModel : ViewModel() {
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
                 .addSnapshotListener(listener)
+    }
+
+
+    /**
+     * 새 채팅 내역 알림
+     */
+    fun sendChat(chatDTO: ChatDTO, calcRoomDTO: CalcRoomDTO) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val calcRoomId = calcRoomDTO.id!!
+            val sendFcmChatDTO = SendFcmChatDTO(chatDTO, calcRoomDTO.name, calcRoomId)
+            FcmRepositoryImpl.sendFcmToTopic(NotificationType.Chat, calcRoomId, sendFcmChatDTO)
+        }
+    }
+
+    fun interface SendMsgOnFailCallback {
+        fun OnFail()
     }
 }

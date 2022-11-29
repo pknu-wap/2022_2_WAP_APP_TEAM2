@@ -14,9 +14,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
-import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
+import com.example.wapapp2.commons.view.NewLoadingView
 import com.example.wapapp2.databinding.FragmentChatBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.ChatViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
@@ -27,7 +29,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 
-class ChatFragment : Fragment(), ScrollListener {
+class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
@@ -35,9 +37,11 @@ class ChatFragment : Fragment(), ScrollListener {
     private var chatAdapter: ChatPagingAdapter? = null
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
-    private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
+
+    private var chatDataObserver: ChatDataObserver? = null
 
     companion object {
         const val TAG = "ChatFragment"
@@ -52,16 +56,25 @@ class ChatFragment : Fragment(), ScrollListener {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.chatList)
 
         binding.chatList.apply {
-            val lm = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
-            layoutManager = lm
+            layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
+            setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                //스크롤이 끝으로 이동한 경우 하단 채팅알림 지우기
+                if (!isVisible)
+                    return@setOnScrollChangeListener
+
+                if (binding.newMsgFrame.visibility == View.VISIBLE) {
+                    chatDataObserver?.apply {
+                        if (atBottom(0)) {
+                            resetNewMsgView()
+                        }
+                    }
+                }
+            }
         }
         setInputListener()
 
@@ -73,6 +86,7 @@ class ChatFragment : Fragment(), ScrollListener {
                 }
             }
         })
+
         return binding.root
     }
 
@@ -86,42 +100,60 @@ class ChatFragment : Fragment(), ScrollListener {
             }
         }
 
-        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
             if (chatAdapter == null) {
                 val config = PagingConfig(20, 10, false)
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
                         .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
                             val id = snapshot.getString("senderId").toString()
-                            val userName = currentCalcRoomViewModel.participantMap[id]!!.userName
+                            val userName: String = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(id))
+                                currentCalcRoomViewModel.participantMap.value!![id]!!.userName
+                            else
+                            snapshot.getString("userName")!!
+
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
-                                    snapshot.getString("msg").toString(), id)
+                                    snapshot.getString("msg").toString(), id, false)
                         }
                         .build()
 
-                chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
-                chatAdapter?.apply {
-                    val adapterObserver = ListAdapterDataObserver(binding.chatList, binding.chatList.layoutManager as LinearLayoutManager,
-                            this)
-                    adapterObserver.registerLoadingView(binding.loadingView, getString(R.string.empty_chats))
-                    adapterObserver.onChanged()
-                    registerAdapterDataObserver(adapterObserver)
-                    binding.chatList.adapter = chatAdapter
-                }
+                if (myAccountViewModel.myProfileData.value != null) {
+                    chatAdapter = ChatPagingAdapter(myAccountViewModel.myProfileData.value!!.id, options)
+                    chatAdapter?.apply {
+                        chatDataObserver = ChatDataObserver(
+                                binding.chatList,
+                                binding.chatList.layoutManager as LinearLayoutManager,
+                                this::getAdapterItemCount,
+                                this::checkLastMessageMine
+                        )
+                        chatDataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_chats))
+                        chatDataObserver!!.onChanged()
+                        registerAdapterDataObserver(chatDataObserver!!)
+                        binding.chatList.adapter = chatAdapter
+                    }
 
-                chatViewModel.addSnapshot(currentCalcRoomViewModel.roomId!!) { value, error ->
-                    if (value != null) {
-                        for (dc in value.documentChanges) {
-                            if (dc.type == DocumentChange.Type.ADDED) {
-                                lifecycleScope.launch {
-                                    chatAdapter!!.submitData(PagingData.from(value.documents))
+                    chatViewModel.addSnapshot(currentCalcRoomViewModel.roomId!!) { value, error ->
+                        if (value != null) {
+                            for (dc in value.documentChanges) {
+                                if (dc.type == DocumentChange.Type.ADDED) {
+                                    if (chatDataObserver!!.newMessageReceivedCallback == null)
+                                        chatDataObserver!!.newMessageReceivedCallback = this@ChatFragment
+
+                                    lifecycleScope.launch {
+                                        chatAdapter!!.submitData(PagingData.from(value.documents))
+                                    }
+                                    break
                                 }
-                                break
                             }
                         }
                     }
-
+                } else {  //내 아이디 안가져와짐 -> 네트워크 확인
+                    binding.chatList.visibility = View.INVISIBLE
+                    (binding.loadingView as NewLoadingView).apply {
+                        onFailed("네트워크 연결을 확인하세요")
+                    }
                 }
+
             } else {
                 chatAdapter?.refresh()
             }
@@ -133,11 +165,13 @@ class ChatFragment : Fragment(), ScrollListener {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
                 val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
-                        .toString(), myAccountViewModel.myProfileData.value!!.id)
+                        .toString(), myAccountViewModel.myProfileData.value!!.id, false)
 
-                binding.textInputLayout.editText!!.text.clear()
                 // 전송
-                chatViewModel.sendMsg(newChat)
+                chatViewModel.sendMsg(newChat) { Toast.makeText(context, "네트워크 연결을 확인하세요!", Toast.LENGTH_SHORT).show() }
+                chatViewModel.sendChat(newChat, currentCalcRoomViewModel.calcRoom.value!!)
+                //입력 초기화
+                binding.textInputEditText.text?.clear()
             } else {
                 Toast.makeText(requireContext(), "메시지를 입력해주세요!", Toast.LENGTH_SHORT).show()
             }
@@ -146,14 +180,17 @@ class ChatFragment : Fragment(), ScrollListener {
 
     override fun onStart() {
         super.onStart()
+        //채팅방이 화면에 띄워진 상태 -> 알림 구독 해제
+        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
-    }
-
-    override fun scrollToBottom() {
-        binding.chatList.scrollToPosition(binding.chatList.adapter!!.itemCount - 1)
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -167,6 +204,56 @@ class ChatFragment : Fragment(), ScrollListener {
             chatAdapter?.stopListening()
         } else {
             chatAdapter?.startListening()
+        }
+    }
+
+    /**
+     * 리스트 스크롤이 끝이 아니면서 새 메시지를 받았을때 -> 화면에 표시
+     */
+    override fun onReceived() {
+        if (!isVisible)
+            return
+
+        chatAdapter?.getLastChatDTO()?.apply {
+            val alias = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(senderId))
+                currentCalcRoomViewModel.participantMap.value!![senderId]!!.userName
+            else userName
+
+            val msg = "$alias : $msg"
+            binding.newMsgTv.text = msg
+            binding.newMsgFrame.visibility = View.VISIBLE
+
+            val anim = binding.newMsgFrame.animate()
+            anim.apply {
+                duration = 3000
+                withEndAction {
+                    resetNewMsgView()
+                }
+                start()
+            }
+
+            //레이아웃 클릭 시 리스트 스크롤 끝으로 이동
+            binding.newMsgFrame.setOnClickListener {
+                chatDataObserver?.scrollToBottom(0)
+                resetNewMsgView()
+            }
+        }
+
+    }
+
+    private fun resetNewMsgView() {
+        if (isVisible) {
+            binding.newMsgFrame.clearAnimation()
+
+            binding.newMsgTv.text = ""
+            binding.newMsgFrame.visibility = View.GONE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        chatDataObserver?.apply {
+            chatAdapter?.unregisterAdapterDataObserver(this)
         }
     }
 }

@@ -8,12 +8,13 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
+    android:paddingVertical="8dp"
     >
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginRight="16dp"
         android:src="@drawable/ic_launcher_foreground"
         />
@@ -23,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="name"
+        android:text="은행명 계좌번호"
         android:textColor="@color/black"
         android:textSize="16sp"
         />

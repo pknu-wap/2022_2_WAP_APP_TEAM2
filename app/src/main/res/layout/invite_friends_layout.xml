@@ -60,12 +60,20 @@
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/save_btn"
         app:layout_constraintTop_toBottomOf="@id/search_view"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="2"
         tools:listitem="@layout/search_friend_item_view"
+        />
+
+    <com.example.wapapp2.commons.view.NewLoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/save_btn"
+        app:layout_constraintTop_toBottomOf="@id/search_view"
         />
 
     <Button
@@ -74,6 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:text="@string/check"
+        android:backgroundTint="@color/purple_200"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 

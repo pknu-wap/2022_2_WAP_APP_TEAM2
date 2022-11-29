@@ -9,11 +9,12 @@
     android:backgroundTint="@color/white"
     android:clickable="true"
     android:focusable="true"
+    android:longClickable="true"
     >
 
 
     <TextView
-        android:id="@+id/receipt_amount"
+        android:id="@+id/total_money"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -32,7 +33,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/receipt"
         />
 
     <TextView
@@ -43,7 +43,7 @@
         android:layout_marginBottom="16dp"
         android:text="멕도날드"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/receipt_amount"
+        app:layout_constraintStart_toStartOf="@+id/total_money"
         app:layout_constraintTop_toBottomOf="@id/receipt_image"
         />
 
