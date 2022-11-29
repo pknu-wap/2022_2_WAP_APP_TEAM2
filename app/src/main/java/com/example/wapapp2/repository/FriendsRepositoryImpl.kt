@@ -23,6 +23,7 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         fun getINSTANCE() = INSTANCE!!
     }
 
+
     override suspend fun loadMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->
         fireStore.collection(FireStoreNames.users.name)
                 .document(auth.currentUser?.uid!!)

@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.model.BankAccountDTO
+import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
 import com.example.wapapp2.view.bankaccount.AddMyBankAccountFragment
 import com.example.wapapp2.view.bankaccount.EditMyBankAccountFragment
 import com.example.wapapp2.view.login.LoginFragment
@@ -20,6 +21,10 @@ import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 class MyprofileFragment : Fragment() {
@@ -27,6 +32,7 @@ class MyprofileFragment : Fragment() {
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
+
     private var _binding: FragmentMyprofileBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MyBankAccountsAdapter
@@ -96,6 +102,10 @@ class MyprofileFragment : Fragment() {
 
         binding.btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
+            CoroutineScope(Dispatchers.IO).launch {
+                val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
+                friendsLocalRepository.clear()
+            }
             val loginFragment = LoginFragment()
 
             myCalendarViewModel.listenerRemove()

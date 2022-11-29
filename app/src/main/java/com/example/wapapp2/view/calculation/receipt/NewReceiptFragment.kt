@@ -28,6 +28,7 @@ class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var currentCalcRoomID : String
     companion object {
         const val TAG = "NewReceiptFragment"
     }
@@ -39,6 +40,11 @@ class NewReceiptFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
+
+        arguments?.apply {
+            currentCalcRoomID = getString("currentRoomId")!!
+            newReceiptViewModel.calcRoomId = currentCalcRoomID
+        }
 
         newReceiptViewModel.myName = myAccountViewModel.myProfileData.value!!.name
     }

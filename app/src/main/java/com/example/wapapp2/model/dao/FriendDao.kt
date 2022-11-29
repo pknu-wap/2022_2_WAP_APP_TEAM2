@@ -15,6 +15,9 @@ interface FriendDao {
     @Delete
     suspend fun delete(friendDTO: FriendDTO)
 
+    @Query("DELETE FROM FriendDTO")
+    suspend fun deleteAll()
+
     @Query("SELECT count(*) FROM FriendDTO")
     fun count(): Flow<Int>
 
@@ -26,4 +29,5 @@ interface FriendDao {
 
     @Query("SELECT * FROM FriendDTO")
     fun getAll(): Flow<List<FriendDTO>>
+
 }

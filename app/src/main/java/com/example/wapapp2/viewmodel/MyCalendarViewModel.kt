@@ -1,5 +1,6 @@
 package com.example.wapapp2.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptDTO
@@ -15,7 +16,7 @@ class MyCalendarViewModel : ViewModel() {
     private val myCalcRoomReceiptListeners: ArrayList<ListenerRegistration> = arrayListOf()
 
     /** Hashmap of my ReceiptDTOs <DateString ISO8610, ReceiptDTO> **/
-    var myReceiptMapLivedata = MutableLiveData<HashMap<String, ArrayList<ReceiptDTO>>>()
+    var myReceiptMapLivedata = MutableLiveData<HashMap<String, ArrayList<ReceiptDTO>>>(hashMapOf())
     val myReceiptMap get() = myReceiptMapLivedata.value
 
     fun loadCalendarReceipts(myCalcRoomIDs: MutableSet<String>) {
@@ -23,17 +24,18 @@ class MyCalendarViewModel : ViewModel() {
             myCalcRoomReceiptListeners.add(myCalendarRepository.addSnapShotListner(
                 myCalcRoomID,
                 EventListener { value, error ->
-                    value?.documentChanges?.apply {
-                        for (dc in this) {
-                            if (dc.type == DocumentChange.Type.ADDED){
-                                val newReceiptDTO = dc.document.toObject(ReceiptDTO::class.java)
-                                newReceiptDTO.roomID = myCalcRoomID
-                                ReceiptAdded(newReceiptDTO)
-                            } else if (dc.type == DocumentChange.Type.REMOVED)
-                                ReceiptRemoved(dc.document.toObject(ReceiptDTO::class.java))
-                            else if (dc.type == DocumentChange.Type.MODIFIED)
-                                ReceiptModified(dc.document.toObject(ReceiptDTO::class.java))
+                    value?.apply {
+                        val tmp = hashMapOf<String, ArrayList<ReceiptDTO>>()
+                        for(dc in this){
+                            val newReceiptDTO = dc.toObject(ReceiptDTO::class.java)
+                            newReceiptDTO.roomID = myCalcRoomID
+                            val keyDateString = DateTime.parse(newReceiptDTO.date.toString()).toString("yyyyMMdd")
+                            if (tmp.containsKey(keyDateString))
+                                tmp[keyDateString]!!.add(newReceiptDTO)
+                            else
+                                tmp[keyDateString] = arrayListOf(newReceiptDTO)
                         }
+                        myReceiptMapLivedata.value = tmp
                     }
                 }))
         }
@@ -52,37 +54,4 @@ class MyCalendarViewModel : ViewModel() {
         }
     }
 
-    fun ReceiptAdded(newReceiptDTO: ReceiptDTO) {
-        val keyDateString = DateTime.parse(newReceiptDTO.date.toString()).toString("yyyyMMdd")
-        var tmplist = myReceiptMapLivedata.value ?: hashMapOf()
-
-        if (tmplist.containsKey(keyDateString)) {
-            tmplist[keyDateString]!!.add(newReceiptDTO)
-        } else {
-            tmplist[keyDateString] = arrayListOf(newReceiptDTO)
-        }
-
-        myReceiptMapLivedata.value = tmplist
-    }
-
-    fun ReceiptRemoved(removedReceiptDTO: ReceiptDTO) {
-        val keyDateString = DateTime.parse(removedReceiptDTO.date.toString()).toString("yyyyMMdd")
-
-        var tmplist = myReceiptMapLivedata.value ?: hashMapOf()
-        tmplist[keyDateString]?.let {
-            it.remove(removedReceiptDTO)
-        }
-        myReceiptMapLivedata.value = tmplist
-    }
-
-    fun ReceiptModified(modifiedReceiptDTO: ReceiptDTO){
-        val keyDateString = DateTime.parse(modifiedReceiptDTO.date.toString()).toString("yyyyMMdd")
-
-        var tmplist = myReceiptMapLivedata.value ?: hashMapOf()
-        tmplist[keyDateString]?.let {
-            it.remove( it.find { it.id == modifiedReceiptDTO.id } )
-            it.add(modifiedReceiptDTO)
-        }
-        myReceiptMapLivedata.value = tmplist
-    }
 }
