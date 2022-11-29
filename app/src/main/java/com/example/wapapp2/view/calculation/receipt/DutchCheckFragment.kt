@@ -74,11 +74,12 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
         currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
-            currentCalcRoomViewModel.participantMap.removeObservers(viewLifecycleOwner)
             OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
-            calculationViewModel.loadOngoingReceiptIds()
         }
+
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
         binding.viewReceipts.adapter = receiptsAdapter
 

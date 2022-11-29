@@ -25,7 +25,6 @@ class DutchPriceFragment : Fragment() {
         const val TAG = "DutchPriceFragment"
     }
 
-
     private val onClickedBankAccountListener =
             ListOnClickListener<BankAccountDTO> { bankAccountDTO, position ->
                 onClickedBankAccount(bankAccountDTO)

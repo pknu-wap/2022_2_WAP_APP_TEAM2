@@ -30,6 +30,7 @@ class FixedPriceAdapter(
     ) :
             RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FinalTransferDTO) {
+            /*
             binding.name.text = item.name
             binding.pay.text = DataTypeConverter.toKRW(item.pay)
             if (item.pay >= 0) {
@@ -53,6 +54,8 @@ class FixedPriceAdapter(
 
             }
             onUpdateMoneyCallback.onUpdateMoney(item.pay)
+
+             */
         }
     }
 
