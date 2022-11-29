@@ -41,21 +41,15 @@ class DutchHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnDone.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                if (calculationViewModel.endCalculation()) {
-                    childFragmentManager.beginTransaction().remove(this).commit()
-                    childFragmentManager.beginTransaction().add(R.id.calculation_fragment_container_view, DutchPriceFragment(), DutchPriceFragment.TAG)
-                            .addToBackStack(DutchPriceFragment.TAG).commit()
-                } else {
-                    Toast.makeText(requireContext().applicationContext, R.string.participants_who_have_not_been_verified, Toast
-                            .LENGTH_SHORT).show()
-                    binding.btnDone.isChecked = false
-                }
+        calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
+            if (isCompleted) {
+                childFragmentManager.beginTransaction()
+                        .replace(binding.fragmentContainerView.id, DutchPriceFragment(), DutchPriceFragment.TAG)
+                        .commit()
             } else {
-                val fragmentManager = childFragmentManager
-                if (fragmentManager.findFragmentByTag(DutchPriceFragment.TAG) != null)
-                    fragmentManager.popBackStack()
+                childFragmentManager.beginTransaction()
+                        .replace(binding.fragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
+                        .commit()
             }
         }
 
@@ -77,26 +71,10 @@ class DutchHostFragment : Fragment() {
             override fun onChanged(status: Boolean?) {
                 if (status!!) {
                     calculationViewModel.onLoadedDataStatus.removeObserver(this)
-
-                    if (calculationViewModel.endCalculation()) {
-                        // 정산 확인이 완료되었을 경우
-                        val dutchPriceFragment = DutchPriceFragment()
-                        childFragmentManager.beginTransaction()
-                                .add(binding.fragmentContainerView.id, dutchPriceFragment,
-                                        DutchPriceFragment.TAG).addToBackStack(DutchPriceFragment.TAG).commit()
-
-                    } else {
-                        val dutchCheckFragment = DutchCheckFragment()
-                        childFragmentManager.beginTransaction()
-                                .add(binding.fragmentContainerView.id, dutchCheckFragment,
-                                        DutchCheckFragment.TAG).addToBackStack(DutchCheckFragment.TAG).commit()
-                    }
-
                 }
 
             }
         })
-
 
     }
 

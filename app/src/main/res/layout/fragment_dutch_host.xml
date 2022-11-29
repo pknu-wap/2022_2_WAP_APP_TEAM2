@@ -11,48 +11,21 @@
         android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="16dp"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/barrier"
+        app:layout_constraintBottom_toTopOf="@id/btn_calc_add"
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="top"
-        app:constraint_referenced_ids="btn_calc_add, btn_done"
-        />
-
-    <androidx.appcompat.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_calc_add"
-        android:layout_width="120dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_btn"
+        android:layout_margin="16dp"
         android:backgroundTint="#9C5ECC"
-        android:text="정산 수정"
+        android:text="@string/modify_receipt"
         android:textColor="#FFFFFF"
-        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/btn_done"
-        />
-
-
-    <ToggleButton
-        android:id="@+id/btn_done"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_btn"
-        android:text="확인 완료"
-        android:textColor="#FFFFFF"
-        android:textOff="확인 완료"
-        android:textOn="확인 취소"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/btn_calc_add"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment_container_view"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
