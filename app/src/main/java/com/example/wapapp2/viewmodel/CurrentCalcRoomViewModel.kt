@@ -69,6 +69,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
             var dto: CalcRoomParticipantDTO? = null
 
             val _participantMap = participantMap.value!!
+            _participantMap.clear()
 
             for (v in downloadedParticipantList.await()) {
                 //내 친구인지 확인

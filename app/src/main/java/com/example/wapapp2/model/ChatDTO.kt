@@ -28,8 +28,8 @@ data class ChatDTO(
         @PropertyName("senderId")
         var senderId: String,
 
-        @SerializedName("isNotice")
-        @PropertyName("isNotice")
+        @SerializedName("notice")
+        @PropertyName("notice")
         var isNotice: Boolean,
 ) : Parcelable {
     constructor() : this("", null, "", "", false)
