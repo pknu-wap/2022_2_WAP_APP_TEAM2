@@ -74,7 +74,6 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
     }
 
     override fun OnReceiptClicked(roomID: String?) {
-        Log.d("roomId",roomID.toString())
         if(roomID != null){
             dialogFragment?.dismiss()
 

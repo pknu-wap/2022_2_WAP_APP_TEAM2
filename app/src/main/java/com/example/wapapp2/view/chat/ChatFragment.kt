@@ -42,6 +42,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
 
     private var chatDataObserver: ChatDataObserver? = null
+    private var initialized : Boolean = true
 
     companion object {
         const val TAG = "ChatFragment"
@@ -95,7 +96,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
         super.onViewCreated(view, savedInstanceState)
 
         currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) { it ->
-            if (chatAdapter == null) {
+            if (initialized) {
                 chatViewModel.attach(it)
             }
         }
