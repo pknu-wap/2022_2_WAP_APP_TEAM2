@@ -85,7 +85,7 @@ class ChatPagingAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (getItem(position)?.get("isNotice") as Boolean)
+        if ((getItem(position)?.get("isNotice") ?: false) as Boolean)
             return ItemViewType.NOTICE.ordinal
         else if (getItem(position)?.get("senderId").toString() == myId)
             return ItemViewType.SENDED.ordinal
