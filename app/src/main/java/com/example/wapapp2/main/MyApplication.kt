@@ -29,7 +29,7 @@ class MyApplication : Application() {
         FirebaseApp.initializeApp(applicationContext)
 
         val settings = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
+                .setPersistenceEnabled(false)
                 .build()
         FirebaseFirestore.getInstance().firestoreSettings = settings
         JodaTimeAndroid.init(applicationContext)
