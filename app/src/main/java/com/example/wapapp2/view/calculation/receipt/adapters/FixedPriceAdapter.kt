@@ -1,4 +1,4 @@
-package com.example.wapapp2.view.calculation.receipt
+package com.example.wapapp2.view.calculation.receipt.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,56 +7,62 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.BankItemViewBinding
 import com.example.wapapp2.databinding.ViewDutchItemBinding
 import com.example.wapapp2.model.BankAccountDTO
-import com.example.wapapp2.model.FixedPayDTO
+import com.example.wapapp2.model.FinalTransferDTO
 import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
-import java.text.DecimalFormat
 
 /** 확정 정산 금액 **/
-class FixedPriceAdapter(val items: ArrayList<FixedPayDTO>, val onClickedBankAccountListener:
-ListOnClickListener<BankAccountDTO>, val onUpdateMoneyCallback: OnUpdateMoneyCallback
-)
-    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FixedPriceAdapter(
+        val items: ArrayList<FinalTransferDTO>,
+        val onClickedBankAccountListener:
+        ListOnClickListener<BankAccountDTO>,
+        val onUpdateMoneyCallback: OnUpdateMoneyCallback,
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
-    private class FixedPayVH(val binding: ViewDutchItemBinding, val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
-                             val onUpdateMoneyCallback: OnUpdateMoneyCallback
+    class FixedPayVH(
+            val binding: ViewDutchItemBinding, val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
+            val onUpdateMoneyCallback: OnUpdateMoneyCallback,
     ) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: FixedPayDTO) {
+            RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: FinalTransferDTO) {
+            /*
             binding.name.text = item.name
-            binding.pay.text = DecimalFormat("#,###").format(item.pay)
+            binding.pay.text = DataTypeConverter.toKRW(item.pay)
             if (item.pay >= 0) {
                 binding.pay.text = "+" + binding.pay.text
                 binding.pay.setTextColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.payPlus
-                    )
+                        ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.payPlus
+                        )
                 )
                 binding.accounts.adapter = AccountsAdapter(null, onClickedBankAccountListener)
 
             } else {
                 binding.pay.setTextColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.payMinus
-                    )
+                        ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.payMinus
+                        )
                 )
                 binding.accounts.adapter = AccountsAdapter(item.accounts, onClickedBankAccountListener)
 
             }
             onUpdateMoneyCallback.onUpdateMoney(item.pay)
+
+             */
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return FixedPayVH(
-            ViewDutchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onClickedBankAccountListener, onUpdateMoneyCallback)
+                ViewDutchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                onClickedBankAccountListener, onUpdateMoneyCallback)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -68,15 +74,16 @@ ListOnClickListener<BankAccountDTO>, val onUpdateMoneyCallback: OnUpdateMoneyCal
     }
 
 
-    private class AccountsAdapter(val items: ArrayList<BankAccountDTO>?,
-                                  val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>
-    )
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private class AccountsAdapter(
+            val items: ArrayList<BankAccountDTO>?,
+            val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private class AccountsVH(val binding: BankItemViewBinding,
-                                 val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>
+         class AccountsVH(
+                val binding: BankItemViewBinding,
+                val onClickedBankAccountListener: ListOnClickListener<BankAccountDTO>,
         ) :
-            RecyclerView.ViewHolder(binding.root) {
+                RecyclerView.ViewHolder(binding.root) {
             fun bind_account(account: BankAccountDTO) {
                 binding.name.textSize = 14.0F
                 binding.name.text = "${account.bankDTO!!.bankName}  ${account.accountNumber}  ${account.accountHolder}"

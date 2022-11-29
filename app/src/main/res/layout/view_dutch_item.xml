@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <ImageView
-        android:id="@+id/sep_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="12dp"
-        android:background="@color/black"
-        />
+    >
 
     <RelativeLayout
         android:id="@+id/pay_frame"
-        android:layout_below="@id/sep_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:paddingVertical="10dp"
         >
 
         <TextView
-            android:text = "정산 해야할 사람"
-            android:id="@+id/name"
+            android:id="@+id/payersName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:text="정산 해야할 사람"
             android:textSize="14sp"
             />
 
         <TextView
-            android:id="@+id/pay"
+            android:id="@+id/transferMoney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
             android:text="+- 얼마?"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            />
 
     </RelativeLayout>
 
@@ -47,10 +41,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/pay_frame"
-        android:layout_marginVertical="10dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
         tools:itemCount="3"
-        tools:listitem="@layout/bank_item_view" />
+        tools:listitem="@layout/bank_item_view"
+        />
 
 </RelativeLayout>

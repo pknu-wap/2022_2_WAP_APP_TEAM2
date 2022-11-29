@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation
 
+
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -9,32 +10,26 @@ import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
-
-
 import androidx.core.content.ContextCompat.getColor
-
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.add
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
-import com.example.wapapp2.repository.FcmRepositoryImpl
+import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
-import com.example.wapapp2.view.calculation.interfaces.OnFixOngoingCallback
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateMoneyCallback
-import com.example.wapapp2.view.calculation.interfaces.OnUpdateSummaryCallback
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
-import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
+import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
+import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
-
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-import java.text.DecimalFormat
 
-
-class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback, OnUpdateSummaryCallback,
-        ParticipantsInCalcRoomFragment.OnNavDrawerListener {
+class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerListener {
     private var _binding: FragmentCalcMainBinding? = null
     private val binding get() = _binding!!
     private var roomId: String? = null
@@ -44,23 +39,26 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     }
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
+    private val chatViewModel by viewModels<ChatViewModel>()
+    private val calculationViewModel by viewModels<CalculationViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
-    /** summary of FixedPay **/
-    private var paymoney = 0
     private var chatInputLayoutHeight = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        roomId = if (arguments == null) {
-            savedInstanceState?.getString("roomId")
-        } else {
-            requireArguments().getString("roomId")!!
+        arguments?.apply {
+            roomId = getString("roomId")!!
+            currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
+            calculationViewModel.calcRoomId = roomId!!
         }
 
+        calculationViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
+        calculationViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
+
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
-        currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,6 +73,34 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
+
+        calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
+            updateMySettlementAmount(transferMoney)
+        }
+
+        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) {
+            binding.topAppBar.title = it.name
+            binding.roomTitle.text = it.name
+        }
+
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            calculationViewModel.calcRoomParticipantIds.clear()
+            calculationViewModel.calcRoomParticipantIds.addAll(it.keys.toMutableSet())
+
+            OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
+            calculationViewModel.loadOngoingReceiptIds()
+        }
+
+
+        calculationViewModel.receiptMap.observe(viewLifecycleOwner) {
+            if (it.isEmpty) {
+                binding.calculationSimpleInfo.title.text = getString(R.string.empty_ongoing_receipts)
+                binding.calculationSimpleInfo.summary.visibility = View.GONE
+            } else {
+                binding.calculationSimpleInfo.title.text = getString(R.string.my_settlement_amount)
+                binding.calculationSimpleInfo.summary.visibility = View.VISIBLE
+            }
+        }
 
         val chatFragment = ChatFragment()
         chatFragment.setViewHeightCallback { height ->
@@ -101,16 +127,10 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     override fun onStart() {
         super.onStart()
-        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
-        // 방에서 나간 경우 -> 채팅 알림 구독 해제
-        if (!currentCalcRoomViewModel.exitFromRoom)
-            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
-        else
-            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -118,25 +138,26 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
         _binding = null
     }
 
-    private fun updateFixedPay() {
-        if (paymoney >= 0) {
-            binding.calculationSimpleInfo.summary.text = "+ ${DecimalFormat("#,###").format(paymoney)}"
-        } else {
-            binding.calculationSimpleInfo.summary.text = paymoney.toString()
-            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext(), R.color.payMinus))
-        }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("roomId", roomId)
     }
 
+    private fun updateMySettlementAmount(transferMoney: Int) {
+        if (transferMoney >= 0) {
+            val value = "+ ${DataTypeConverter.toKRW(transferMoney)}"
+            binding.calculationSimpleInfo.summary.text = value
+        } else {
+            binding.calculationSimpleInfo.summary.text = DataTypeConverter.toKRW(transferMoney)
+            binding.calculationSimpleInfo.summary.setTextColor(getColor(requireContext().applicationContext, R.color.payMinus))
+        }
+    }
+
     private fun setOngoingFolderView() {
         //정산 확정 전
         childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.fragmentContainerView.id, DutchCheckFragment(this@CalcMainFragment::onFixOngoingReceipt,
-                        this@CalcMainFragment::updateSummaryUI), DutchCheckFragment::class.java.name)
+                .replace(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
                 .commit()
 
         binding.calculationSimpleInfo.expandBtn.setOnClickListener(object : View.OnClickListener {
@@ -148,7 +169,7 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 expanded = !expanded
                 binding.calculationSimpleInfo.expandBtn.setImageResource(if (expanded) R.drawable.ic_baseline_expand_less_24 else
                     R.drawable.ic_baseline_expand_more_24)
-                binding.calculationSimpleInfo.fragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
+                binding.calculationSimpleInfo.calculationFragmentContainerView.visibility = if (expanded) View.VISIBLE else View.GONE
                 binding.calculationSimpleInfo.checklistReceipts.layoutParams.height =
                         if (expanded) LinearLayout.LayoutParams.MATCH_PARENT else FrameLayout.LayoutParams.WRAP_CONTENT
 
@@ -157,8 +178,19 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                 cardViewLayoutParams.bottomMargin = if (expanded) chatInputLayoutHeight else collapsedMarginBottom.toInt()
 
                 binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
+
+                if (expanded) {
+                    if (calculationViewModel.endCalculation()) {
+                        // 정산 확인이 완료되었을 경우
+
+                    }
+
+                } else {
+
+                }
             }
         })
+
 
         //default를 false로 수정할 필요.
         binding.calculationSimpleInfo.expandBtn.post(Runnable {
@@ -193,6 +225,20 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                     .addToBackStack("CheckReceiptFragment")
                     .commit()
         }
+
+        binding.rushCalcBtn.setOnClickListener {
+            if (calculationViewModel.receiptMap.value!!.isEmpty) {
+                Toast.makeText(requireContext().applicationContext, R.string.no_available_rush_calc, Toast.LENGTH_SHORT).show()
+            } else {
+                val rushCalcFragment = RushCalcFragment()
+                val fragmentManager = parentFragmentManager
+                fragmentManager.beginTransaction().hide(this@CalcMainFragment)
+                        .add(R.id.fragment_container_view, rushCalcFragment, RushCalcFragment.TAG)
+                        .addToBackStack(RushCalcFragment.TAG)
+                        .commit()
+            }
+        }
+
         binding.exitRoom.setOnClickListener {
             //방 나가기
             MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.exit_from_room)
@@ -203,6 +249,9 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
                             Toast.makeText(context, "진행중인 정산이 존재합니다!", Toast.LENGTH_SHORT).show()
                         else {
                             currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
+                            val myProfile = myAccountViewModel.myProfileData.value!!
+                            val noticeChatDTO = ChatDTO(myProfile.name, null, "", myProfile.id, true)
+                            chatViewModel.sendMsg(noticeChatDTO){}
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
                     }.setNegativeButton(R.string.close) { dialog, which ->
@@ -219,21 +268,6 @@ class CalcMainFragment : Fragment(), OnUpdateMoneyCallback, OnFixOngoingCallback
 
     fun interface ViewHeightCallback {
         fun height(height: Int)
-    }
-
-    override fun onUpdateMoney(money: Int) {
-        paymoney += money
-        updateFixedPay() //마지막에 최종 업데이트 되도록 수정 필요
-    }
-
-    override fun onFixOngoingReceipt() {
-        childFragmentManager.beginTransaction()
-                .replace(binding.calculationSimpleInfo.fragmentContainerView.id, DutchPriceFragment(this@CalcMainFragment::onUpdateMoney))
-                .commitAllowingStateLoss()
-    }
-
-    override fun updateSummaryUI(summary: Int) {
-        binding.calculationSimpleInfo.summary.text = DecimalFormat("#,###").format(summary)
     }
 
     override fun closeDrawer() {

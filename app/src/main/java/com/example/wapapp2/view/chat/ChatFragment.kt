@@ -37,9 +37,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private var chatAdapter: ChatPagingAdapter? = null
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
-    private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
 
     private var chatDataObserver: ChatDataObserver? = null
 
@@ -54,13 +54,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.chatList)
 
@@ -104,20 +100,20 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             }
         }
 
-        currentCalcRoomViewModel.participants.observe(viewLifecycleOwner) {
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
             if (chatAdapter == null) {
                 val config = PagingConfig(20, 10, false)
                 val options = FirestorePagingOptions.Builder<ChatDTO>()
                         .setLifecycleOwner(this@ChatFragment.viewLifecycleOwner)
                         .setQuery(chatViewModel.getQueryForOption(currentCalcRoomViewModel.roomId!!), config) { snapshot ->
                             val id = snapshot.getString("senderId").toString()
-                            val userName: String = if (currentCalcRoomViewModel.participantMap.containsKey(id))
-                                currentCalcRoomViewModel.participantMap[id]!!.userName
+                            val userName: String = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(id))
+                                currentCalcRoomViewModel.participantMap.value!![id]!!.userName
                             else
-                                snapshot.getString("userName")!!
+                            snapshot.getString("userName")!!
 
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
-                                    snapshot.getString("msg").toString(), id)
+                                    snapshot.getString("msg").toString(), id, false)
                         }
                         .build()
 
@@ -169,7 +165,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
         binding.sendBtn.setOnClickListener {
             if (binding.textInputEditText.text!!.isNotEmpty()) {
                 val newChat = ChatDTO(myAccountViewModel.myProfileData.value!!.name, Date(), binding.textInputLayout.editText!!.text
-                        .toString(), myAccountViewModel.myProfileData.value!!.id)
+                        .toString(), myAccountViewModel.myProfileData.value!!.id, false)
 
                 // 전송
                 chatViewModel.sendMsg(newChat) { Toast.makeText(context, "네트워크 연결을 확인하세요!", Toast.LENGTH_SHORT).show() }
@@ -184,10 +180,17 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onStart() {
         super.onStart()
+        //채팅방이 화면에 띄워진 상태 -> 알림 구독 해제
+        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
+        // 방에서 나간 경우 -> 채팅 알림 구독 해제
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -212,10 +215,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
             return
 
         chatAdapter?.getLastChatDTO()?.apply {
-            val alias = if (currentCalcRoomViewModel.participantMap.containsKey(senderId))
-                currentCalcRoomViewModel.participantMap[senderId]!!.userName
-            else
-                userName
+            val alias = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(senderId))
+                currentCalcRoomViewModel.participantMap.value!![senderId]!!.userName
+            else userName
 
             val msg = "$alias : $msg"
             binding.newMsgTv.text = msg
@@ -235,7 +237,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
                 chatDataObserver?.scrollToBottom(0)
                 resetNewMsgView()
             }
-
         }
 
     }

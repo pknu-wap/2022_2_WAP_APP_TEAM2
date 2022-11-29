@@ -5,8 +5,10 @@ import com.example.wapapp2.model.datastore.FcmTokenDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.ReceivedPushNotificationDTO
 import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
+import com.example.wapapp2.model.notifications.send.SendFcmCalcRushDTO
 import com.example.wapapp2.model.notifications.send.SendFcmChatDTO
 import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
+import com.example.wapapp2.notification.helper.CalcRushNotificationHelper
 import com.example.wapapp2.notification.helper.ChatNotificationHelper
 import com.example.wapapp2.notification.helper.NewCalcRoomNotificationHelper
 import com.example.wapapp2.notification.helper.ReceiptNotificationHelper
@@ -37,12 +39,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 NotificationType.Chat -> chat(receivedDTO)
                 NotificationType.Receipt -> receipt(receivedDTO)
                 NotificationType.NewCalcRoom -> newCalcRoom(receivedDTO)
+                NotificationType.CalcRush -> newCalcRoom(receivedDTO)
                 else -> {}
             }
         }
     }
 
-    /** 토큰 생성시 서버에 등록 과정 필요 **/
+    /** 토큰 변경 시 서버에 토큰 변경 등록 **/
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         CoroutineScope(Dispatchers.IO).launch {
@@ -92,5 +95,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val sendFcmCalcRoomDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmCalcRoomDTO::class.java)
 
         notificationHelper.notifyNotification(applicationContext, sendFcmCalcRoomDTO)
+    }
+
+    /**
+     * 정산 채촉
+     */
+    private fun calcRush(receivedPushNotificationDTO: ReceivedPushNotificationDTO) {
+        val notificationHelper = CalcRushNotificationHelper.getINSTANCE(applicationContext)
+        val sendFcmCalcRushDTO = Gson().fromJson(receivedPushNotificationDTO.data, SendFcmCalcRushDTO::class.java)
+
+        notificationHelper.notifyNotification(applicationContext, sendFcmCalcRushDTO)
     }
 }

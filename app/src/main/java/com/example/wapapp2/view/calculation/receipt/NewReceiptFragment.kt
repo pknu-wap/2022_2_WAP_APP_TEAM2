@@ -28,6 +28,7 @@ class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var currentCalcRoomID : String
     companion object {
         const val TAG = "NewReceiptFragment"
     }
@@ -39,6 +40,11 @@ class NewReceiptFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         adapter = NewReceiptViewPagerAdapter(this)
+
+        arguments?.apply {
+            currentCalcRoomID = getString("currentRoomId")!!
+            newReceiptViewModel.calcRoomId = currentCalcRoomID
+        }
 
         newReceiptViewModel.myName = myAccountViewModel.myProfileData.value!!.name
     }
@@ -85,7 +91,7 @@ class NewReceiptFragment : Fragment() {
         newReceiptViewModel.addReceiptResult.observe(viewLifecycleOwner) { //추가 종료
             //영수증 추가 FCM전송
             for (receipt in newReceiptViewModel.getReceipts()) {
-                newReceiptViewModel.sendNewReceipt(receipt, newReceiptViewModel.calcRoomId!!)
+                newReceiptViewModel.sendNewReceiptFcm(receipt, newReceiptViewModel.calcRoomId!!)
             }
 
             LoadingDialogView.clearDialogs()

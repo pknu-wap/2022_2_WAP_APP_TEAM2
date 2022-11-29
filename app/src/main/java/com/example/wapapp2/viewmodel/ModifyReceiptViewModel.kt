@@ -3,6 +3,7 @@ package com.example.wapapp2.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
@@ -10,6 +11,7 @@ import kotlinx.coroutines.*
 class ModifyReceiptViewModel : ViewModel() {
     private val receiptRepositoryImpl = ReceiptRepositoryImpl.INSTANCE
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
+    private val calcRoomReceiptRepositoryImpl = CalcRoomRepositorylmpl.getINSTANCE()
 
     lateinit var originalReceiptDTO: ReceiptDTO
     lateinit var modifiedReceiptDTO: ReceiptDTO
@@ -126,6 +128,15 @@ class ModifyReceiptViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             //영수증 삭제
             receiptRepositoryImpl.removeReceipt(calcRoomId, receiptDTO.id)
+
+            //진행중인 영수증 개수 가져오기기
+            val onGoingReceiptCountsResult = async {
+                calcRoomReceiptRepositoryImpl.getOngoingReceiptCounts(calcRoomId)
+            }
+            val onGoingReceiptCounts = onGoingReceiptCountsResult.await()
+            //정산 상태 변경, 진행중인 정산이 없으면 false로, 그 외 -> true
+            calcRoomReceiptRepositoryImpl.updateCalculationStatus(calcRoomId, onGoingReceiptCounts != 0)
+
             //영수증 사진 삭제
             if (receiptDTO.imgUrl.isNotEmpty()) {
                 receiptImgRepositoryImpl.deleteReceiptImg(receiptDTO.imgUrl!!)

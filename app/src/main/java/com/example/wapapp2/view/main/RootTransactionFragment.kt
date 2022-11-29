@@ -7,14 +7,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentLoginBinding
 import com.example.wapapp2.databinding.FragmentRootTransactionBinding
+import com.example.wapapp2.datastore.MyDataStore
+import com.example.wapapp2.viewmodel.MyAccountViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class RootTransactionFragment : Fragment() {
     private var _binding: FragmentRootTransactionBinding? = null
     private val binding get() = _binding!!
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     companion object {
         const val TAG = "RootTransactionFragment"
@@ -34,18 +42,18 @@ class RootTransactionFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(onBackPressedCallback)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        myAccountViewModel.init()
     }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
     ): View? {
-        _binding = FragmentRootTransactionBinding.inflate(inflater)
+        _binding = FragmentRootTransactionBinding.inflate(inflater, container, false)
         return binding.root
     }
 

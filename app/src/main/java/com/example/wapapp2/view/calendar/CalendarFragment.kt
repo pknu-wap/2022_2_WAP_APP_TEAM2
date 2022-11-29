@@ -1,6 +1,7 @@
 package com.example.wapapp2.view.calendar
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,23 +12,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.CalendarFragmentBinding
+import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calendar.dialog.CalendarDialogFragment
 import com.example.wapapp2.view.calendar.dialog.ReceiptItemClickListener
 import com.example.wapapp2.view.main.MainHostFragment
-import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import org.joda.time.DateTime
 
 class CalendarFragment : Fragment(), ReceiptItemClickListener {
-    private var dstDate: DateTime = DateTime()
     private lateinit var binding: CalendarFragmentBinding
+    private var dstDate: DateTime = DateTime()
 
-    private var calendarAdapter: CalendarAdapter? = null
-
-    private val friendsViewModel by activityViewModels<FriendsViewModel>()
-    private val calendarViewModel by activityViewModels<MyCalendarViewModel>()
-
+    private val myCalendarViewModel by activityViewModels<MyCalendarViewModel>()
     private var dialogFragment : DialogFragment? = null
 
     companion object{
@@ -35,17 +32,11 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
     }
 
     private val dayItemOnClickListener: ListOnClickListener<String> = ListOnClickListener<String> { dayISO8601, _ ->
-        dialogFragment = CalendarDialogFragment( calendarViewModel.myReceiptMap.value ?: hashMapOf(), this::OnReceiptClicked)
+        dialogFragment = CalendarDialogFragment( this::OnReceiptClicked )
         dialogFragment!!.arguments = Bundle().apply {
             putString("selectedDayISO8601", dayISO8601)
         }
         dialogFragment!!.show(childFragmentManager, CalendarDialogFragment.TAG)
-
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
     }
 
@@ -56,13 +47,9 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
         // Inflate the layout for this fragment
         binding = CalendarFragmentBinding.inflate(layoutInflater)
         binding.calendarRv.layoutManager = object : GridLayoutManager(context,7) { override fun canScrollVertically() = false }
-        updateCal()
-
-        calendarViewModel.myReceiptMap.observe(viewLifecycleOwner){
+        myCalendarViewModel.myReceiptMapLivedata.observe(viewLifecycleOwner){
             updateCal()
         }
-
-        //unscrollable
 
         binding.calendarBtnBack.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.minusMonths(1)
@@ -78,12 +65,12 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
     }
 
     fun updateCal() {
-        val hashMap = calendarViewModel.myReceiptMap.value ?: hashMapOf()
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
-        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener)
+        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), myCalendarViewModel.myReceiptMap!! ,dayItemOnClickListener)
     }
 
     override fun OnReceiptClicked(roomID: String?) {
+        Log.d("roomId",roomID.toString())
         if(roomID != null){
             dialogFragment?.dismiss()
 
