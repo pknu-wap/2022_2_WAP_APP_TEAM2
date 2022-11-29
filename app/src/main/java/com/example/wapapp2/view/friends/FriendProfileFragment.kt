@@ -1,6 +1,7 @@
 package com.example.wapapp2.view.friends
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +9,17 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentFriendProfileBinding
 import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.viewmodel.FriendAliasViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.UserViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 
 class FriendProfileFragment : DialogFragment() {
     private var _binding: FragmentFriendProfileBinding? = null
@@ -25,13 +30,14 @@ class FriendProfileFragment : DialogFragment() {
     private val userViewModel by viewModels<UserViewModel>()
     private var showModifyAliasLayout = false
 
+    lateinit var dstUserDTO: UserDTO
     companion object {
         const val TAG = "FriendProfileFragment"
 
-        fun newInstance(friendDTO: FriendDTO): FriendProfileFragment {
+        fun newInstance(userDTO: UserDTO): FriendProfileFragment {
             val fragment = FriendProfileFragment()
             fragment.arguments = Bundle().apply {
-                putParcelable("friendDTO", friendDTO)
+                putParcelable("userDTO", userDTO)
             }
             return fragment
         }
@@ -41,7 +47,8 @@ class FriendProfileFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.apply {
-            friendAliasViewModel.friendDTO = getParcelable("friendDTO")
+            dstUserDTO = getParcelable("userDTO")!!
+            friendAliasViewModel.friendDTO = FriendsViewModel.MY_FRIEND_MAP[dstUserDTO.id]
         }
     }
 
@@ -52,6 +59,8 @@ class FriendProfileFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if(dstUserDTO.imgUri.isEmpty().not())
+            Glide.with(binding.root).load(dstUserDTO.imgUri).circleCrop().into(binding.profileImg)
         binding.setAliasLayout.visibility = View.GONE
         binding.username.text = friendAliasViewModel.friendDTO?.alias
 
