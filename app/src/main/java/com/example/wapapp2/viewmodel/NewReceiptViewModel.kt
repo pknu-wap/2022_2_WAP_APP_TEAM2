@@ -9,12 +9,14 @@ import com.example.wapapp2.model.notifications.send.SendFcmReceiptDTO
 import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
+import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
+import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 
 class NewReceiptViewModel : ViewModel() {
-    private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
-    private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
+    private val receiptRepository : ReceiptRepository = ReceiptRepositoryImpl.INSTANCE
+    private val receiptImgRepository : ReceiptImgRepository = ReceiptImgRepositoryImpl.INSTANCE
     private val receiptMap = HashMap<String, ReceiptDTO>()
 
     val removeReceiptLiveData: MutableLiveData<String> = MutableLiveData<String>()
@@ -43,7 +45,7 @@ class NewReceiptViewModel : ViewModel() {
                 //영수증 사진 있는 경우 추가
                 receipt.imgUriInMyPhone?.also {
                     val imgFileName = async {
-                        receiptImgRepositoryImpl.uploadReceiptImg(it, calcRoomId)
+                        receiptImgRepository.uploadReceiptImg(it, calcRoomId)
                     }
 
                     imgFileName.await()?.apply {

@@ -4,8 +4,7 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.repository.interfaces.FriendsRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -23,6 +22,7 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
 
         fun getINSTANCE() = INSTANCE!!
     }
+
 
     override suspend fun loadMyFriends() = suspendCoroutine<MutableList<FriendDTO>> { continuation ->
         fireStore.collection(FireStoreNames.users.name)
@@ -63,5 +63,8 @@ class FriendsRepositoryImpl private constructor() : FriendsRepository {
         }
     }
 
+
+    override fun addSnapShotListenerToFriend(id : String, eventListener: EventListener<DocumentSnapshot>) : ListenerRegistration =
+        fireStore.collection(FireStoreNames.users.name).document(id).addSnapshotListener(eventListener)
 
 }

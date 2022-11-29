@@ -18,16 +18,14 @@ import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
+import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
 import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
-import com.example.wapapp2.viewmodel.CalculationViewModel
-import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
-import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
@@ -41,6 +39,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     }
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>()
+    private val chatViewModel by viewModels<ChatViewModel>()
     private val calculationViewModel by viewModels<CalculationViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
@@ -250,6 +249,9 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                             Toast.makeText(context, "진행중인 정산이 존재합니다!", Toast.LENGTH_SHORT).show()
                         else {
                             currentCalcRoomViewModel.exitFromRoom(currentCalcRoomViewModel.roomId!!)
+                            val myProfile = myAccountViewModel.myProfileData.value!!
+                            val noticeChatDTO = ChatDTO(myProfile.name, null, "", myProfile.id, true)
+                            chatViewModel.sendMsg(noticeChatDTO){}
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
                     }.setNegativeButton(R.string.close) { dialog, which ->

@@ -60,6 +60,9 @@ class DutchCheckFragment() : Fragment() {
         binding.btnAdd.setOnClickListener {
             //영수증 추가
             val fragment = NewReceiptFragment()
+            fragment.arguments = Bundle().apply {
+                putString("currentRoomId",currentCalcRoomViewModel.roomId)
+            }
             val fragmentManager = requireParentFragment().parentFragmentManager
 
             fragmentManager.beginTransaction()

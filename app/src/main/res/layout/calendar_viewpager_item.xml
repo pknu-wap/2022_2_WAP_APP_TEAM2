@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp">
+    >
 
 
     <RelativeLayout
@@ -22,24 +22,24 @@
             android:layout_centerHorizontal="true"
             android:textSize="20sp"
             />
-
         <ImageView
             android:id="@+id/calendar_btnBack"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:clickable="true"
+            android:src="@drawable/ic_back"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:clickable="true"
-            android:src="@drawable/ic_back" />
+            />
 
         <ImageView
             android:id="@+id/calendar_btnNext"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_back"
+            android:rotation="180"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:rotation="180"
-            android:src="@drawable/ic_back"
 
             />
 
@@ -113,19 +113,5 @@
         tools:listitem="@layout/calendar_day"
         tools:itemCount="35"
         />
-
-
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:orientation="horizontal"
-        />
-
-
 
 </LinearLayout>

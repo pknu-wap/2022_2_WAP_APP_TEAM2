@@ -65,6 +65,5 @@ class ReceiptImgRepositoryImpl private constructor() : ReceiptImgRepository {
                 continuation.resumeWithException(it.exception!!)
             }
         }
-
     }
 }

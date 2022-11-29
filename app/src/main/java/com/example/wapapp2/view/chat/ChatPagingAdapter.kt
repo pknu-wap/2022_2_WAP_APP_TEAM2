@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DateConverter
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
+import com.example.wapapp2.databinding.ChatMsgItemNoticeBinding
 import com.example.wapapp2.databinding.ChatMsgItemReceivedBinding
 import com.example.wapapp2.databinding.ChatMsgItemSendedBinding
 import com.example.wapapp2.model.ChatDTO
@@ -27,7 +28,14 @@ class ChatPagingAdapter(
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
     private enum class ItemViewType {
-        SENDED, RECEVEIED
+        SENDED, RECEVEIED, NOTICE
+    }
+
+    inner class NoticeHolder(val binding: ChatMsgItemNoticeBinding): RecyclerView.ViewHolder(binding.root), ChatHolder{
+        override fun bind(position: Int, model: ChatDTO) {
+            binding.notice.text = "${model.userName}님이 방을 나갔습니다."
+            //별명으로 ?
+        }
     }
 
 
@@ -68,13 +76,22 @@ class ChatPagingAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == ItemViewType.RECEVEIED.ordinal) ChatHolder_received(ChatMsgItemReceivedBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else
-            ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        if (viewType == ItemViewType.RECEVEIED.ordinal)
+            return ChatHolder_received(ChatMsgItemReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        else if (viewType == ItemViewType.SENDED.ordinal)
+            return ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        else
+            return NoticeHolder(ChatMsgItemNoticeBinding.inflate(LayoutInflater.from(parent.context),parent,false))
     }
 
-    override fun getItemViewType(position: Int): Int =
-            if (getItem(position)?.get("senderId").toString() == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
+    override fun getItemViewType(position: Int): Int {
+        if (getItem(position)?.get("isNotice") as Boolean)
+            return ItemViewType.NOTICE.ordinal
+        else if (getItem(position)?.get("senderId").toString() == myId)
+            return ItemViewType.SENDED.ordinal
+        else
+            return ItemViewType.RECEVEIED.ordinal
+    }
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {
