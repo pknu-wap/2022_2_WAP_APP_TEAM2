@@ -42,7 +42,7 @@ class CalendarDialogFragment( val receiptItemClickListener: ReceiptItemClickList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        hashMap = myCalendarViewModel.myReceiptMap ?: hashMapOf()
+        hashMap = myCalendarViewModel.getTotalHashMap()
         calendarDialogViewModel.arguments = arguments ?: savedInstanceState
         calendarDialogViewModel.firstSelectedDay = calendarDialogViewModel.arguments!!.getString("selectedDayISO8601", "")
         val dstKey = DateTime.parse(calendarDialogViewModel.firstSelectedDay).toString("yyyyMMdd")

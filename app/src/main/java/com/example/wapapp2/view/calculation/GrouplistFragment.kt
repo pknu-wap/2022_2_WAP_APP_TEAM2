@@ -95,7 +95,6 @@ class GrouplistFragment : Fragment() {
 
         myCalcRoomViewModel.myCalcRoomIds.observe(viewLifecycleOwner) {
             adapter?.stopListening()
-
             if (it.isNotEmpty()) {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
