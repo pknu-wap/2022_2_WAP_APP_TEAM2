@@ -18,8 +18,8 @@ class DutchPriceFragment : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
+    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment().requireParentFragment() })
+    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment() })
 
     companion object {
         const val TAG = "DutchPriceFragment"
@@ -36,6 +36,7 @@ class DutchPriceFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
+        /*
         binding.btnAdd.setOnClickListener(View.OnClickListener {
             TODO(" 영수증 추가 화면 연결 ")
         })
@@ -48,17 +49,17 @@ class DutchPriceFragment : Fragment() {
 
             }
         })
-        /*
+
         binding.viewReceipts.adapter =
                 FixedPriceAdapter(DummyData.getFixedDTOs(), onClickedBankAccountListener, onUpdateMoneyCallback)
-
-
          */
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
     }
 
     /** show Bank App dialog **/
