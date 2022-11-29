@@ -136,8 +136,6 @@ class DialogEditDetailFragment : DialogFragment() {
 
     private fun String.toEditable(): Editable = Editable.Factory().newEditable(this)
 
-
-
     private fun ShowCameraDialog(){
         MaterialAlertDialogBuilder(requireActivity())
             .setTitle(R.string.profile_modify)

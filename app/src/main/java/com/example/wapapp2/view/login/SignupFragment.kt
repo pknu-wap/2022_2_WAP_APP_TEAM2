@@ -48,7 +48,6 @@ class SignupFragment : Fragment() {
         fun UpdateProfile(uid: String) {
             db = FirebaseFirestore.getInstance()
             var gender: String = "man"
-            var uid: String = "uid"
 
             viewBinding.radioGroupGender.setOnCheckedChangeListener { radioGroup, checkedID ->
                 when (checkedID) {

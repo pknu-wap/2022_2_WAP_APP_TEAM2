@@ -11,10 +11,7 @@ import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
 import com.example.wapapp2.repository.FriendsRepositoryImpl
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
@@ -33,10 +30,16 @@ class FriendsViewModel : ViewModel() {
 
     val myFriendsMapUpdatedLiveData = MutableLiveData<Boolean>(true)
 
+    private var friendsListener: ListenerRegistration? = null
 
     /** ID : friendDTO **/
     companion object {
         val MY_FRIEND_MAP = mutableMapOf<String, FriendDTO>()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        friendsListener?.remove()
     }
 
     fun checkedFriend(friendDTO: FriendDTO, isChecked: Boolean) {
@@ -94,9 +97,10 @@ class FriendsViewModel : ViewModel() {
                         FriendDTO(userDTO.id, userDTO.name, userDTO.email)
                 )
             }
-            withContext(Main){
-                result.await()?.apply { if(this)
-                    MY_FRIEND_MAP[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
+            withContext(Main) {
+                result.await()?.apply {
+                    if (this)
+                        MY_FRIEND_MAP[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
                     myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
                 }
             }
@@ -118,19 +122,18 @@ class FriendsViewModel : ViewModel() {
     /** Must Call After Get myFriendsIDs **/
     fun getMyFriendsOptions_new(): FirestoreRecyclerOptions<UserDTO> {
         val query =
-            fireStore.collection(FireStoreNames.users.name)
-                .whereIn(FieldPath.documentId(), MY_FRIEND_MAP.keys.toList())
-
-//                .orderBy("name", Query.Direction.ASCENDING)
+                fireStore.collection(FireStoreNames.users.name)
+                        .whereIn(FieldPath.documentId(), if (MY_FRIEND_MAP.isEmpty())
+                            mutableListOf("1") else MY_FRIEND_MAP.keys.toMutableList())
 
         //snapshot listener 달아줘야함 별명 거기다가 snapshot -> ob
         val option = FirestoreRecyclerOptions.Builder<UserDTO>()
-            .setQuery(query, MetadataChanges.INCLUDE) {
-                val userDTO = it.toObject<UserDTO>()!!
-                userDTO.id = it.id
-                userDTO
-            }
-            .build()
+                .setQuery(query, MetadataChanges.INCLUDE) {
+                    val userDTO = it.toObject<UserDTO>()!!
+                    userDTO.id = it.id
+                    userDTO
+                }
+                .build()
         return option
     }
 
@@ -149,6 +152,17 @@ class FriendsViewModel : ViewModel() {
                 }
                 .build()
         return option
+    }
+
+
+    fun myFriends() {
+        val query =
+                fireStore.collection(FireStoreNames.users.name)
+                        .document(firebaseAuth.currentUser?.uid!!)
+                        .collection(FireStoreNames.myFriends.name).orderBy("alias", Query.Direction.ASCENDING)
+        friendsListener = query.addSnapshotListener { value, error ->
+
+        }
     }
 
     fun loadMyFriends() {
@@ -170,7 +184,7 @@ class FriendsViewModel : ViewModel() {
                     val myFriends = async {
                         friendsRepositoryImpl.loadMyFriends()
                     }
-                    
+
                     for (friend in myFriends.await()) {
                         MY_FRIEND_MAP[friend.friendUserId] = friend
                         friendsLocalRepository.insert(FriendDTO(friend.friendUserId, friend.alias, friend.email))
