@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:orientation="vertical"
+        android:layout_marginTop="8dp"
         app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
