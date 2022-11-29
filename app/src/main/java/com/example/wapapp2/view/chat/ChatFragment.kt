@@ -37,9 +37,9 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private var chatAdapter: ChatPagingAdapter? = null
 
     private lateinit var viewHeightCallback: CalcMainFragment.ViewHeightCallback
-    private val chatViewModel by viewModels<ChatViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
 
     private var chatDataObserver: ChatDataObserver? = null
 

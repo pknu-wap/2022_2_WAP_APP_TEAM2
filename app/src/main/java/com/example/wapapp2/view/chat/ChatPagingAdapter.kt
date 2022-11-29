@@ -34,6 +34,7 @@ class ChatPagingAdapter(
     inner class NoticeHolder(val binding: ChatMsgItemNoticeBinding): RecyclerView.ViewHolder(binding.root), ChatHolder{
         override fun bind(position: Int, model: ChatDTO) {
             binding.notice.text = "${model.userName}님이 방을 나갔습니다."
+            //별명으로 ?
         }
     }
 
