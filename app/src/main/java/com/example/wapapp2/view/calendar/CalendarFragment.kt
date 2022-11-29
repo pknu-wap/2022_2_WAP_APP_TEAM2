@@ -47,6 +47,10 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
         // Inflate the layout for this fragment
         binding = CalendarFragmentBinding.inflate(layoutInflater)
         binding.calendarRv.layoutManager = object : GridLayoutManager(context,7) { override fun canScrollVertically() = false }
+        myCalendarViewModel.updatedBooleanLiveData.observe(viewLifecycleOwner){
+            updateCal()
+        }
+
         myCalendarViewModel.myReceiptMapLivedata.observe(viewLifecycleOwner){
             updateCal()
         }
@@ -66,11 +70,10 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
 
     fun updateCal() {
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
-        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), myCalendarViewModel.myReceiptMap!! ,dayItemOnClickListener)
+        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), myCalendarViewModel.getTotalHashMap()!! ,dayItemOnClickListener)
     }
 
     override fun OnReceiptClicked(roomID: String?) {
-        Log.d("roomId",roomID.toString())
         if(roomID != null){
             dialogFragment?.dismiss()
 

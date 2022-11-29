@@ -31,6 +31,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
+    val onCompletedCalculation = MutableLiveData<Boolean>(false)
+    val onLoadedDataStatus = MutableLiveData<Boolean>(false)
+
     lateinit var myUid: String
     lateinit var myUserName: String
 
@@ -212,6 +215,10 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     }
 
                     checkVerifiedParticipants()
+                    onCompletedCalculation.value = endCalculation()
+
+                    if (!isLoadingReceiptData())
+                        onLoadedDataStatus.value = true
                 }
 
                 productsListenerMap[receiptId]?.apply {
@@ -232,6 +239,14 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                 verifiedParticipantIds.addAll(product.participants.keys)
             }
         }
+    }
+
+    fun isLoadingReceiptData(): Boolean {
+        for (receipt in receiptMap.value!!.values) {
+            if (receipt.productMap.isEmpty)
+                return true
+        }
+        return false
     }
 
     fun endCalculation(): Boolean = verifiedParticipantIds == calcRoomParticipantIds

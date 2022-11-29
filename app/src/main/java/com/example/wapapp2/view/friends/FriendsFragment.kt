@@ -128,7 +128,6 @@ class FriendsFragment : Fragment() {
     private fun setFriendsProfile() {
         friendsViewModel.myFriendsMapUpdatedLiveData.observe(viewLifecycleOwner){
             myFriendsAdapter?.stopListening()
-            Log.d("이거 왜 안나타남??",FriendsViewModel.MY_FRIEND_MAP.toString())
             myFriendsAdapter = MyFriendsAdapter(friendOnClickListener, friendsViewModel.getMyFriendsOptions_new(), FriendsViewModel.MY_FRIEND_MAP.toMap())
             dataObserver = ListAdapterDataObserver(binding.myFriendsList, binding.myFriendsList.layoutManager as
                     LinearLayoutManager, myFriendsAdapter!!)

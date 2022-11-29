@@ -22,7 +22,7 @@ import org.joda.time.format.ISODateTimeFormat
 
 class ChatPagingAdapter(
         private val myId: String,
-        private val option: FirestorePagingOptions<ChatDTO>,
+        option: FirestorePagingOptions<ChatDTO>,
 ) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount, ChatDataObserver.CheckMyMessage {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
@@ -31,10 +31,9 @@ class ChatPagingAdapter(
         SENDED, RECEVEIED, NOTICE
     }
 
-    inner class NoticeHolder(val binding: ChatMsgItemNoticeBinding): RecyclerView.ViewHolder(binding.root), ChatHolder{
+    inner class NoticeHolder(val binding: ChatMsgItemNoticeBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder {
         override fun bind(position: Int, model: ChatDTO) {
             binding.notice.text = "${model.userName}님이 방을 나갔습니다."
-            //별명으로 ?
         }
     }
 
@@ -81,16 +80,16 @@ class ChatPagingAdapter(
         else if (viewType == ItemViewType.SENDED.ordinal)
             return ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
         else
-            return NoticeHolder(ChatMsgItemNoticeBinding.inflate(LayoutInflater.from(parent.context),parent,false))
+            return NoticeHolder(ChatMsgItemNoticeBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (getItem(position)?.get("isNotice") as Boolean)
-            return ItemViewType.NOTICE.ordinal
-        else if (getItem(position)?.get("senderId").toString() == myId)
-            return ItemViewType.SENDED.ordinal
+        return if (getItem(position)?.getBoolean("notice")!!)
+            ItemViewType.NOTICE.ordinal
+        else if (getItem(position)?.getString("senderId") == myId)
+            ItemViewType.SENDED.ordinal
         else
-            return ItemViewType.RECEVEIED.ordinal
+            ItemViewType.RECEVEIED.ordinal
     }
 
 

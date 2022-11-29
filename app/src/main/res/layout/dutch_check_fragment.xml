@@ -1,71 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/view_receipts"
+        android:id="@+id/receipt_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btn_frame"
-        android:layout_alignParentTop="true"
+        android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="4"
-        tools:listitem="@layout/view_dutch_item"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
-    <!-- Button Frame -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/btn_frame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:paddingVertical="5dp"
-        >
 
-        <ToggleButton
-            android:id="@+id/btn_done"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/bg_btn"
-            android:paddingHorizontal="30dp"
-            android:text="확인 완료"
-            android:textColor="#FFFFFF"
-            android:textOff="확인 완료"
-            android:textOn="확인 취소"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="@id/guideline1"
-            />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_add"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/bg_btn"
-            android:paddingHorizontal="30dp"
-            android:text="정산 추가"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="@id/guideline1"
-            />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline1"
-            android:layout_width="wrap_content"
-            android:layout_height="1dp"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

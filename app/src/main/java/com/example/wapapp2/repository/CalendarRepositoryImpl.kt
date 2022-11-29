@@ -3,10 +3,7 @@ package com.example.wapapp2.repository
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.interfaces.CalendarRepository
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import org.joda.time.DateTime
 import kotlin.coroutines.resume

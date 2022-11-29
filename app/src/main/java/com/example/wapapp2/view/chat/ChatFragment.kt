@@ -42,6 +42,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
 
     private var chatDataObserver: ChatDataObserver? = null
+    private var initialized: Boolean = true
 
     companion object {
         const val TAG = "ChatFragment"
@@ -54,6 +55,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        chatViewModel.roomId = currentCalcRoomViewModel.roomId!!
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -66,7 +68,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
                 //스크롤이 끝으로 이동한 경우 하단 채팅알림 지우기
                 if (!isVisible)
                     return@setOnScrollChangeListener
-
                 if (binding.newMsgFrame.visibility == View.VISIBLE) {
                     chatDataObserver?.apply {
                         if (atBottom(0)) {
@@ -94,12 +95,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        currentCalcRoomViewModel.calcRoom.observe(viewLifecycleOwner) { it ->
-            if (chatAdapter == null) {
-                chatViewModel.attach(it)
-            }
-        }
-
         currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
             if (chatAdapter == null) {
                 val config = PagingConfig(20, 10, false)
@@ -110,10 +105,10 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
                             val userName: String = if (currentCalcRoomViewModel.participantMap.value!!.containsKey(id))
                                 currentCalcRoomViewModel.participantMap.value!![id]!!.userName
                             else
-                            snapshot.getString("userName")!!
+                                snapshot.getString("userName")!!
 
                             ChatDTO(userName, snapshot.getTimestamp("sendedTime")?.toDate(),
-                                    snapshot.getString("msg").toString(), id, false)
+                                    snapshot.getString("msg").toString(), id, snapshot.getBoolean("notice")!!)
                         }
                         .build()
 

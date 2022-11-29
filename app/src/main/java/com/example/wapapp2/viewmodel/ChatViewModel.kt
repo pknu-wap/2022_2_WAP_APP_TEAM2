@@ -21,7 +21,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
-    private lateinit var EnableChatRoom: CalcRoomDTO
+    lateinit var roomId: String
     private val chatRepository: ChatRepository = ChatRepositorylmpl.getINSTANCE()
     private var listenerRegistration: ListenerRegistration? = null
 
@@ -30,14 +30,10 @@ class ChatViewModel : ViewModel() {
         listenerRegistration?.remove()
     }
 
-    fun attach(calcRoomDTO: CalcRoomDTO) {
-        EnableChatRoom = calcRoomDTO
-    }
-
 
     fun sendMsg(chatDTO: ChatDTO, sendMsgOnFailCallback: SendMsgOnFailCallback) {
         CoroutineScope(Dispatchers.Default).launch {
-            val result = async { chatRepository.sendMsg(EnableChatRoom.id!!, chatDTO) }
+            val result = async { chatRepository.sendMsg(roomId, chatDTO) }
             if (result.await().not()) {
                 sendMsgOnFailCallback.OnFail()
             }
