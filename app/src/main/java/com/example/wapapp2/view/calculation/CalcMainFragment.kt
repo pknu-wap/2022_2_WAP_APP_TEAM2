@@ -18,6 +18,7 @@ import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.DutchHostFragment
 import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
@@ -73,10 +74,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
-
-        childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchHostFragment(),
-                        DutchHostFragment.TAG).commit()
 
         calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
             updateMySettlementAmount(transferMoney)
@@ -135,6 +132,10 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
     override fun onStop() {
         super.onStop()
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToTopic(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToTopic(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -191,8 +192,8 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                     childFragmentManager.beginTransaction().add(binding.calculationSimpleInfo.calculationFragmentContainerView.id,
                             DutchHostFragment(), DutchHostFragment.TAG).commit()
                 } else {
-                    childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.apply {
-                        childFragmentManager.beginTransaction().remove(this).commit()
+                    childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.also { dutchFragment ->
+                        childFragmentManager.beginTransaction().remove(dutchFragment).commit()
                     }
                 }
 
@@ -204,6 +205,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             override fun onGlobalLayout() {
                 if (binding.calculationSimpleInfo.root.height > 0) {
                     binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
                     //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
                     val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
                     chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height

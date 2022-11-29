@@ -176,16 +176,16 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback {
     override fun onStart() {
         super.onStart()
         //채팅방이 화면에 띄워진 상태 -> 알림 구독 해제
-        FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+        FcmRepositoryImpl.unSubscribeToTopic(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onStop() {
         super.onStop()
         // 방에서 나간 경우 -> 채팅 알림 구독 해제
         if (currentCalcRoomViewModel.exitFromRoom)
-            FcmRepositoryImpl.unSubscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+            FcmRepositoryImpl.unSubscribeToTopic(currentCalcRoomViewModel.roomId!!)
         else
-            FcmRepositoryImpl.subscribeToCalcRoom(currentCalcRoomViewModel.roomId!!)
+            FcmRepositoryImpl.subscribeToTopic(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {

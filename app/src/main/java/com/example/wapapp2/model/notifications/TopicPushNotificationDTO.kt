@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class TopicPushNotificationDTO(
         @SerializedName("to")
-        val to: String,
+        var to: String,
         @SerializedName("notification")
         val notification: Notification,
 ) {

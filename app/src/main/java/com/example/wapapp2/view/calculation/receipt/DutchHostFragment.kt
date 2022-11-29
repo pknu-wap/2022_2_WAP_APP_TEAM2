@@ -39,19 +39,7 @@ class DutchHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnCalcAdd.setOnClickListener {
-            //영수증 추가
-            val fragment = NewReceiptFragment()
-            fragment.arguments = Bundle().apply {
-                putString("currentRoomId", currentCalcRoomViewModel.roomId)
-            }
 
-            val fragmentManager = requireParentFragment().requireParentFragment().parentFragmentManager
-            fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!)
-                    .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                    .addToBackStack(NewReceiptFragment.TAG).commit()
-        }
 
         calculationViewModel.onLoadedDataStatus.observe(viewLifecycleOwner, object : Observer<Boolean> {
             override fun onChanged(status: Boolean?) {
@@ -60,7 +48,7 @@ class DutchHostFragment : Fragment() {
                     calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
                         if (isCompleted) {
                             childFragmentManager.beginTransaction()
-                                    .replace(binding.fragmentContainerView.id, FinalTransferFragment(), FinalTransferFragment.TAG)
+                                    .replace(binding.fragmentContainerView.id, FinalDutchFragment(), FinalDutchFragment.TAG)
                                     .commit()
                         } else {
                             childFragmentManager.beginTransaction()

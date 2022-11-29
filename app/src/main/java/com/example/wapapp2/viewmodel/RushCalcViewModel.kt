@@ -11,7 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RushCalcViewModel : ViewModel(), ICheckedRecipient<CalcRoomParticipantDTO> {
-    val selectedRecipients = mutableSetOf<String>()
+    val selectedRecipientTokens = mutableSetOf<String>()
+    val calcRoomParticipants = mutableMapOf<String, CalcRoomParticipantDTO>()
 
     lateinit var myUid: String
     lateinit var myUserName: String
@@ -19,9 +20,9 @@ class RushCalcViewModel : ViewModel(), ICheckedRecipient<CalcRoomParticipantDTO>
 
     override fun onCheckedChange(e: CalcRoomParticipantDTO, isChecked: Boolean) {
         if (isChecked) {
-            selectedRecipients.add(e.fcmToken)
+            selectedRecipientTokens.add(e.fcmToken)
         } else {
-            selectedRecipients.remove(e.fcmToken)
+            selectedRecipientTokens.remove(e.fcmToken)
         }
     }
 
@@ -31,7 +32,7 @@ class RushCalcViewModel : ViewModel(), ICheckedRecipient<CalcRoomParticipantDTO>
      */
     fun sendRushCalcFcm() {
         CoroutineScope(Dispatchers.IO).launch {
-            FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.CalcRush, selectedRecipients.toMutableList(), SendFcmCalcRushDTO(calcRoomId,
+            FcmRepositoryImpl.sendFcmToRecipients(NotificationType.CalcRush, selectedRecipientTokens.toMutableList(), SendFcmCalcRushDTO(calcRoomId,
                     myUserName, myUid))
         }
     }

@@ -259,7 +259,6 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
             for (receipt in receipts.values) {
                 val payersId = receipt.payersId
-                val payersIsMe = payersId == myUid
 
                 val bankAccountsResult = async {
                     bankAccountsRepository.getBankAccounts(payersId)
@@ -276,6 +275,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     }
                 }
 
+                val payersIsMe = payersId == myUid
                 if (payersIsMe)
                     mySettlementAmount = -mySettlementAmount
 

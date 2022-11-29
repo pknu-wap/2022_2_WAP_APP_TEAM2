@@ -37,7 +37,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 .document(productId)
 
         if (add) {
-            val updateMap = mapOf("participants" to mapOf(myUid to participantDTO))
+            val updateMap = mapOf("participants.$myUid" to participantDTO)
             productDocument.update(updateMap)
         } else {
             val updateMap = mapOf("participants.$myUid" to FieldValue.delete())

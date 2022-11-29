@@ -1,24 +1,20 @@
 package com.example.wapapp2.view.calculation.receipt
 
-import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.Toast
-import androidx.collection.arrayMapOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
-import com.example.wapapp2.databinding.DutchCheckFragmentBinding
-import com.example.wapapp2.model.ReceiptDTO
+import com.example.wapapp2.databinding.OngoingDutchFragmentBinding
 import com.example.wapapp2.view.calculation.CalcMainFragment
+import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
 class OngoingReceiptsFragment() : Fragment() {
-    private var _binding: DutchCheckFragmentBinding? = null
+    private var _binding: OngoingDutchFragmentBinding? = null
     private val binding get() = _binding!!
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment().requireParentFragment() })
@@ -36,13 +32,26 @@ class OngoingReceiptsFragment() : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
+        _binding = OngoingDutchFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnCalcAdd.setOnClickListener {
+            //영수증 추가
+            val fragment = NewReceiptFragment()
+            fragment.arguments = Bundle().apply {
+                putString("currentRoomId", currentCalcRoomViewModel.roomId)
+            }
+
+            val fragmentManager = requireParentFragment().parentFragmentManager
+            fragmentManager.beginTransaction()
+                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!)
+                    .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
+                    .addToBackStack(NewReceiptFragment.TAG).commit()
+        }
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
         binding.receiptList.adapter = receiptsAdapter
 

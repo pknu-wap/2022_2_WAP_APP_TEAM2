@@ -36,10 +36,6 @@ class OngoingReceiptsAdapter(
         private var productsAdapter: ProductsAdapter? = null
         private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd E a hh:mm", Locale.getDefault())
 
-        init {
-            binding.recentCalcItem.addItemDecoration(DividerItemDecoration(binding.root.context, DividerItemDecoration.VERTICAL))
-        }
-
         fun bind(receipt: ReceiptDTO) {
             val description = "${receipt.name} - ${receipt.payersName}"
             binding.description.text = description

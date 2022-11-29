@@ -28,7 +28,8 @@ class NewReceiptFragment : Fragment() {
     private var _binding: FragmentNewReceiptBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var currentCalcRoomID : String
+    private lateinit var currentCalcRoomID: String
+
     companion object {
         const val TAG = "NewReceiptFragment"
     }
