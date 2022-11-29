@@ -1,11 +1,13 @@
 package com.example.wapapp2.view.friends
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -60,7 +62,7 @@ class FriendProfileFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(dstUserDTO.imgUri.isEmpty().not())
-            Glide.with(binding.root).load(dstUserDTO.imgUri).circleCrop().into(binding.profileImg)
+            Glide.with(this@FriendProfileFragment).load(dstUserDTO.imgUri).circleCrop().into(binding.profileImg)
         binding.setAliasLayout.visibility = View.GONE
         binding.username.text = friendAliasViewModel.friendDTO?.alias
 
