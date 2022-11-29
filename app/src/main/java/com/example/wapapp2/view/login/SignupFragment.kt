@@ -41,7 +41,7 @@ class SignupFragment : Fragment() {
             parentFragmentManager
                     .beginTransaction()
                     .hide(this@SignupFragment)
-                    .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                    .add(R.id.fragment_container_view, loginFragment, LoginFragment.TAG)
                     .commitAllowingStateLoss()
         }
 

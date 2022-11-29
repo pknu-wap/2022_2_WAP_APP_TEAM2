@@ -101,20 +101,14 @@ class MyprofileFragment : Fragment() {
         }
 
         binding.btnLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            CoroutineScope(Dispatchers.IO).launch {
-                val friendsLocalRepository = FriendsLocalRepositoryImpl.getINSTANCE()
-                friendsLocalRepository.clear()
-            }
-            val loginFragment = LoginFragment()
+            myAccountViewModel.signOut()
 
             myCalendarViewModel.listenerRemove()
             myCalcRoomViewModel.listenerRemove()
 
             parentFragmentManager
                     .beginTransaction()
-                    .hide(this@MyprofileFragment)
-                    .add(R.id.fragment_container_view, loginFragment, LoginFragment::class.java.name)
+                    .replace(R.id.fragment_container_view, LoginFragment(), LoginFragment.TAG)
                     .commitAllowingStateLoss()
         }
 
@@ -132,12 +126,12 @@ class MyprofileFragment : Fragment() {
         }
 
         myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
-            if(it.imgUri.isEmpty().not())
+            if (it.imgUri.isEmpty().not())
                 Glide.with(binding.root).load(it.imgUri).circleCrop().into(binding.myProfileImg)
-            else if(it.gender == "man")
-                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.man))
+            else if (it.gender == "man")
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.man))
             else
-                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.girl))
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.girl))
 
             binding.myProfileName.text = it.name
             binding.myAccountId.text = it.email
