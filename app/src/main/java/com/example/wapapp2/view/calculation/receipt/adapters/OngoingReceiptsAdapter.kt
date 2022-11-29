@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.collection.ArrayMap
@@ -26,6 +27,7 @@ class OngoingReceiptsAdapter(
         var PARTICIPANT_COUNT = 0
         lateinit var MY_UID: String
     }
+
 
     class ReceiptVM(
             private val binding: ViewReceiptItemBinding,
@@ -72,49 +74,48 @@ class OngoingReceiptsAdapter(
             private var delayCheckBoxListener: DelayCheckBoxListener? = null
 
             fun bind(product: ReceiptProductDTO) {
-                binding.receiptMenu.text = product.name
-                binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
-                binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMyMoney(product))
-                binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
+                delayCheckBoxListener?.run {
+                    binding.recentCalcCkbox.removeOnCheckedStateChangedListener(this)
+                    null
+                }
 
-                iProductCheckBox.updateSummaryForNewProduct(product)
-
-                delayCheckBoxListener = object : DelayCheckBoxListener(4000L) {
+                delayCheckBoxListener = object : DelayCheckBoxListener(3000L) {
                     override fun onCheckedChanged(isChecked: Boolean) {
                         if (isChecked) {
+                            ++product.numOfPeopleSelected
+
                             iProductCheckBox.onProductChecked(product)
-                            val newMoney = calcMyMoney(product)
-                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(newMoney)
+                            binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMoney(product))
                         } else {
+                            --product.numOfPeopleSelected
+
                             iProductCheckBox.onProductUnchecked(product)
                             binding.receiptMyMoney.text = DataTypeConverter.toKRW(0)
                         }
-
-                        val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
-                        binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
+                        showNumOfPeopleSelected(product)
                     }
                 }
+                binding.receiptMenu.text = product.name
+                binding.receiptTotalMoney.text = DataTypeConverter.toKRW(product.price)
+                binding.receiptMyMoney.text = DataTypeConverter.toKRW(calcMoney(product))
+                binding.recentCalcCkbox.isChecked = product.participants.containsKey(MY_UID)
 
+                showNumOfPeopleSelected(product)
                 binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
+            }
 
+            private fun calcMoney(product: ReceiptProductDTO): Int = if (product.numOfPeopleSelected == 0) 0
+            else product.price / product.numOfPeopleSelected
+
+            private fun showNumOfPeopleSelected(product: ReceiptProductDTO) {
                 val numOfPeopleSelected = "${product.numOfPeopleSelected}/${PARTICIPANT_COUNT}"
                 binding.receiptNumOfPeopleSelected.text = numOfPeopleSelected
-
             }
-
-            private fun calcMyMoney(product: ReceiptProductDTO): Int {
-                return try {
-                    product.price / product.numOfPeopleSelected
-                } catch (e: ArithmeticException) {
-                    0
-                }
-            }
-
         }
 
         override fun onCreateViewHolder(
                 parent: ViewGroup, viewType: Int,
-        ): ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
+        ): ProductsAdapter.ProductVH = ProductVH(ViewRecentCalcProductBinding.inflate(LayoutInflater.from(parent.context), parent, false), iProductCheckBox)
 
         override fun onBindViewHolder(holder: ProductVH, position: Int) {
             holder.bind(items.valueAt(position))

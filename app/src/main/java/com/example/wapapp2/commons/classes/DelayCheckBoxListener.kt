@@ -33,6 +33,15 @@ abstract class DelayCheckBoxListener(
         onCheckedChanged(isChecked)
     }
 
+    fun delay(checkBox: CompoundButton) {
+        checkBox.isClickable = false
+
+        debounceJob = uiScope.launch {
+            delay(delayMillis)
+            checkBox.isClickable = true
+        }
+    }
+
     /**
      * 한번 상태가 변경된 직후에는 설정한 시간동안 상태변경 불가
      */

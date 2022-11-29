@@ -21,6 +21,7 @@ import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
+import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
@@ -82,6 +83,15 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             binding.roomTitle.text = it.name
         }
 
+        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            calculationViewModel.calcRoomParticipantIds.clear()
+            calculationViewModel.calcRoomParticipantIds.addAll(it.keys.toMutableSet())
+
+            OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
+            calculationViewModel.loadOngoingReceiptIds()
+        }
+
+
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) {
             if (it.isEmpty) {
                 binding.calculationSimpleInfo.title.text = getString(R.string.empty_ongoing_receipts)
@@ -89,7 +99,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             } else {
                 binding.calculationSimpleInfo.title.text = getString(R.string.my_settlement_amount)
                 binding.calculationSimpleInfo.summary.visibility = View.VISIBLE
-                updateMySettlementAmount(calculationViewModel.mySettlementAmount.value!!)
             }
         }
 
@@ -169,8 +178,19 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                 cardViewLayoutParams.bottomMargin = if (expanded) chatInputLayoutHeight else collapsedMarginBottom.toInt()
 
                 binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
+
+                if (expanded) {
+                    if (calculationViewModel.endCalculation()) {
+                        // 정산 확인이 완료되었을 경우
+
+                    }
+
+                } else {
+
+                }
             }
         })
+
 
         //default를 false로 수정할 필요.
         binding.calculationSimpleInfo.expandBtn.post(Runnable {

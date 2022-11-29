@@ -50,8 +50,8 @@ class InviteFriendsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        friendsViewModel.participantsInCalcRoom.addAll(calcRoomViewModel.participants.value!!.toMutableList())
-        searchFriendsListAdapter.ignoreIds(calcRoomViewModel.participantIds.toMutableSet())
+        friendsViewModel.participantsInCalcRoom.addAll(calcRoomViewModel.participantMap.value!!.values.toMutableList())
+        searchFriendsListAdapter.ignoreIds(calcRoomViewModel.participantMap.value!!.keys.toMutableSet())
     }
 
     override fun onCreateView(

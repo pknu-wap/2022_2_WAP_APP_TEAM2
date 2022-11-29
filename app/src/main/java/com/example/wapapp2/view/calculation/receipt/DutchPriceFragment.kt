@@ -6,19 +6,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.DutchCheckFragmentBinding
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.view.bankaccount.BankTransferDialogFragment
+import com.example.wapapp2.viewmodel.CalculationViewModel
+import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
 class DutchPriceFragment : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
+    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
+
     companion object {
         const val TAG = "DutchPriceFragment"
     }
-
 
     private val onClickedBankAccountListener =
             ListOnClickListener<BankAccountDTO> { bankAccountDTO, position ->
@@ -30,7 +35,7 @@ class DutchPriceFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = DutchCheckFragmentBinding.inflate(inflater)
+        _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
         binding.btnAdd.setOnClickListener(View.OnClickListener {
             TODO(" 영수증 추가 화면 연결 ")
         })
@@ -62,5 +67,9 @@ class DutchPriceFragment : Fragment() {
         fragment.show(childFragmentManager, BankTransferDialogFragment.TAG)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
 }

@@ -35,16 +35,17 @@ class RushCalcFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         participantsAdapter = ParticipantsAdapter(rushCalcRoomViewModel)
-        currentCalcRoomViewModel.participants.value!!.toMutableList().apply {
-            val list = this
+        currentCalcRoomViewModel.participantMap.value!!.apply {
+            val map = this.toMutableMap()
             val myUid = myAccountViewModel.myProfileData.value!!.id
-            for (p in list) {
-                if (p.userId == myUid) {
-                    list.remove(p)
+
+            for (participantId in map.keys) {
+                if (participantId == myUid) {
+                    map.remove(myUid)
                     break
                 }
             }
-            participantsAdapter!!.participants.addAll(list)
+            participantsAdapter!!.participants.addAll(map.values)
         }
 
         rushCalcRoomViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name

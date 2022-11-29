@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 interface IProductCheckBox {
-    fun updateSummaryForNewProduct(productDTO: ReceiptProductDTO)
+    fun updateMyTransferMoney(): Int
 
     fun onProductChecked(productDTO: ReceiptProductDTO)
 

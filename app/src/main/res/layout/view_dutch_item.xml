@@ -6,24 +6,16 @@
     android:layout_height="wrap_content"
     >
 
-    <ImageView
-        android:id="@+id/sep_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="12dp"
-        android:background="@color/black"
-        />
-
     <RelativeLayout
         android:id="@+id/pay_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sep_line"
+        android:layout_alignParentTop="true"
         android:paddingVertical="10dp"
         >
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/payersName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -33,7 +25,7 @@
             />
 
         <TextView
-            android:id="@+id/pay"
+            android:id="@+id/transferMoney"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -49,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/pay_frame"
-        android:layout_marginVertical="10dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical"
         app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
         tools:itemCount="3"
