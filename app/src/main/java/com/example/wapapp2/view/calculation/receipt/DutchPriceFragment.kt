@@ -36,6 +36,7 @@ class DutchPriceFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
+        /*
         binding.btnAdd.setOnClickListener(View.OnClickListener {
             TODO(" 영수증 추가 화면 연결 ")
         })
@@ -48,11 +49,9 @@ class DutchPriceFragment : Fragment() {
 
             }
         })
-        /*
+
         binding.viewReceipts.adapter =
                 FixedPriceAdapter(DummyData.getFixedDTOs(), onClickedBankAccountListener, onUpdateMoneyCallback)
-
-
          */
         return binding.root
     }

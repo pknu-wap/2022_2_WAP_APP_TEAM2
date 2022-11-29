@@ -37,54 +37,18 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = DutchCheckFragmentBinding.inflate(inflater, container, false)
-
-        binding.btnDone.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                if (calculationViewModel.endCalculation()) {
-                    parentFragmentManager.beginTransaction()
-                            .replace(R.id.calculation_fragment_container_view, DutchPriceFragment(), DutchPriceFragment.TAG)
-                            .addToBackStack(DutchPriceFragment.TAG)
-                            .commitAllowingStateLoss()
-                } else {
-                    Toast.makeText(requireContext().applicationContext, R.string.participants_who_have_not_been_verified, Toast
-                            .LENGTH_SHORT).show()
-                    binding.btnDone.isChecked = false
-                }
-            } else {
-                val fragmentManager = parentFragmentManager
-                if (fragmentManager.findFragmentByTag(DutchPriceFragment.TAG) != null)
-                    fragmentManager.popBackStack()
-            }
-        })
-
-        binding.btnAdd.setOnClickListener {
-            //영수증 추가
-            val fragment = NewReceiptFragment()
-            fragment.arguments = Bundle().apply {
-                putString("currentRoomId",currentCalcRoomViewModel.roomId)
-            }
-            val fragmentManager = requireParentFragment().parentFragmentManager
-
-            fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG) as Fragment)
-                    .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                    .addToBackStack(NewReceiptFragment.TAG).commit()
-        }
-
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
             OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
         }
 
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
-        binding.viewReceipts.adapter = receiptsAdapter
+        binding.finalReceipts.adapter = receiptsAdapter
 
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
             receiptsAdapter.receiptMap.clear()

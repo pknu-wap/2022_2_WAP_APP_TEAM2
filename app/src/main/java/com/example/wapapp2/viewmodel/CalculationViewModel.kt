@@ -234,6 +234,14 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
         }
     }
 
+    fun isLoadingReceiptData(): Boolean {
+        for (receipt in receiptMap.value!!.values) {
+            if (receipt.productMap.isEmpty)
+                return true
+        }
+        return false
+    }
+
     fun endCalculation(): Boolean = verifiedParticipantIds == calcRoomParticipantIds
 
     fun loadFinalTransferData() {
