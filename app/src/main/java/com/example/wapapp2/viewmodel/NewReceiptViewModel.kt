@@ -13,6 +13,8 @@ import com.example.wapapp2.repository.interfaces.ReceiptImgRepository
 import com.example.wapapp2.repository.interfaces.ReceiptRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
+import java.util.*
+import kotlin.collections.HashMap
 
 class NewReceiptViewModel : ViewModel() {
     private val receiptRepository : ReceiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -20,10 +22,9 @@ class NewReceiptViewModel : ViewModel() {
     private val receiptMap = HashMap<String, ReceiptDTO>()
 
     val removeReceiptLiveData: MutableLiveData<String> = MutableLiveData<String>()
-
     val addReceiptResult = MutableLiveData<Boolean>()
 
-    var calcRoomId: String? = "LvJY5fz6TjlTDaHHX53l"
+    var calcRoomId: String? = null
     lateinit var myName: String
 
     fun removeProduct(receiptId: String, receiptProductDTO: ReceiptProductDTO): Int {
@@ -103,6 +104,7 @@ class NewReceiptViewModel : ViewModel() {
         receiptMap[receiptId] = ReceiptDTO().apply {
             id = receiptId
             payersName = myName
+            createdTime = Date()
         }
     }
 
