@@ -59,6 +59,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
         calculationViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
         calculationViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
+        calculationViewModel.calcRoomId = currentCalcRoomViewModel.roomId!!
 
         currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
     }
@@ -193,22 +194,14 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                     return
 
                 if (expanded) {
-                    if (calculationViewModel.endCalculation()) {
-                        // 정산 확인이 완료되었을 경우
-                        val dutchPriceFragment = DutchPriceFragment()
-                        childFragmentManager.beginTransaction()
-                                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, dutchPriceFragment,
-                                        DutchPriceFragment.TAG).addToBackStack(DutchPriceFragment.TAG).commit()
-
-                    } else {
-                        val dutchCheckFragment = DutchCheckFragment()
-                        childFragmentManager.beginTransaction()
-                                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, dutchCheckFragment,
-                                        DutchCheckFragment.TAG).addToBackStack(DutchCheckFragment.TAG).commit()
-                    }
+                    childFragmentManager.beginTransaction().add(binding.calculationSimpleInfo.calculationFragmentContainerView.id,
+                            DutchHostFragment(), DutchHostFragment.TAG).commit()
                 } else {
-                    childFragmentManager.popBackStack()
+                    childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.apply {
+                        childFragmentManager.beginTransaction().remove(this).commit()
+                    }
                 }
+
             }
         })
 

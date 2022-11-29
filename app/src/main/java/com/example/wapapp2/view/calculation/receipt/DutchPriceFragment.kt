@@ -18,8 +18,8 @@ class DutchPriceFragment : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
+    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment().requireParentFragment() })
+    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment() })
 
     companion object {
         const val TAG = "DutchPriceFragment"
@@ -58,6 +58,8 @@ class DutchPriceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
     }
 
     /** show Bank App dialog **/

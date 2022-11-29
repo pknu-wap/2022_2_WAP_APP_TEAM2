@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentDutchHostBinding
 import com.example.wapapp2.view.calculation.CalcMainFragment
@@ -71,6 +72,32 @@ class DutchHostFragment : Fragment() {
                     .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
                     .addToBackStack(NewReceiptFragment.TAG).commit()
         }
+
+        calculationViewModel.onLoadedDataStatus.observe(viewLifecycleOwner, object : Observer<Boolean> {
+            override fun onChanged(status: Boolean?) {
+                if (status!!) {
+                    calculationViewModel.onLoadedDataStatus.removeObserver(this)
+
+                    if (calculationViewModel.endCalculation()) {
+                        // 정산 확인이 완료되었을 경우
+                        val dutchPriceFragment = DutchPriceFragment()
+                        childFragmentManager.beginTransaction()
+                                .add(binding.fragmentContainerView.id, dutchPriceFragment,
+                                        DutchPriceFragment.TAG).addToBackStack(DutchPriceFragment.TAG).commit()
+
+                    } else {
+                        val dutchCheckFragment = DutchCheckFragment()
+                        childFragmentManager.beginTransaction()
+                                .add(binding.fragmentContainerView.id, dutchCheckFragment,
+                                        DutchCheckFragment.TAG).addToBackStack(DutchCheckFragment.TAG).commit()
+                    }
+
+                }
+
+            }
+        })
+
+
     }
 
     override fun onDestroyView() {

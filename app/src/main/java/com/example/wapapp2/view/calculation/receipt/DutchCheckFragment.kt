@@ -21,8 +21,8 @@ class DutchCheckFragment() : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
-    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
+    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment().requireParentFragment() })
+    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment()  })
 
     private lateinit var receiptsAdapter: OngoingReceiptsAdapter
 
@@ -48,7 +48,7 @@ class DutchCheckFragment() : Fragment() {
         }
 
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
-        binding.finalReceipts.adapter = receiptsAdapter
+        binding.receiptList.adapter = receiptsAdapter
 
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
             receiptsAdapter.receiptMap.clear()

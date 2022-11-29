@@ -31,6 +31,8 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
+    val onLoadedDataStatus = MutableLiveData<Boolean>(false)
+
     lateinit var myUid: String
     lateinit var myUserName: String
 
@@ -212,6 +214,8 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     }
 
                     checkVerifiedParticipants()
+                    if (!isLoadingReceiptData())
+                        onLoadedDataStatus.value = true
                 }
 
                 productsListenerMap[receiptId]?.apply {
