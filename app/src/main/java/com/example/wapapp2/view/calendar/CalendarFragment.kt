@@ -48,25 +48,25 @@ class CalendarFragment : Fragment(), ReceiptItemClickListener {
         binding = CalendarFragmentBinding.inflate(layoutInflater)
         binding.calendarRv.layoutManager = object : GridLayoutManager(context,7) { override fun canScrollVertically() = false }
         myCalendarViewModel.myReceiptMapLivedata.observe(viewLifecycleOwner){
-            updateCal(myCalendarViewModel.myReceiptMap!!)
+            updateCal()
         }
 
         binding.calendarBtnBack.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.minusMonths(1)
-            updateCal(myCalendarViewModel.myReceiptMap ?: hashMapOf())
+            updateCal()
         })
         binding.calendarBtnNext.setOnClickListener(View.OnClickListener {
             dstDate = dstDate.plusMonths(1)
-            updateCal(myCalendarViewModel.myReceiptMap ?: hashMapOf())
+            updateCal()
         })
 
 
         return binding.root
     }
 
-    fun updateCal(hashMap: HashMap<String, ArrayList<ReceiptDTO>>) {
+    fun updateCal() {
         binding.calendarDate.text = dstDate.toString("yyyy년 MM월")
-        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), hashMap!! ,dayItemOnClickListener)
+        binding.calendarRv.adapter = CalendarAdapter(dstDate.withDayOfMonth(1), myCalendarViewModel.myReceiptMap!! ,dayItemOnClickListener)
     }
 
     override fun OnReceiptClicked(roomID: String?) {
