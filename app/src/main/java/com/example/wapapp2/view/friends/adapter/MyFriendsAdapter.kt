@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MyFriendsAdapter(
-        private val onClickListener: ListOnClickListener<FriendDTO>,
+        private val onClickListener: ListOnClickListener<UserDTO>,
         options: FirestoreRecyclerOptions<UserDTO>,
         val friendMap: Map<String, FriendDTO>
 ) :
@@ -52,7 +52,7 @@ class MyFriendsAdapter(
 
     inner class CustomViewHolder(
             private val binding: MyFriendItemViewBinding,
-            private val onClickListener: ListOnClickListener<FriendDTO>,
+            private val onClickListener: ListOnClickListener<UserDTO>,
     ) :
             RecyclerView.ViewHolder(binding.root) {
 
@@ -63,7 +63,7 @@ class MyFriendsAdapter(
             friendMap[userDTO.id]?.apply {
                 binding.myProfileName.text = this.alias
                 binding.root.setOnClickListener {
-                    onClickListener.onClicked(this, bindingAdapterPosition)
+                    onClickListener.onClicked(userDTO, bindingAdapterPosition)
                 }
             }
             CoroutineScope(Dispatchers.Main).launch {

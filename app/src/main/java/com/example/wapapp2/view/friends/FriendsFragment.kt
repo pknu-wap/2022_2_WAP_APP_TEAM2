@@ -16,6 +16,7 @@ import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.FragmentFriendsBinding
 import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.view.friends.adapter.MyFriendsAdapter
 import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.view.myprofile.MyprofileFragment
@@ -34,7 +35,7 @@ class FriendsFragment : Fragment() {
         const val TAG = "FriendsFragment"
     }
 
-    private val friendOnClickListener = ListOnClickListener<FriendDTO> { item, position ->
+    private val friendOnClickListener = ListOnClickListener<UserDTO> { item, position ->
         val fragment = FriendProfileFragment.newInstance(item)
         fragment.show(childFragmentManager, FriendProfileFragment.TAG)
     }
