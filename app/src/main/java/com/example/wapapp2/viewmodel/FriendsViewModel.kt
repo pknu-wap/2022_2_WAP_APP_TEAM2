@@ -94,9 +94,11 @@ class FriendsViewModel : ViewModel() {
                         FriendDTO(userDTO.id, userDTO.name, userDTO.email)
                 )
             }
-            result.await()?.apply { if(this)
-                MY_FRIEND_MAP[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
-                myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
+            withContext(Main){
+                result.await()?.apply { if(this)
+                    MY_FRIEND_MAP[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
+                    myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
+                }
             }
         }
     }
