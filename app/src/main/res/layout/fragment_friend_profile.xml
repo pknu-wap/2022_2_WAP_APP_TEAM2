@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/profile_img"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="150dp"
         android:scaleType="fitCenter"
         android:src="@drawable/man"
