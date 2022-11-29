@@ -5,8 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.wapapp2.R
@@ -41,18 +39,6 @@ class DutchHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
-            if (isCompleted) {
-                childFragmentManager.beginTransaction()
-                        .replace(binding.fragmentContainerView.id, DutchPriceFragment(), DutchPriceFragment.TAG)
-                        .commit()
-            } else {
-                childFragmentManager.beginTransaction()
-                        .replace(binding.fragmentContainerView.id, DutchCheckFragment(), DutchCheckFragment.TAG)
-                        .commit()
-            }
-        }
-
         binding.btnCalcAdd.setOnClickListener {
             //영수증 추가
             val fragment = NewReceiptFragment()
@@ -62,7 +48,7 @@ class DutchHostFragment : Fragment() {
 
             val fragmentManager = requireParentFragment().requireParentFragment().parentFragmentManager
             fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG) as Fragment)
+                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!)
                     .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
                     .addToBackStack(NewReceiptFragment.TAG).commit()
         }
@@ -71,6 +57,17 @@ class DutchHostFragment : Fragment() {
             override fun onChanged(status: Boolean?) {
                 if (status!!) {
                     calculationViewModel.onLoadedDataStatus.removeObserver(this)
+                    calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
+                        if (isCompleted) {
+                            childFragmentManager.beginTransaction()
+                                    .replace(binding.fragmentContainerView.id, FinalTransferFragment(), FinalTransferFragment.TAG)
+                                    .commit()
+                        } else {
+                            childFragmentManager.beginTransaction()
+                                    .replace(binding.fragmentContainerView.id, OngoingReceiptsFragment(), OngoingReceiptsFragment.TAG)
+                                    .commit()
+                        }
+                    }
                 }
 
             }

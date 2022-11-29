@@ -31,7 +31,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
-    val onCompletedCalculation = MutableLiveData<Boolean>()
+    val onCompletedCalculation = MutableLiveData<Boolean>(false)
     val onLoadedDataStatus = MutableLiveData<Boolean>(false)
 
     lateinit var myUid: String
@@ -215,6 +215,8 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     }
 
                     checkVerifiedParticipants()
+                    onCompletedCalculation.value = endCalculation()
+
                     if (!isLoadingReceiptData())
                         onLoadedDataStatus.value = true
                 }
