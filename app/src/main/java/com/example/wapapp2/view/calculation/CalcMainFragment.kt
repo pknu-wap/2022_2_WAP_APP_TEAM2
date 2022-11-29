@@ -13,16 +13,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.add
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.model.ChatDTO
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
-import com.example.wapapp2.view.calculation.receipt.DutchCheckFragment
 import com.example.wapapp2.view.calculation.receipt.DutchHostFragment
-import com.example.wapapp2.view.calculation.receipt.DutchPriceFragment
 import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
@@ -184,14 +181,11 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
                 binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
 
-                if (initializing) {
+                //영수증 데이터가 로딩 중이면 스킵
+                if (initializing || calculationViewModel.isLoadingReceiptData()) {
                     initializing = false
                     return
                 }
-
-                //영수증 데이터가 로딩 중이면 스킵
-                if (calculationViewModel.isLoadingReceiptData())
-                    return
 
                 if (expanded) {
                     childFragmentManager.beginTransaction().add(binding.calculationSimpleInfo.calculationFragmentContainerView.id,
@@ -205,24 +199,18 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
         })
 
-
-        //default를 false로 수정할 필요.
-        binding.calculationSimpleInfo.expandBtn.post(Runnable {
-            binding.calculationSimpleInfo.expandBtn.callOnClick()
-
-            binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                override fun onGlobalLayout() {
-                    if (binding.calculationSimpleInfo.root.height > 0) {
-                        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
-                        val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
-                        chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
-                        binding.chat.layoutParams = chatFragmentContainerLayoutParams
-                    }
+        binding.calculationSimpleInfo.expandBtn.callOnClick()
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (binding.calculationSimpleInfo.root.height > 0) {
+                    binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
+                    val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
+                    chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
+                    binding.chat.layoutParams = chatFragmentContainerLayoutParams
                 }
-            })
+            }
         })
-
 
     }
 

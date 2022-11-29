@@ -14,7 +14,7 @@ import com.example.wapapp2.view.bankaccount.BankTransferDialogFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
-class DutchPriceFragment : Fragment() {
+class FinalTransferFragment : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
@@ -22,7 +22,7 @@ class DutchPriceFragment : Fragment() {
     private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment() })
 
     companion object {
-        const val TAG = "DutchPriceFragment"
+        const val TAG = "FinalTransferFragment"
     }
 
     private val onClickedBankAccountListener =
@@ -58,8 +58,6 @@ class DutchPriceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
     }
 
     /** show Bank App dialog **/

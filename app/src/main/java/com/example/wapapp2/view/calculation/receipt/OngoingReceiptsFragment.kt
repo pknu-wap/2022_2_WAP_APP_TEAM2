@@ -17,17 +17,17 @@ import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
-class DutchCheckFragment() : Fragment() {
+class OngoingReceiptsFragment() : Fragment() {
     private var _binding: DutchCheckFragmentBinding? = null
     private val binding get() = _binding!!
 
     private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment().requireParentFragment() })
-    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment()  })
+    private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment().requireParentFragment() })
 
     private lateinit var receiptsAdapter: OngoingReceiptsAdapter
 
     companion object {
-        const val TAG = "DutchCheckFragment"
+        const val TAG = "OngoingReceiptsFragment"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,10 +42,6 @@ class DutchCheckFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        currentCalcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
-            OngoingReceiptsAdapter.PARTICIPANT_COUNT = it.size
-        }
 
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
         binding.receiptList.adapter = receiptsAdapter
