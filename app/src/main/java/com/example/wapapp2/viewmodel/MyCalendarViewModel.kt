@@ -37,7 +37,6 @@ class MyCalendarViewModel : ViewModel() {
                         }
                         myReceiptMapLivedata.value = tmp
                     }
-
                 }))
         }
     }
