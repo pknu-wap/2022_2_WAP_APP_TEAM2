@@ -87,6 +87,10 @@ class FinalDutchFragment : Fragment() {
             finalDutchAdapter.items.clear()
             finalDutchAdapter.items.addAll(it)
             finalDutchAdapter.notifyDataSetChanged()
+
+            if (calculationViewModel.payersIds.value!!.contains(calculationViewModel.myUid)) binding.completeCalculationBtn.visibility =
+                    View.VISIBLE
+            else binding.completeCalculationBtn.visibility = View.GONE
         }
 
         calculationViewModel.calculationCompletedPayerIds.observe(viewLifecycleOwner, object : Observer<MutableSet<String>> {
@@ -98,15 +102,10 @@ class FinalDutchFragment : Fragment() {
             }
         })
 
-
         currentCalcRoomViewModel.participantMap.value!!.apply {
             rushCalcRoomViewModel.calcRoomParticipants.clear()
             rushCalcRoomViewModel.calcRoomParticipants.putAll(this)
 
-            if (this.containsKey(calculationViewModel.myUid))
-                binding.completeCalculationBtn.visibility = View.VISIBLE
-            else
-                binding.completeCalculationBtn.visibility = View.GONE
         }
 
         calculationViewModel.loadFinalTransferData()

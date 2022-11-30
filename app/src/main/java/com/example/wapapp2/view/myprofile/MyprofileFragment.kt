@@ -140,7 +140,7 @@ class MyprofileFragment : Fragment() {
                 binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.man))
             else
                 binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.girl))
-
+            
             binding.myProfileName.text = it.name
             binding.myAccountId.text = it.email
         }

@@ -95,10 +95,8 @@ class EditReceiptFragment : Fragment() {
         receiptViewModel.getProducts(modifyReceiptViewModel.originalReceiptDTO.id!!, modifyReceiptViewModel.currentRoomId!!)
 
         binding.receiptImgBtn.setOnClickListener {
-            if (modifyReceiptViewModel.hasReceiptImg)
-                dialogModifyImg()
-            else
-                dialogAddImg()
+            if (modifyReceiptViewModel.hasReceiptImg) dialogModifyImg()
+            else dialogAddImg()
         }
 
         binding.receiptImage.setOnClickListener {

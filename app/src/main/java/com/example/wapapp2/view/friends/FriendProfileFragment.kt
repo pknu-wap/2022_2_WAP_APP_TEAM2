@@ -1,20 +1,14 @@
 package com.example.wapapp2.view.friends
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.NonNull
-import androidx.annotation.Nullable
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.transition.Transition
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
 import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentFriendProfileBinding
 import com.example.wapapp2.model.UserDTO
@@ -49,7 +43,7 @@ class FriendProfileFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        
         arguments?.apply {
             dstUserDTO = getParcelable("userDTO")!!
             friendAliasViewModel.friendDTO = FriendsViewModel.MY_FRIEND_MAP[dstUserDTO.id]
@@ -63,7 +57,6 @@ class FriendProfileFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         binding.setAliasLayout.visibility = View.GONE
         binding.username.text = friendAliasViewModel.friendDTO?.alias
@@ -91,7 +84,6 @@ class FriendProfileFragment : DialogFragment() {
                             dialog.dismiss()
                             dismiss()
                         }.create().show()
-
             }
         }
 
@@ -121,8 +113,7 @@ class FriendProfileFragment : DialogFragment() {
         userViewModel.getUser(friendAliasViewModel.friendDTO!!.friendUserId)
 
         if (dstUserDTO.imgUri.isEmpty().not()) {
-            Glide.with(binding.root).load(dstUserDTO.imgUri).centerCrop()
-                    .into(binding.profile)
+            Glide.with(binding.root).load(dstUserDTO.imgUri).centerCrop().into(binding.profile)
         }
     }
 

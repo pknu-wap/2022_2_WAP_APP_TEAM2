@@ -53,12 +53,10 @@ class FriendsFragment : Fragment() {
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager
-            fragmentManager
-                    .beginTransaction()
+            fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
                     .add(R.id.fragment_container_view, fragment, AddMyFriendFragment.TAG)
-                    .addToBackStack(AddMyFriendFragment.TAG)
-                    .commit()
+                    .addToBackStack(AddMyFriendFragment.TAG).commit()
         }
 
         return binding.root

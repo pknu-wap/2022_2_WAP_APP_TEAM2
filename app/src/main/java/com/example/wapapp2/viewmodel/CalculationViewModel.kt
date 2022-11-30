@@ -35,6 +35,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     val onVerifiedAllParticipants = MutableLiveData<Boolean>(false)
     val verifiedParticipantIds = MutableLiveData(mutableSetOf<String>())
     val onCompletedFirstReceiptsData = MutableLiveData<Boolean>(false)
+    val payersIds = MutableLiveData(mutableSetOf<String>())
 
     val calculationCompletedPayerIds = MutableLiveData(mutableSetOf<String>())
     val completedAllCalc = MutableLiveData(false)
@@ -177,7 +178,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                 //영수증 정보 로드
                 loadReceipts(addedReceiptIds)
 
-                if (loadedOngoingReceiptIds.isEmpty()) {
+                if (receiptCount.get() == 0) {
                     withContext(Main) {
                         completedAllCalc.value = true
                     }
@@ -343,6 +344,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
             }
 
             withContext(Main) {
+                payersIds.value = finalCalculationMap.keys.toMutableSet()
                 finalTransferData.value = finalCalculationMap.values.toMutableList()
             }
         }
@@ -367,8 +369,10 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
             if (isCompletedAllCalcResult.await()) {
                 calcRoomRepository.updateCalculationStatus(calcRoomId, false, receiptMap.value!!.keys.toMutableList())
-                completedAllCalc.value = true
-                // 정산이 완료되면 calcmainfragment에서 프래그먼트 전환
+                withContext(Main){
+                    completedAllCalc.value = true
+                    // 정산이 완료되면 calcmainfragment에서 프래그먼트 전환
+                }
             }
         }
     }
