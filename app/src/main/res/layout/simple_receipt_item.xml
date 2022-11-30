@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_margin="4dp"
+    android:background="?attr/selectableItemBackground"
+    android:contentDescription="@string/receipt_img"
+    android:elevation="2dp"
+    android:src="@drawable/ic_baseline_receipt_24"
+    android:scaleType="centerCrop"
+    />

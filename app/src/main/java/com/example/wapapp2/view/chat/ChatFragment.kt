@@ -87,7 +87,7 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
-        binding.loadingView.setContentView(binding.chatList)
+        binding.loadingView.setContentView(getString(R.string.empty_chats), binding.chatList)
 
         binding.chatList.apply {
             layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)

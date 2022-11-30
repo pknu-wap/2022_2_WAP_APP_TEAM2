@@ -139,5 +139,6 @@
     <string name="add_calculation">정산 추가</string>
     <string name="verified">확인 완료</string>
     <string name="msg_modify_calculation">내 정산 정보를 수정하시겠습니까?</string>
+    <string name="empty_my_bank_accounts">내 계좌 목록이 비어있습니다.</string>
 
 </resources>

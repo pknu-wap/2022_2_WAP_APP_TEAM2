@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.databinding.BankAccountListItemBinding
 import com.example.wapapp2.model.BankAccountDTO
 import com.firebase.ui.common.ChangeEventType
@@ -15,13 +16,17 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
 
-class MyBankAccountsAdapter(options: FirestoreRecyclerOptions<BankAccountDTO>,
-                            private val onClickedPopupMenuListener: MyprofileFragment.OnClickedPopupMenuListener) :
+class MyBankAccountsAdapter(
+        options: FirestoreRecyclerOptions<BankAccountDTO>,
+        private val onClickedPopupMenuListener: MyprofileFragment.OnClickedPopupMenuListener,
+) :
         FirestoreRecyclerAdapter<BankAccountDTO,
-                MyBankAccountsAdapter.ViewHolder>(options) {
+                MyBankAccountsAdapter.ViewHolder>(options), IAdapterItemCount {
 
-    class ViewHolder(private val viewBinding: BankAccountListItemBinding,
-                     private val onClickedPopupMenuListener: MyprofileFragment.OnClickedPopupMenuListener) :
+    class ViewHolder(
+            private val viewBinding: BankAccountListItemBinding,
+            private val onClickedPopupMenuListener: MyprofileFragment.OnClickedPopupMenuListener,
+    ) :
             RecyclerView.ViewHolder(viewBinding.root) {
         fun bind(bankAccountDTO: BankAccountDTO) {
             val position = bindingAdapterPosition
@@ -64,13 +69,14 @@ class MyBankAccountsAdapter(options: FirestoreRecyclerOptions<BankAccountDTO>,
         super.onDataChanged()
     }
 
+    override fun getAdapterItemCount() = itemCount
+
     override fun onError(e: FirebaseFirestoreException) {
         super.onError(e)
     }
 
     override fun onChildChanged(type: ChangeEventType, snapshot: DocumentSnapshot, newIndex: Int, oldIndex: Int) {
         super.onChildChanged(type, snapshot, newIndex, oldIndex)
-        Log.e("내 계좌 목록 어댑터", "${type.name} ${snapshot.metadata.isFromCache}")
     }
 
 }

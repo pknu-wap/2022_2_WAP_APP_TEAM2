@@ -48,7 +48,7 @@ class FriendsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFriendsBinding.inflate(inflater, container, false)
-        binding.loadingView.setContentView(binding.myFriendsList)
+        binding.loadingView.setContentView(getString(R.string.empty_my_friends), binding.myFriendsList)
 
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()

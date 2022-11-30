@@ -60,7 +60,7 @@ class InviteFriendsFragment : Fragment() {
     ): View? {
         _binding = FragmentInviteFriendsBinding.inflate(inflater, container, false)
 
-        binding.inviteFriendsLayout.loadingView.setContentView(binding.inviteFriendsLayout.searchFriendsList)
+        binding.inviteFriendsLayout.loadingView.setContentView(getString(R.string.no_search_results_found), binding.inviteFriendsLayout.searchFriendsList)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
@@ -112,6 +112,7 @@ class InviteFriendsFragment : Fragment() {
                     .setPositiveButton(R.string.invite) { dialog, which ->
                         calcRoomViewModel.inviteFriends(checkedFriendsListAdapter.friends.toMutableList(), calcRoomViewModel.roomId!!)
                         dialog.dismiss()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }.setNegativeButton(R.string.cancel) { dialog, which ->
                         dialog.dismiss()
                     }.create().show()

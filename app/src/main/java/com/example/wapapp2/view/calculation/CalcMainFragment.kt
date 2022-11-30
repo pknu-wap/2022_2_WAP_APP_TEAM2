@@ -25,6 +25,7 @@ import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdap
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
+import com.example.wapapp2.view.receipt.SideNavReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -225,23 +226,12 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
             val fragmentManager = parentFragmentManager
             fragmentManager.beginTransaction().hide(this@CalcMainFragment)
-                    .add(R.id.fragment_container_view, fragment, "CheckReceiptFragment")
-                    .addToBackStack("CheckReceiptFragment")
+                    .add(R.id.fragment_container_view, fragment, ReceiptsFragment.TAG)
+                    .addToBackStack(ReceiptsFragment.TAG)
                     .commit()
+            closeDrawer()
         }
 
-        binding.rushCalcBtn.setOnClickListener {
-            if (calculationViewModel.receiptMap.value!!.isEmpty) {
-                Toast.makeText(requireContext().applicationContext, R.string.no_available_rush_calc, Toast.LENGTH_SHORT).show()
-            } else {
-                val rushCalcFragment = RushCalcFragment()
-                val fragmentManager = parentFragmentManager
-                fragmentManager.beginTransaction().hide(this@CalcMainFragment)
-                        .add(R.id.fragment_container_view, rushCalcFragment, RushCalcFragment.TAG)
-                        .addToBackStack(RushCalcFragment.TAG)
-                        .commit()
-            }
-        }
 
         binding.exitRoom.setOnClickListener {
             //방 나가기
@@ -266,7 +256,8 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
         participantsInCalcRoomFragment.onNavDrawerListener = this
         childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
-                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG).commit()
+                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG)
+                .replace(binding.receiptsFragmentContainer.id, SideNavReceiptsFragment(), SideNavReceiptsFragment.TAG).commit()
     }
 
 

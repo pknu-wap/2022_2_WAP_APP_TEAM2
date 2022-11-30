@@ -76,7 +76,7 @@ class GrouplistFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
-        binding.loadingView.setContentView(binding.groupRV)
+        binding.loadingView.setContentView(getString(R.string.empty_calc_rooms), binding.groupRV)
         return binding.root
     }
 
