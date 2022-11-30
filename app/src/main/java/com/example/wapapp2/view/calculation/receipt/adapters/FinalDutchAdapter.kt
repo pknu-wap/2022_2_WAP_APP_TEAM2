@@ -30,10 +30,13 @@ class FinalDutchAdapter(
 
         fun bind(item: FinalTransferDTO) {
             binding.payersName.text = item.payersName
-            binding.money.text = DataTypeConverter.toKRW(item.transferMoney)
+            binding.money.text = if (item.transferMoney >= 0) DataTypeConverter.toKRW(item.transferMoney)
+            else DataTypeConverter.toKRW(item.totalMoney + item.transferMoney)
 
             binding.type.text = if (item.transferMoney >= 0) binding.root.context.getString(R.string.money_to_give)
             else binding.root.context.getString(R.string.money_to_be_received)
+
+
 
             if (item.transferMoney >= 0) {
                 binding.accounts.adapter =

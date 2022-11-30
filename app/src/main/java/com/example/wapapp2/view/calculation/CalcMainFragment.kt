@@ -25,6 +25,7 @@ import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdap
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
+import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.view.receipt.SideNavReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -215,6 +216,13 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
         })
 
+        calculationViewModel.completedAllCalc.observe(viewLifecycleOwner) {
+            if (it) {
+                childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.apply {
+                    binding.calculationSimpleInfo.expandBtn.callOnClick()
+                }
+            }
+        }
     }
 
 

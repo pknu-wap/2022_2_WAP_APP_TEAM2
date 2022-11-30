@@ -36,7 +36,7 @@ data class ReceiptDTO(
         var payersName: String,
 
         @field:JvmField
-        @PropertyName("status")
+        @PropertyName("status") // true -> 정산 완료, else -> 진행 중
         var status: Boolean,
 
         @PropertyName("totalMoney")

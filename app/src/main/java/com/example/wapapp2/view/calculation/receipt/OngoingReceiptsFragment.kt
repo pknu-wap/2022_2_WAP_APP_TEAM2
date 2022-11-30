@@ -41,6 +41,7 @@ class OngoingReceiptsFragment() : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.loadingView.setContentView(getString(R.string.empty_ongoing_receipts), binding.receiptList)
 
         binding.btnCalcAdd.setOnClickListener {
             //영수증 추가
@@ -71,7 +72,7 @@ class OngoingReceiptsFragment() : Fragment() {
                             dialog.dismiss()
                             receiptsAdapter.unlockCheckBox(true)
                             calculationViewModel.requestModifyCalculation()
-                        }
+                        }.create().show()
             }
         }
 
@@ -79,6 +80,14 @@ class OngoingReceiptsFragment() : Fragment() {
         binding.receiptList.adapter = receiptsAdapter
 
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
+            if (result.isNotEmpty()) {
+                if (!binding.loadingView.isSuccess) {
+                    binding.loadingView.onSuccessful()
+                    binding.calcBtn.visibility = View.VISIBLE
+                }
+            } else
+                onEmptyOngoingReceipts()
+
             receiptsAdapter.receiptMap.clear()
             receiptsAdapter.receiptMap.putAll(result.toMap())
 
@@ -90,6 +99,11 @@ class OngoingReceiptsFragment() : Fragment() {
             receiptsAdapter.notifyDataSetChanged()
         }
 
+        calculationViewModel.completedAllCalc.observe(viewLifecycleOwner) {
+            if (it) {
+
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -97,5 +111,9 @@ class OngoingReceiptsFragment() : Fragment() {
         _binding = null
     }
 
+    private fun onEmptyOngoingReceipts() {
+        binding.loadingView.onFailed(getString(R.string.empty_ongoing_receipts))
+        binding.calcBtn.visibility = View.GONE
+    }
 
 }

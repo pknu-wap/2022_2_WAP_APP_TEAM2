@@ -36,6 +36,9 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     val verifiedParticipantIds = MutableLiveData(mutableSetOf<String>())
     val onCompletedFirstReceiptsData = MutableLiveData<Boolean>(false)
 
+    val calculationCompletedPayerIds = MutableLiveData(mutableSetOf<String>())
+    val completedAllCalc = MutableLiveData(false)
+
     val receiptCount = AtomicInteger(0)
 
     lateinit var myUid: String
@@ -173,6 +176,12 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
                 //영수증 정보 로드
                 loadReceipts(addedReceiptIds)
+
+                if (loadedOngoingReceiptIds.isEmpty()) {
+                    withContext(Main) {
+                        completedAllCalc.value = true
+                    }
+                }
             }
 
         }
@@ -193,10 +202,17 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                         lastReceiptDTO.checkedParticipantIds.clear()
                         lastReceiptDTO.checkedParticipantIds.addAll(newReceiptDTO.checkedParticipantIds)
                         lastReceiptDTO.totalMoney = newReceiptDTO.totalMoney
+                        lastReceiptDTO.status = newReceiptDTO.status
 
                         receiptMap.value = lastReceiptMap
                     } else {
                         loadProducts(newReceiptDTO)
+                    }
+
+                    if (newReceiptDTO.status) {
+                        val completedPayerIds = calculationCompletedPayerIds.value!!
+                        completedPayerIds.add(newReceiptDTO.payersId)
+                        calculationCompletedPayerIds.value = completedPayerIds
                     }
 
                     if (isCompletedLoadReceipts()) {
@@ -294,9 +310,12 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
             for (receipt in receipts.values) {
                 val payersId = receipt.payersId
                 if (!finalCalculationMap.containsKey(payersId))
-                    finalCalculationMap[payersId] = FinalTransferDTO(payersId, receipt.payersName, 0, mutableListOf())
+                    finalCalculationMap[payersId] = FinalTransferDTO(payersId, receipt.payersName, 0, 0, mutableListOf())
 
                 var mySettlementAmount = finalCalculationMap[payersId]!!.transferMoney
+                var totalMoney = finalCalculationMap[payersId]!!.totalMoney
+                totalMoney += receipt.totalMoney
+
                 for (product in receipt.productMap.values) {
 
                     for (participantId in product.participants.keys) {
@@ -309,6 +328,8 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
                 if (payersId == myUid)
                     mySettlementAmount = -mySettlementAmount
+                finalCalculationMap[payersId]!!.transferMoney = mySettlementAmount
+                finalCalculationMap[payersId]!!.totalMoney = totalMoney
             }
 
             for (receipt in finalCalculationMap.values) {
@@ -328,4 +349,27 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     }
 
     fun myCheckStatus() = verifiedParticipantIds.value!!.contains(myUid)
+
+    fun completeCalculation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val myReceiptIds = mutableListOf<String>()
+            for (receipt in receiptMap.value!!.values) {
+                if (receipt.payersId == myUid) {
+                    myReceiptIds.add(receipt.id)
+                }
+            }
+
+            receiptRepository.modifyReceipts(mutableMapOf("status" to true), calcRoomId, myReceiptIds.toList())
+
+            val isCompletedAllCalcResult = async {
+                calcRoomRepository.isCompletedStatus(calcRoomId)
+            }
+
+            if (isCompletedAllCalcResult.await()) {
+                calcRoomRepository.updateCalculationStatus(calcRoomId, false, receiptMap.value!!.keys.toMutableList())
+                completedAllCalc.value = true
+                // 정산이 완료되면 calcmainfragment에서 프래그먼트 전환
+            }
+        }
+    }
 }

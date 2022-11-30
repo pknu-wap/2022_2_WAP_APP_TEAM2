@@ -112,6 +112,8 @@ class MyprofileFragment : Fragment() {
             myCalendarViewModel.listenerRemove()
             myCalcRoomViewModel.listenerRemove()
 
+            requireActivity().viewModelStore.clear()
+
             parentFragmentManager
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, LoginFragment(), LoginFragment.TAG)

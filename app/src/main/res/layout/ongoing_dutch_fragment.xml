@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     >
 
+    <com.example.wapapp2.commons.view.NewLoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/btn_calc_add"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/receipt_list"
         android:layout_width="match_parent"
@@ -14,11 +22,12 @@
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/btn_calc_add"
+        app:layout_constraintBottom_toTopOf="@id/barrier"
         app:layout_constraintTop_toTopOf="parent"
         />
 
     <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="top"
@@ -33,11 +42,10 @@
         android:backgroundTint="#9C5ECC"
         android:text="@string/add_calculation"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/calc_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/calc_btn"
-        app:layout_constraintTop_toTopOf="@id/calc_btn"
         />
 
     <ToggleButton
@@ -45,7 +53,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
-        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_btn"
         android:textColor="@color/white"
         android:textOff="@string/verified"

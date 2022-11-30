@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.ItemOnClickListener
@@ -88,9 +89,24 @@ class FinalDutchFragment : Fragment() {
             finalDutchAdapter.notifyDataSetChanged()
         }
 
+        calculationViewModel.calculationCompletedPayerIds.observe(viewLifecycleOwner, object : Observer<MutableSet<String>> {
+            override fun onChanged(payerIds: MutableSet<String>) {
+                if (payerIds.isNotEmpty()) {
+                    calculationViewModel.calculationCompletedPayerIds.removeObserver(this)
+                    binding.modifyCalc.visibility = View.GONE
+                }
+            }
+        })
+
+
         currentCalcRoomViewModel.participantMap.value!!.apply {
             rushCalcRoomViewModel.calcRoomParticipants.clear()
             rushCalcRoomViewModel.calcRoomParticipants.putAll(this)
+
+            if (this.containsKey(calculationViewModel.myUid))
+                binding.completeCalculationBtn.visibility = View.VISIBLE
+            else
+                binding.completeCalculationBtn.visibility = View.GONE
         }
 
         calculationViewModel.loadFinalTransferData()
@@ -103,8 +119,21 @@ class FinalDutchFragment : Fragment() {
                     }.setPositiveButton(R.string.check) { dialog, _ ->
                         dialog.dismiss()
                         calculationViewModel.requestModifyCalculation()
-                    }
+                    }.create().show()
         }
+
+        binding.completeCalculationBtn.setOnClickListener {
+            MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.complete_calculation)
+                    .setMessage(R.string.msg_complete_calculation)
+                    .setNegativeButton(R.string.cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }.setPositiveButton(R.string.check) { dialog, _ ->
+                        dialog.dismiss()
+                        calculationViewModel.completeCalculation()
+                    }.create().show()
+        }
+
+
     }
 
 

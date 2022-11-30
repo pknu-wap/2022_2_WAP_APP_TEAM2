@@ -140,5 +140,9 @@
     <string name="verified">확인 완료</string>
     <string name="msg_modify_calculation">내 정산 정보를 수정하시겠습니까?</string>
     <string name="empty_my_bank_accounts">내 계좌 목록이 비어있습니다.</string>
+    <string name="failed_loading_image">사진 불러오기 실패</string>
+    <string name="impossible_to_invite_friends_because_of_calculation">정산이 완료되지 않아 친구 초대가 불가합니다!</string>
+    <string name="complete_calculation">정산 확정</string>
+    <string name="msg_complete_calculation">정산을 완료하시겠습니까?</string>
 
 </resources>

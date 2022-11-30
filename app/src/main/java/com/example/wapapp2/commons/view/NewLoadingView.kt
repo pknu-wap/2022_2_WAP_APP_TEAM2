@@ -104,4 +104,6 @@ class NewLoadingView : FrameLayout, DefaultLifecycleObserver {
         contentViews.clear()
     }
 
+
+
 }

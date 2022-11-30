@@ -57,6 +57,7 @@ class SideNavReceiptsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.loadingView.setContentView(getString(R.string.empty_receipts), binding.receiptList)
 
         listAdapterDataObserver =
                 ListAdapterDataObserver(binding.receiptList, binding.receiptList.layoutManager as WrapContentLinearLayoutManager, adapter!!)

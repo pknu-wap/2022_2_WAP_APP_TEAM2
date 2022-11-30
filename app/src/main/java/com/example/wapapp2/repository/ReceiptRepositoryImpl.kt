@@ -115,6 +115,17 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    override suspend fun modifyReceipts(map: MutableMap<String, Any?>, calcRoomId: String, receiptIds: List<String>) {
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+
+        val writeBatch = fireStore.batch()
+        for (id in receiptIds) {
+            writeBatch.update(receiptCollection.document(id), map)
+        }
+        writeBatch.commit()
+    }
+
     /**
      * 영수증 삭제 -> calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
      */
@@ -144,6 +155,22 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 batch.delete(collection.document(removeId))
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
+
+    }
+
+    suspend fun clearParticipants(
+            calcRoomId: String, receiptId: String,
+            productIds: MutableList<String>,
+    ) {
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+
+        fireStore.runBatch { batch ->
+            for (id in productIds) {
+                batch.update(collection.document(id), "participants", emptyMap<String, Any?>())
+            }
+        }
 
     }
 
