@@ -23,11 +23,25 @@ class OngoingReceiptsAdapter(
 ) : RecyclerView.Adapter<OngoingReceiptsAdapter.ReceiptVM>() {
     val receiptMap = arrayMapOf<String, ReceiptDTO>()
 
+    init {
+        lockCheckBox = false
+    }
+
     companion object {
         var PARTICIPANT_COUNT = 0
         lateinit var MY_UID: String
+        var lockCheckBox = false
     }
 
+    fun lockCheckBox() {
+        lockCheckBox = true
+        notifyDataSetChanged()
+    }
+
+    fun unlockCheckBox() {
+        lockCheckBox = false
+        notifyDataSetChanged()
+    }
 
     class ReceiptVM(
             private val binding: ViewReceiptItemBinding,
@@ -98,6 +112,7 @@ class OngoingReceiptsAdapter(
 
                 showNumOfPeopleSelected(product)
                 binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
+                binding.recentCalcCkbox.isClickable = !lockCheckBox
             }
 
             private fun calcMoney(product: ReceiptProductDTO): Int = if (product.numOfPeopleSelected == 0) 0

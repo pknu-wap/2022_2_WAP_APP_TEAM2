@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +37,7 @@ class OngoingReceiptsFragment() : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -46,12 +48,23 @@ class OngoingReceiptsFragment() : Fragment() {
                 putString("currentRoomId", currentCalcRoomViewModel.roomId)
             }
 
-            val fragmentManager = requireParentFragment().parentFragmentManager
+            val fragmentManager = requireParentFragment().requireParentFragment().parentFragmentManager
             fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!)
                     .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
                     .addToBackStack(NewReceiptFragment.TAG).commit()
         }
+
+        binding.calcBtn.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                receiptsAdapter.lockCheckBox()
+                calculationViewModel.confirmMyCalculation()
+            } else {
+                receiptsAdapter.unlockCheckBox()
+                calculationViewModel.requestModifyCalculation()
+            }
+        }
+
         receiptsAdapter = OngoingReceiptsAdapter(calculationViewModel)
         binding.receiptList.adapter = receiptsAdapter
 

@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DeviceUtils
+import com.example.wapapp2.commons.classes.DeviceUtils.Companion.showingKeyboard
 import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.view.NewLoadingView
 import com.example.wapapp2.databinding.FragmentChatBinding
@@ -35,12 +36,15 @@ import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.absoluteValue
 
 
 class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, ChatDataObserver.OnFirstDataListListener {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
+    private val verticalScrollOffset = AtomicInteger(0)
 
     private var chatAdapter: ChatPagingAdapter? = null
 
@@ -50,9 +54,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
     private val chatViewModel by viewModels<ChatViewModel>({ requireParentFragment() })
 
     private var chatDataObserver: ChatDataObserver? = null
-    private var initialized: Boolean = true
-
-    private var keyboardOpen = false
 
     companion object {
         const val TAG = "ChatFragment"
@@ -61,11 +62,16 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
 
     private val chatListOnLayoutChangeListener =
             View.OnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-                Log.e("채팅리스트 OnLayoutChangeListener", "oldBottom : $oldBottom, bottom : $bottom, 키보드 상태 : ${
-                    DeviceUtils.showingKeyboard
-                    (requireContext())
-                }")
-
+                val showingKeyboard = showingKeyboard()
+                Log.e("채팅리스트 OnLayoutChangeListener", "oldBottom : $oldBottom, bottom : $bottom, 키보드 상태 : $showingKeyboard")
+                val verticalDiff = oldBottom - bottom
+                if (showingKeyboard) {
+                    //키보드 올라오면서 같은 위치의 아이템을 보여주기 위해 스크롤을 이동
+                    //binding.chatList.scrollBy(0, verticalDiff)
+                } else {
+                    // if (bottom > oldBottom)
+                    // binding.chatList.scrollBy(0, -verticalDiff)
+                }
             }
 
     fun setViewHeightCallback(callback: CalcMainFragment.ViewHeightCallback) {
@@ -83,8 +89,6 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.loadingView.setContentView(binding.chatList)
 
-
-
         binding.chatList.apply {
             layoutManager = WrapContentLinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
             setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
@@ -100,8 +104,51 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
                 }
             }
 
-            addOnLayoutChangeListener(chatListOnLayoutChangeListener)
 
+            addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+                val y = oldBottom - bottom
+                if (y.absoluteValue > 0) {
+                    // if y is positive the keyboard is up else it's down
+                    post {
+
+                        if (y > 0 || verticalScrollOffset.get().absoluteValue >= y.absoluteValue) {
+                            //키보드 올라왔을때
+                            scrollBy(0, y)
+                        } else {
+                            scrollBy(0, verticalScrollOffset.get())
+                        }
+
+
+                    }
+                }
+            }
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                val state = AtomicInteger(RecyclerView.SCROLL_STATE_IDLE)
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    state.compareAndSet(RecyclerView.SCROLL_STATE_IDLE, newState)
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_IDLE -> {
+                            if (!state.compareAndSet(RecyclerView.SCROLL_STATE_SETTLING, newState)) {
+                                state.compareAndSet(RecyclerView.SCROLL_STATE_DRAGGING, newState)
+                            }
+                        }
+                        RecyclerView.SCROLL_STATE_DRAGGING -> {
+                            state.compareAndSet(RecyclerView.SCROLL_STATE_IDLE, newState)
+                        }
+                        RecyclerView.SCROLL_STATE_SETTLING -> {
+                            state.compareAndSet(RecyclerView.SCROLL_STATE_DRAGGING, newState)
+                        }
+                    }
+                }
+
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (state.get() != RecyclerView.SCROLL_STATE_IDLE) {
+                        verticalScrollOffset.getAndAdd(dy)
+                    }
+                }
+            })
         }
         setInputListener()
 
@@ -333,6 +380,18 @@ class ChatFragment : Fragment(), ChatDataObserver.NewMessageReceivedCallback, Ch
             addChatListener()
     }
 
+    private fun showingKeyboard(): Boolean {
+        val rootViewHeight = binding.chatList.rootView.height
+        return calcHeightDiffForKeyboard() > rootViewHeight * 0.2
+    }
+
+    private fun calcHeightDiffForKeyboard(): Int {
+        val rect = Rect()
+        binding.chatList.getWindowVisibleDisplayFrame(rect)
+
+        val rootViewHeight = binding.chatList.rootView.height
+        return rootViewHeight - rect.height()
+    }
 
     private fun RecyclerView.isScrollable(): Boolean {
         return canScrollVertically(1) || canScrollVertically(-1)

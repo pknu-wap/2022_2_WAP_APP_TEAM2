@@ -17,8 +17,10 @@ interface ReceiptRepository {
     suspend fun getReceipts(calcRoomId: String): MutableList<ReceiptDTO>
     suspend fun getReceipts(calcRoomId: String, receiptIds: List<String>): MutableList<ReceiptDTO>
     fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration
+    fun snapshotReceipt(calcRoomId: String, receiptId: String, eventListener: EventListener<DocumentSnapshot>): ListenerRegistration
     suspend fun getProducts(receiptId: String, calcRoomId: String): MutableList<ReceiptProductDTO>
     suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String): Boolean
+    suspend fun updateMyIdInCheckedParticipants(add: Boolean, calcRoomId: String, receiptId: String)
 
     suspend fun updateMyIdFromProductParticipantIds(
             add: Boolean, calcRoomId: String, receiptId: String, productId: String,

@@ -137,5 +137,6 @@
     <string name="money_to_give">보낼 금액</string>
     <string name="money_to_be_received">받을 금액</string>
     <string name="add_calculation">정산 추가</string>
+    <string name="verified">확인 완료</string>
 
 </resources>

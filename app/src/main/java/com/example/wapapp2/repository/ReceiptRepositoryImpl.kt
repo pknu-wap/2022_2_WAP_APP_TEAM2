@@ -1,6 +1,5 @@
 package com.example.wapapp2.repository
 
-import android.provider.SyncStateContract.Helpers.update
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
@@ -209,14 +208,21 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
 
     }
 
-    override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+    override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>) =
             fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
 
-    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+    override fun snapshotReceipt(
+            calcRoomId: String, receiptId: String,
+            eventListener: EventListener<DocumentSnapshot>,
+    ): ListenerRegistration =
             fireStore.collection(FireStoreNames.calc_rooms.name)
-                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
-                    .collection(FireStoreNames.products.name).addSnapshotListener(eventListener)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).addSnapshotListener(eventListener)
+
+    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>) =
+            fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).collection(FireStoreNames.products.name)
+                    .addSnapshotListener(eventListener)
 
     override suspend fun getProducts(
             receiptId: String,
@@ -242,4 +248,18 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+
+    override suspend fun updateMyIdInCheckedParticipants(add: Boolean, calcRoomId: String, receiptId: String) {
+        val myUid = currentUser!!.uid
+        val document = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId)
+
+        if (add) {
+            document.update("checkedParticipantIds", FieldValue.arrayUnion(myUid))
+        } else {
+            document.update("checkedParticipantIds", FieldValue.arrayRemove(myUid))
+        }
+
+    }
 }

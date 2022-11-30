@@ -94,6 +94,10 @@ class FinalDutchFragment : Fragment() {
         }
 
         calculationViewModel.loadFinalTransferData()
+
+        binding.modifyCalc.setOnClickListener {
+            calculationViewModel.requestModifyCalculation()
+        }
     }
 
 

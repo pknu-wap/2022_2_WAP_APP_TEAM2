@@ -183,7 +183,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                 binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
 
                 //영수증 데이터가 로딩 중이면 스킵
-                if (initializing || calculationViewModel.isLoadingReceiptData()) {
+                if (initializing) {
                     initializing = false
                     return
                 }

@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentDutchHostBinding
-import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
@@ -19,7 +17,6 @@ class DutchHostFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
-    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
 
     companion object {
         const val TAG = "DutchHostFragment"
@@ -39,23 +36,32 @@ class DutchHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        calculationViewModel.onCompletedFirstReceiptsData.observe(viewLifecycleOwner, object : Observer<Boolean> {
+            override fun onChanged(status: Boolean) {
+                if (status) {
+                    calculationViewModel.onCompletedFirstReceiptsData.removeObserver(this)
+                    calculationViewModel.onVerifiedAllParticipants.observe(viewLifecycleOwner, object : Observer<Boolean> {
+                        private var lastStatus = false
+                        private var init = true
 
+                        override fun onChanged(isCompleted: Boolean) {
+                            if (!init && isCompleted == lastStatus)
+                                return
 
-        calculationViewModel.onLoadedDataStatus.observe(viewLifecycleOwner, object : Observer<Boolean> {
-            override fun onChanged(status: Boolean?) {
-                if (status!!) {
-                    calculationViewModel.onLoadedDataStatus.removeObserver(this)
-                    calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
-                        if (isCompleted) {
-                            childFragmentManager.beginTransaction()
-                                    .replace(binding.fragmentContainerView.id, FinalDutchFragment(), FinalDutchFragment.TAG)
-                                    .commit()
-                        } else {
-                            childFragmentManager.beginTransaction()
-                                    .replace(binding.fragmentContainerView.id, OngoingReceiptsFragment(), OngoingReceiptsFragment.TAG)
-                                    .commit()
+                            if (isCompleted) {
+                                childFragmentManager.beginTransaction()
+                                        .replace(binding.fragmentContainerView.id, FinalDutchFragment(), FinalDutchFragment.TAG)
+                                        .commit()
+                            } else {
+                                childFragmentManager.beginTransaction()
+                                        .replace(binding.fragmentContainerView.id, OngoingReceiptsFragment(), OngoingReceiptsFragment.TAG)
+                                        .commit()
+                            }
+
+                            init = false
+                            lastStatus = isCompleted
                         }
-                    }
+                    })
                 }
 
             }
