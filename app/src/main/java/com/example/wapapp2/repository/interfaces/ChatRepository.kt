@@ -9,4 +9,5 @@ import com.google.firebase.firestore.ListenerRegistration
 
 interface ChatRepository {
     suspend fun sendMsg(roomId: String, chatDTO: ChatDTO) : Boolean
+    suspend fun isEmptyChatList(roomId: String): Boolean
 }

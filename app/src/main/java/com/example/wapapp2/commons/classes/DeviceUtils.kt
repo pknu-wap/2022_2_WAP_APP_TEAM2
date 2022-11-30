@@ -2,6 +2,7 @@ package com.example.wapapp2.commons.classes
 
 import android.content.Context
 import android.os.PowerManager
+import android.view.inputmethod.InputMethodManager
 
 
 class DeviceUtils {
@@ -18,6 +19,12 @@ class DeviceUtils {
                     "TAG:WAKE_NOTIFICATION")
             wakeLock.acquire(5000L)
             wakeLock.release()
+        }
+
+        fun showingKeyboard(context: Context): Boolean {
+            val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                    as InputMethodManager
+            return inputMethodManager.isAcceptingText
         }
     }
 }
