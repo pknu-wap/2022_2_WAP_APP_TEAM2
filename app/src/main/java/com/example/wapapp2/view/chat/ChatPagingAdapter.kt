@@ -61,16 +61,27 @@ class ChatPagingAdapter(
 
         private fun setUserName(position: Int, model: ChatDTO) {
             if (model.senderId == myId || equalsTopUserId(model.senderId, position)) {
-                binding.userName.visibility = View.GONE
-                return
-            }
-            binding.userName.visibility = View.VISIBLE
+                if (topIsNotice(model.senderId, position))
+                    binding.userName.visibility = View.VISIBLE
+                else {
+                    binding.userName.visibility = View.GONE
+                    return
+                }
+            } else
+                binding.userName.visibility = View.VISIBLE
+
             binding.userName.text = model.userName
         }
 
         // for reverse
         private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
-            return if (currentPosition >= itemCount) false else getItem(currentPosition + 1)?.get("senderId") == userId
+            return if (currentPosition + 1 >= itemCount) false
+            else getItem(currentPosition + 1)?.getString("senderId") == userId
+        }
+
+        private fun topIsNotice(userId: String, currentPosition: Int): Boolean {
+            return if (currentPosition + 1 >= itemCount) false
+            else getItem(currentPosition + 1)?.getBoolean("notice")!!
         }
     }
 
@@ -109,5 +120,6 @@ class ChatPagingAdapter(
     fun getLastChatDTO(): ChatDTO {
         return getItem(0)!!.toObject(ChatDTO::class.java)!!
     }
+
 
 }

@@ -18,12 +18,15 @@ import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.databinding.FragmentCalcMainBinding
 import com.example.wapapp2.model.ChatDTO
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.view.calculation.calcroom.ParticipantsInCalcRoomFragment
 import com.example.wapapp2.view.calculation.receipt.DutchHostFragment
 import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.view.calculation.rushcalc.RushCalcFragment
 import com.example.wapapp2.view.chat.ChatFragment
 import com.example.wapapp2.view.checkreceipt.ReceiptsFragment
+import com.example.wapapp2.view.main.MainHostFragment
+import com.example.wapapp2.view.receipt.SideNavReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -73,10 +76,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSideMenu()
-
-        childFragmentManager.beginTransaction()
-                .add(binding.calculationSimpleInfo.calculationFragmentContainerView.id, DutchHostFragment(),
-                        DutchHostFragment.TAG).commit()
 
         calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
             updateMySettlementAmount(transferMoney)
@@ -135,6 +134,10 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
     override fun onStop() {
         super.onStop()
+        if (currentCalcRoomViewModel.exitFromRoom)
+            FcmRepositoryImpl.unSubscribeToTopic(currentCalcRoomViewModel.roomId!!)
+        else
+            FcmRepositoryImpl.subscribeToTopic(currentCalcRoomViewModel.roomId!!)
     }
 
     override fun onDestroyView() {
@@ -182,7 +185,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                 binding.calculationSimpleInfo.root.layoutParams = cardViewLayoutParams
 
                 //영수증 데이터가 로딩 중이면 스킵
-                if (initializing || calculationViewModel.isLoadingReceiptData()) {
+                if (initializing) {
                     initializing = false
                     return
                 }
@@ -191,8 +194,8 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                     childFragmentManager.beginTransaction().add(binding.calculationSimpleInfo.calculationFragmentContainerView.id,
                             DutchHostFragment(), DutchHostFragment.TAG).commit()
                 } else {
-                    childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.apply {
-                        childFragmentManager.beginTransaction().remove(this).commit()
+                    childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.also { dutchFragment ->
+                        childFragmentManager.beginTransaction().remove(dutchFragment).commit()
                     }
                 }
 
@@ -204,6 +207,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             override fun onGlobalLayout() {
                 if (binding.calculationSimpleInfo.root.height > 0) {
                     binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
                     //채팅 프래그먼트의 상단 마진 값을 최근정산 접었을때 높이 + 8dp로 설정
                     val chatFragmentContainerLayoutParams = binding.chat.layoutParams as FrameLayout.LayoutParams
                     chatFragmentContainerLayoutParams.topMargin = binding.calculationSimpleInfo.root.height
@@ -212,6 +216,13 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
         })
 
+        calculationViewModel.completedAllCalc.observe(viewLifecycleOwner) {
+            if (it) {
+                childFragmentManager.findFragmentByTag(DutchHostFragment.TAG)?.apply {
+                    binding.calculationSimpleInfo.expandBtn.callOnClick()
+                }
+            }
+        }
     }
 
 
@@ -223,23 +234,12 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             }
             val fragmentManager = parentFragmentManager
             fragmentManager.beginTransaction().hide(this@CalcMainFragment)
-                    .add(R.id.fragment_container_view, fragment, "CheckReceiptFragment")
-                    .addToBackStack("CheckReceiptFragment")
+                    .add(R.id.fragment_container_view, fragment, ReceiptsFragment.TAG)
+                    .addToBackStack(ReceiptsFragment.TAG)
                     .commit()
+            closeDrawer()
         }
 
-        binding.rushCalcBtn.setOnClickListener {
-            if (calculationViewModel.receiptMap.value!!.isEmpty) {
-                Toast.makeText(requireContext().applicationContext, R.string.no_available_rush_calc, Toast.LENGTH_SHORT).show()
-            } else {
-                val rushCalcFragment = RushCalcFragment()
-                val fragmentManager = parentFragmentManager
-                fragmentManager.beginTransaction().hide(this@CalcMainFragment)
-                        .add(R.id.fragment_container_view, rushCalcFragment, RushCalcFragment.TAG)
-                        .addToBackStack(RushCalcFragment.TAG)
-                        .commit()
-            }
-        }
 
         binding.exitRoom.setOnClickListener {
             //방 나가기
@@ -264,7 +264,8 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
         val participantsInCalcRoomFragment = ParticipantsInCalcRoomFragment()
         participantsInCalcRoomFragment.onNavDrawerListener = this
         childFragmentManager.beginTransaction().replace(binding.participantsFragmentContainer.id,
-                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG).commit()
+                participantsInCalcRoomFragment, ParticipantsInCalcRoomFragment.TAG)
+                .replace(binding.receiptsFragmentContainer.id, SideNavReceiptsFragment(), SideNavReceiptsFragment.TAG).commit()
     }
 
 

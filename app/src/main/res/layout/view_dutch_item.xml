@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="12dp"
     >
 
     <RelativeLayout
@@ -11,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:paddingVertical="10dp"
         >
 
         <TextView
@@ -19,17 +19,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:text="정산 해야할 사람"
+            android:text="결제자"
+            android:textSize="15sp"
+            />
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/money"
+            android:text="@string/money_to_give"
             android:textSize="14sp"
             />
 
         <TextView
-            android:id="@+id/transferMoney"
+            android:id="@+id/money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="16dp"
             android:text="+- 얼마?"
             android:textSize="14sp"
             />
@@ -43,7 +51,7 @@
         android:layout_below="@id/pay_frame"
         android:layout_marginTop="10dp"
         android:orientation="vertical"
-        app:layoutManager=".commons.classes.WrapContentLinearLayoutManager"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="3"
         tools:listitem="@layout/bank_item_view"
         />

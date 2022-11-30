@@ -1,8 +1,9 @@
 package com.example.wapapp2.model
 
 data class FinalTransferDTO(
-        val payersId: String,
-        val payersName: String,
-        val transferMoney: Int,
+        var payersId: String,
+        var payersName: String,
+        var transferMoney: Int,
+        var totalMoney: Int,
         val accounts: MutableList<BankAccountDTO> = mutableListOf<BankAccountDTO>(),
 )

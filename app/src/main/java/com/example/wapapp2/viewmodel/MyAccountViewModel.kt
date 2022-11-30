@@ -16,6 +16,7 @@ import com.example.wapapp2.repository.interfaces.UserImgRepository
 import com.example.wapapp2.repository.interfaces.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
@@ -42,8 +43,12 @@ class MyAccountViewModel : ViewModel() {
     }
 
     fun checkFcmToken() {
-        CoroutineScope(Dispatchers.IO).launch {
-            MyDataStore.getINSTANCE().checkFcmToken()
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if (it.isSuccessful) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    MyDataStore.getINSTANCE().updateFcmToken(it.result)
+                }
+            }
         }
     }
 
@@ -74,6 +79,9 @@ class MyAccountViewModel : ViewModel() {
             FirebaseAuth.getInstance().signOut()
             FriendsLocalRepositoryImpl.getINSTANCE().clear()
 
+            CoroutineScope(Dispatchers.IO).launch {
+                MyDataStore.getINSTANCE().removeFcmToken()
+            }
         }
     }
 

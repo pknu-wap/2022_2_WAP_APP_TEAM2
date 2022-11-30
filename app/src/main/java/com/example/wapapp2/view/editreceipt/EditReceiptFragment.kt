@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
@@ -13,7 +14,9 @@ import com.example.wapapp2.commons.classes.DataTypeConverter
 import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.databinding.FragmentEditReceiptBinding
 import com.example.wapapp2.observer.MyLifeCycleObserver
+import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.editreceipt.EditReceiptFragment.OnUpdatedValueListener
+import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.ModifyReceiptViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -34,6 +37,9 @@ class EditReceiptFragment : Fragment() {
 
     private val receiptViewModel by viewModels<ReceiptViewModel>()
     private val modifyReceiptViewModel by viewModels<ModifyReceiptViewModel>()
+    private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({
+        parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
+    })
 
     private val onUpdatedValueListener = OnUpdatedValueListener {
         binding.totalMoney.text = DataTypeConverter.toKRW(modifyReceiptViewModel.calcTotalPrice().toInt())
@@ -89,10 +95,8 @@ class EditReceiptFragment : Fragment() {
         receiptViewModel.getProducts(modifyReceiptViewModel.originalReceiptDTO.id!!, modifyReceiptViewModel.currentRoomId!!)
 
         binding.receiptImgBtn.setOnClickListener {
-            if (modifyReceiptViewModel.hasReceiptImg)
-                dialogModifyImg()
-            else
-                dialogAddImg()
+            if (modifyReceiptViewModel.hasReceiptImg) dialogModifyImg()
+            else dialogAddImg()
         }
 
         binding.receiptImage.setOnClickListener {

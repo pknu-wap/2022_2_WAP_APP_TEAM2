@@ -9,6 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.databinding.*
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.repository.FriendsLocalRepositoryImpl
@@ -36,6 +38,7 @@ class MyprofileFragment : Fragment() {
     private var _binding: FragmentMyprofileBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: MyBankAccountsAdapter
+    private var bankListAdapterDataObserver: ListAdapterDataObserver? = null
 
     companion object {
         const val TAG = "MyProfile"
@@ -84,9 +87,12 @@ class MyprofileFragment : Fragment() {
             savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentMyprofileBinding.inflate(inflater, container, false)
+        binding.loadingView.setContentView(getString(R.string.empty_my_bank_accounts), binding.bankList)
 
-        binding.loadingView.setContentView(binding.bankList)
-        binding.loadingView.onSuccessful()
+        bankListAdapterDataObserver =
+                ListAdapterDataObserver(binding.bankList, binding.bankList.layoutManager as WrapContentLinearLayoutManager, adapter)
+        bankListAdapterDataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_my_bank_accounts))
+        adapter.registerAdapterDataObserver(bankListAdapterDataObserver!!)
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -105,6 +111,8 @@ class MyprofileFragment : Fragment() {
 
             myCalendarViewModel.listenerRemove()
             myCalcRoomViewModel.listenerRemove()
+
+            requireActivity().viewModelStore.clear()
 
             parentFragmentManager
                     .beginTransaction()
@@ -132,7 +140,7 @@ class MyprofileFragment : Fragment() {
                 binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.man))
             else
                 binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.girl))
-
+            
             binding.myProfileName.text = it.name
             binding.myAccountId.text = it.email
         }

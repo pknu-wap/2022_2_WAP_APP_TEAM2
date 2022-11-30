@@ -29,7 +29,7 @@ class FriendsFragment : Fragment() {
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
-    private var dataObserver : ListAdapterDataObserver? = null
+    private var dataObserver: ListAdapterDataObserver? = null
 
     companion object {
         const val TAG = "FriendsFragment"
@@ -48,17 +48,15 @@ class FriendsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFriendsBinding.inflate(inflater, container, false)
-        binding.loadingView.setContentView(binding.myFriendsList)
+        binding.loadingView.setContentView(getString(R.string.empty_my_friends), binding.myFriendsList)
 
         binding.addFriendBtn.setOnClickListener {
             val fragment = AddMyFriendFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager
-            fragmentManager
-                    .beginTransaction()
+            fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
                     .add(R.id.fragment_container_view, fragment, AddMyFriendFragment.TAG)
-                    .addToBackStack(AddMyFriendFragment.TAG)
-                    .commit()
+                    .addToBackStack(AddMyFriendFragment.TAG).commit()
         }
 
         return binding.root
@@ -103,12 +101,12 @@ class FriendsFragment : Fragment() {
         }
 
         myAccountViewModel.myProfileData.observe(viewLifecycleOwner) {
-            if(it.imgUri.isEmpty().not())
+            if (it.imgUri.isEmpty().not())
                 Glide.with(binding.root).load(it.imgUri).circleCrop().into(binding.myProfileImg)
-            else if(it.gender == "man")
-                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.man))
+            else if (it.gender == "man")
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.man))
             else
-                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext() ,R.drawable.girl))
+                binding.myProfileImg.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.girl))
 
             binding.myProfileName.text = it.name
             binding.myAccountId.text = it.email
@@ -127,9 +125,10 @@ class FriendsFragment : Fragment() {
 
 
     private fun setFriendsProfile() {
-        friendsViewModel.myFriendsMapUpdatedLiveData.observe(viewLifecycleOwner){
+        friendsViewModel.myFriendsMapUpdatedLiveData.observe(viewLifecycleOwner) {
             myFriendsAdapter?.stopListening()
-            myFriendsAdapter = MyFriendsAdapter(friendOnClickListener, friendsViewModel.getMyFriendsOptions_new(), FriendsViewModel.MY_FRIEND_MAP.toMap())
+            myFriendsAdapter = MyFriendsAdapter(friendOnClickListener,
+                    friendsViewModel.getMyFriendsOptions_new(), FriendsViewModel.MY_FRIEND_MAP.toMap())
             dataObserver = ListAdapterDataObserver(binding.myFriendsList, binding.myFriendsList.layoutManager as
                     LinearLayoutManager, myFriendsAdapter!!)
             dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_my_friends))

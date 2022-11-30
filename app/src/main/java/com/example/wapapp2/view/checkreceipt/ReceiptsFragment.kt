@@ -112,7 +112,7 @@ class ReceiptsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCheckReceiptBinding.inflate(inflater, container, false)
-        binding.loadingView.setContentView(binding.rvEditreceipt)
+        binding.loadingView.setContentView(getString(R.string.empty_receipts), binding.rvEditreceipt)
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()

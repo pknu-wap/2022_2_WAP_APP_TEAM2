@@ -33,4 +33,7 @@ data class ChatDTO(
         var isNotice: Boolean,
 ) : Parcelable {
     constructor() : this("", null, "", "", false)
+
+    @get:Exclude
+    var id: String? = null
 }

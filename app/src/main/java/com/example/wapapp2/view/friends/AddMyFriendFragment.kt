@@ -58,8 +58,7 @@ class AddMyFriendFragment : Fragment() {
         binding.searchUserList.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
         binding.searchUserList.adapter = adapter
 
-        binding.loadingView.setContentView(binding.searchUserList)
-        binding.loadingView.onSuccessful()
+        binding.loadingView.setContentView(getString(R.string.no_search_results_found), binding.searchUserList)
 
         binding.topAppBar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()

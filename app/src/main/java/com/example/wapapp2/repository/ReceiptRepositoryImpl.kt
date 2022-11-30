@@ -1,6 +1,5 @@
 package com.example.wapapp2.repository
 
-import android.provider.SyncStateContract.Helpers.update
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
@@ -37,7 +36,7 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 .document(productId)
 
         if (add) {
-            val updateMap = mapOf("participants" to mapOf(myUid to participantDTO))
+            val updateMap = mapOf("participants.$myUid" to participantDTO)
             productDocument.update(updateMap)
         } else {
             val updateMap = mapOf("participants.$myUid" to FieldValue.delete())
@@ -116,6 +115,17 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+    override suspend fun modifyReceipts(map: MutableMap<String, Any?>, calcRoomId: String, receiptIds: List<String>) {
+        val receiptCollection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+
+        val writeBatch = fireStore.batch()
+        for (id in receiptIds) {
+            writeBatch.update(receiptCollection.document(id), map)
+        }
+        writeBatch.commit()
+    }
+
     /**
      * 영수증 삭제 -> calcRoom문서의 ongoingReceiptIds, endReceiptIds에서 영수증id삭제
      */
@@ -145,6 +155,22 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
                 batch.delete(collection.document(removeId))
             }
         }.addOnCompleteListener { continuation.resume(it.isSuccessful) }
+
+    }
+
+    suspend fun clearParticipants(
+            calcRoomId: String, receiptId: String,
+            productIds: MutableList<String>,
+    ) {
+        val collection = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId).collection(FireStoreNames.products.name)
+
+        fireStore.runBatch { batch ->
+            for (id in productIds) {
+                batch.update(collection.document(id), "participants", emptyMap<String, Any?>())
+            }
+        }
 
     }
 
@@ -209,14 +235,21 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
 
     }
 
-    override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+    override fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>) =
             fireStore.collection(FireStoreNames.calc_rooms.name)
                     .document(calcRoomId).collection(FireStoreNames.receipts.name).addSnapshotListener(eventListener)
 
-    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration =
+    override fun snapshotReceipt(
+            calcRoomId: String, receiptId: String,
+            eventListener: EventListener<DocumentSnapshot>,
+    ): ListenerRegistration =
             fireStore.collection(FireStoreNames.calc_rooms.name)
-                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId)
-                    .collection(FireStoreNames.products.name).addSnapshotListener(eventListener)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).addSnapshotListener(eventListener)
+
+    fun snapshotProducts(calcRoomId: String, receiptId: String, eventListener: EventListener<QuerySnapshot>) =
+            fireStore.collection(FireStoreNames.calc_rooms.name)
+                    .document(calcRoomId).collection(FireStoreNames.receipts.name).document(receiptId).collection(FireStoreNames.products.name)
+                    .addSnapshotListener(eventListener)
 
     override suspend fun getProducts(
             receiptId: String,
@@ -242,4 +275,18 @@ class ReceiptRepositoryImpl private constructor() : ReceiptRepository {
         }
     }
 
+
+    override suspend fun updateMyIdInCheckedParticipants(add: Boolean, calcRoomId: String, receiptId: String) {
+        val myUid = currentUser!!.uid
+        val document = fireStore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name)
+                .document(receiptId)
+
+        if (add) {
+            document.update("checkedParticipantIds", FieldValue.arrayUnion(myUid))
+        } else {
+            document.update("checkedParticipantIds", FieldValue.arrayRemove(myUid))
+        }
+
+    }
 }

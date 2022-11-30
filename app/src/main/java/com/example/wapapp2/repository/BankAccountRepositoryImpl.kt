@@ -1,6 +1,7 @@
 package com.example.wapapp2.repository
 
 import com.example.wapapp2.firebase.FireStoreNames
+import com.example.wapapp2.main.MyApplication
 import com.example.wapapp2.model.BankAccountDTO
 import com.example.wapapp2.repository.interfaces.BankAccountRepository
 import com.example.wapapp2.repository.interfaces.MyBankAccountRepository
@@ -33,9 +34,12 @@ class BankAccountRepositoryImpl private constructor() : BankAccountRepository {
         collection.orderBy("bankId", Query.Direction.ASCENDING).get().addOnCompleteListener {
             if (it.isSuccessful) {
                 val dtoList = mutableListOf<BankAccountDTO>()
+                var bankAccountDTO: BankAccountDTO? = null
 
                 for (v in it.result.documents) {
-                    dtoList.add(v.toObject<BankAccountDTO>()!!)
+                    bankAccountDTO = v.toObject<BankAccountDTO>()!!
+                    bankAccountDTO.bankDTO = MyApplication.BANK_MAPS[bankAccountDTO.bankId]
+                    dtoList.add(bankAccountDTO)
                 }
                 continuation.resume(dtoList)
             } else

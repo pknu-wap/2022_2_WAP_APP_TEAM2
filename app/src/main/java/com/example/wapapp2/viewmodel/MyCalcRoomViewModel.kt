@@ -6,6 +6,7 @@ import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
+import com.example.wapapp2.repository.FcmRepositoryImpl
 import com.example.wapapp2.repository.interfaces.CalcRoomRepository
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
@@ -21,7 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MyCalcRoomViewModel : ViewModel() {
-    private val myCalcRoomRepository : CalcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
+    private val myCalcRoomRepository: CalcRoomRepository = CalcRoomRepositorylmpl.getINSTANCE()
     private val fireStore = FirebaseFirestore.getInstance()
     val myCalcRoomIds = MutableLiveData<MutableSet<String>>(mutableSetOf())
 
@@ -35,6 +36,7 @@ class MyCalcRoomViewModel : ViewModel() {
                 .setQuery(query, MetadataChanges.INCLUDE) { snapshot ->
                     val dto = snapshot.toObject<CalcRoomDTO>()!!
                     dto.id = snapshot.id
+                    FcmRepositoryImpl.subscribeToTopic(dto.id!!)
                     dto
                 }.build()
         return options
@@ -47,7 +49,7 @@ class MyCalcRoomViewModel : ViewModel() {
         listenerRemove()
     }
 
-    fun listenerRemove(){
+    fun listenerRemove() {
         myCalcRoomIdsListener?.remove()
     }
 
@@ -70,17 +72,17 @@ class MyCalcRoomViewModel : ViewModel() {
         }
     }
 
-    fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO, newCalcRoomAddedCallback: NewCalcRoomAddedCallback ){
+    fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO, newCalcRoomAddedCallback: NewCalcRoomAddedCallback) {
         CoroutineScope(Dispatchers.Main).launch {
-            val result = async{ myCalcRoomRepository.addNewCalcRoom(calcRoomDTO) }
+            val result = async { myCalcRoomRepository.addNewCalcRoom(calcRoomDTO) }
             //방 생성 완료
-            if( result.await() ){
+            if (result.await()) {
                 newCalcRoomAddedCallback.newCalcRoomAdded(calcRoomDTO)
             }
         }
     }
 
-    fun interface NewCalcRoomAddedCallback{
+    fun interface NewCalcRoomAddedCallback {
         fun newCalcRoomAdded(calcRoomDTO: CalcRoomDTO)
     }
 

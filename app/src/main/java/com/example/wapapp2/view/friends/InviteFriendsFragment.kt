@@ -20,6 +20,7 @@ import com.example.wapapp2.view.friends.adapter.CheckedFriendsListAdapter
 import com.example.wapapp2.view.friends.adapter.SearchFriendsListAdapter
 import com.example.wapapp2.view.friends.interfaces.OnCheckedFriendListener
 import com.example.wapapp2.view.friends.interfaces.OnRemovedFriendListener
+import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -37,7 +38,10 @@ class InviteFriendsFragment : Fragment() {
         parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
     })
     private val friendsViewModel: FriendsViewModel by activityViewModels()
-
+    private val calculationViewModel by viewModels<CalculationViewModel>({
+        parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
+    })
+    
     private var listAdapterDataObserver: ListAdapterDataObserver? = null
     private val onCheckedFriendListener: OnCheckedFriendListener =
             OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
@@ -60,7 +64,7 @@ class InviteFriendsFragment : Fragment() {
     ): View? {
         _binding = FragmentInviteFriendsBinding.inflate(inflater, container, false)
 
-        binding.inviteFriendsLayout.loadingView.setContentView(binding.inviteFriendsLayout.searchFriendsList)
+        binding.inviteFriendsLayout.loadingView.setContentView(getString(R.string.no_search_results_found), binding.inviteFriendsLayout.searchFriendsList)
 
         binding.inviteFriendsLayout.inviteFriendsList.adapter = checkedFriendsListAdapter
         binding.inviteFriendsLayout.searchFriendsList.adapter = searchFriendsListAdapter
@@ -112,6 +116,7 @@ class InviteFriendsFragment : Fragment() {
                     .setPositiveButton(R.string.invite) { dialog, which ->
                         calcRoomViewModel.inviteFriends(checkedFriendsListAdapter.friends.toMutableList(), calcRoomViewModel.roomId!!)
                         dialog.dismiss()
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
                     }.setNegativeButton(R.string.cancel) { dialog, which ->
                         dialog.dismiss()
                     }.create().show()

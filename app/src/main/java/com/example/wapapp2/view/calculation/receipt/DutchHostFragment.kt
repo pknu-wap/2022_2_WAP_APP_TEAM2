@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.example.wapapp2.R
 import com.example.wapapp2.databinding.FragmentDutchHostBinding
-import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 
@@ -19,7 +17,6 @@ class DutchHostFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val calculationViewModel by viewModels<CalculationViewModel>({ requireParentFragment() })
-    private val currentCalcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
 
     companion object {
         const val TAG = "DutchHostFragment"
@@ -39,35 +36,32 @@ class DutchHostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnCalcAdd.setOnClickListener {
-            //영수증 추가
-            val fragment = NewReceiptFragment()
-            fragment.arguments = Bundle().apply {
-                putString("currentRoomId", currentCalcRoomViewModel.roomId)
-            }
+        calculationViewModel.onCompletedFirstReceiptsData.observe(viewLifecycleOwner, object : Observer<Boolean> {
+            override fun onChanged(status: Boolean) {
+                if (status) {
+                    calculationViewModel.onCompletedFirstReceiptsData.removeObserver(this)
+                    calculationViewModel.onVerifiedAllParticipants.observe(viewLifecycleOwner, object : Observer<Boolean> {
+                        private var lastStatus = false
+                        private var init = true
 
-            val fragmentManager = requireParentFragment().requireParentFragment().parentFragmentManager
-            fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!)
-                    .add(R.id.fragment_container_view, fragment, NewReceiptFragment.TAG)
-                    .addToBackStack(NewReceiptFragment.TAG).commit()
-        }
+                        override fun onChanged(isCompleted: Boolean) {
+                            if (!init && isCompleted == lastStatus)
+                                return
 
-        calculationViewModel.onLoadedDataStatus.observe(viewLifecycleOwner, object : Observer<Boolean> {
-            override fun onChanged(status: Boolean?) {
-                if (status!!) {
-                    calculationViewModel.onLoadedDataStatus.removeObserver(this)
-                    calculationViewModel.onCompletedCalculation.observe(viewLifecycleOwner) { isCompleted ->
-                        if (isCompleted) {
-                            childFragmentManager.beginTransaction()
-                                    .replace(binding.fragmentContainerView.id, FinalTransferFragment(), FinalTransferFragment.TAG)
-                                    .commit()
-                        } else {
-                            childFragmentManager.beginTransaction()
-                                    .replace(binding.fragmentContainerView.id, OngoingReceiptsFragment(), OngoingReceiptsFragment.TAG)
-                                    .commit()
+                            if (isCompleted) {
+                                childFragmentManager.beginTransaction()
+                                        .replace(binding.fragmentContainerView.id, FinalDutchFragment(), FinalDutchFragment.TAG)
+                                        .commit()
+                            } else {
+                                childFragmentManager.beginTransaction()
+                                        .replace(binding.fragmentContainerView.id, OngoingReceiptsFragment(), OngoingReceiptsFragment.TAG)
+                                        .commit()
+                            }
+
+                            init = false
+                            lastStatus = isCompleted
                         }
-                    }
+                    })
                 }
 
             }

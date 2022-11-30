@@ -12,6 +12,7 @@ class UserViewModel : ViewModel() {
     val myFriendsIdSet = mutableSetOf<String>()
     val searchUsersResult = MutableLiveData<MutableList<UserDTO>>()
     val user = MutableLiveData<UserDTO?>()
+    val users = MutableLiveData<MutableList<UserDTO>>()
 
     fun findUsers(email: String) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -38,6 +39,18 @@ class UserViewModel : ViewModel() {
             result.await()
             withContext(Main) {
                 user.value = result.await()
+            }
+        }
+    }
+
+    fun getUsers(userIds: MutableList<String>) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val result = async {
+                userRepositoryImpl.getUsers(userIds)
+            }
+            result.await()
+            withContext(Main) {
+                users.value = result.await()
             }
         }
     }
