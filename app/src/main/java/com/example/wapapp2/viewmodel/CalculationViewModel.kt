@@ -33,6 +33,7 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
     val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
     val onVerifiedAllParticipants = MutableLiveData<Boolean>(false)
+    val verifiedParticipantIds = MutableLiveData(mutableSetOf<String>())
     val onCompletedFirstReceiptsData = MutableLiveData<Boolean>(false)
 
     val receiptCount = AtomicInteger(0)
@@ -256,12 +257,17 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     private fun checkVerifiedAllParticipants(): Boolean {
         val receiptMap = receiptMap.value!!
+        val verifiedParticipants = mutableSetOf<String>()
 
         for (receipt in receiptMap.values) {
+            verifiedParticipants.addAll(receipt.checkedParticipantIds.toSet())
+            verifiedParticipantIds.value = verifiedParticipants
+
             if (receipt.checkedParticipantIds.toSet() != calcRoomParticipantIds.toSet())
                 return false
         }
-        return receiptMap.isNotEmpty()
+
+        return true
     }
 
     private fun isCompletedLoadReceipts(): Boolean = receiptMap.value!!.size == receiptCount.get()
@@ -320,4 +326,6 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
             }
         }
     }
+
+    fun myCheckStatus() = verifiedParticipantIds.value!!.contains(myUid)
 }

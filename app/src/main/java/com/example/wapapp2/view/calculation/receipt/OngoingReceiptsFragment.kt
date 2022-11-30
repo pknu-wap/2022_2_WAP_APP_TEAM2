@@ -13,6 +13,7 @@ import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calculation.receipt.adapters.OngoingReceiptsAdapter
 import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class OngoingReceiptsFragment() : Fragment() {
     private var _binding: OngoingDutchFragmentBinding? = null
@@ -55,13 +56,22 @@ class OngoingReceiptsFragment() : Fragment() {
                     .addToBackStack(NewReceiptFragment.TAG).commit()
         }
 
+        binding.calcBtn.isChecked = calculationViewModel.myCheckStatus()
+
         binding.calcBtn.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                receiptsAdapter.lockCheckBox()
+                receiptsAdapter.lockCheckBox(true)
                 calculationViewModel.confirmMyCalculation()
             } else {
-                receiptsAdapter.unlockCheckBox()
-                calculationViewModel.requestModifyCalculation()
+                MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.edit_calculation)
+                        .setMessage(R.string.msg_modify_calculation)
+                        .setNegativeButton(R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }.setPositiveButton(R.string.check) { dialog, _ ->
+                            dialog.dismiss()
+                            receiptsAdapter.unlockCheckBox(true)
+                            calculationViewModel.requestModifyCalculation()
+                        }
             }
         }
 
@@ -71,6 +81,12 @@ class OngoingReceiptsFragment() : Fragment() {
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) { result ->
             receiptsAdapter.receiptMap.clear()
             receiptsAdapter.receiptMap.putAll(result.toMap())
+
+            if (calculationViewModel.myCheckStatus())
+                receiptsAdapter.lockCheckBox(false)
+            else
+                receiptsAdapter.unlockCheckBox(false)
+
             receiptsAdapter.notifyDataSetChanged()
         }
 

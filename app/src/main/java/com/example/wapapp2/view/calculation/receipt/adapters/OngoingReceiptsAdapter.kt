@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt.adapters
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -33,14 +34,18 @@ class OngoingReceiptsAdapter(
         var lockCheckBox = false
     }
 
-    fun lockCheckBox() {
+    @SuppressLint("NotifyDataSetChanged")
+    fun lockCheckBox(refresh: Boolean) {
         lockCheckBox = true
-        notifyDataSetChanged()
+        if (refresh)
+            notifyDataSetChanged()
     }
 
-    fun unlockCheckBox() {
+    @SuppressLint("NotifyDataSetChanged")
+    fun unlockCheckBox(refresh: Boolean) {
         lockCheckBox = false
-        notifyDataSetChanged()
+        if (refresh)
+            notifyDataSetChanged()
     }
 
     class ReceiptVM(

@@ -96,7 +96,14 @@ class FinalDutchFragment : Fragment() {
         calculationViewModel.loadFinalTransferData()
 
         binding.modifyCalc.setOnClickListener {
-            calculationViewModel.requestModifyCalculation()
+            MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.edit_calculation)
+                    .setMessage(R.string.msg_modify_calculation)
+                    .setNegativeButton(R.string.cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }.setPositiveButton(R.string.check) { dialog, _ ->
+                        dialog.dismiss()
+                        calculationViewModel.requestModifyCalculation()
+                    }
         }
     }
 
