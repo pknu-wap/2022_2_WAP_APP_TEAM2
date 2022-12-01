@@ -4,13 +4,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
-import com.example.wapapp2.model.ChatDTO
 
 class ChatDataObserver(
         private val recycler: RecyclerView,
         private val manager: LinearLayoutManager,
         private val iAdapterItemCount: IAdapterItemCount,
         private val IsMessageMine: CheckMyMessage,
+        private val onFirstDataListListener: OnFirstDataListListener,
 ) : ListAdapterDataObserver(recycler, manager, iAdapterItemCount) {
 
     var newMessageReceivedCallback: NewMessageReceivedCallback? = null
@@ -28,6 +28,10 @@ class ChatDataObserver(
             // 현재 스크롤 위치가 리스트 끝이 아니고, 받은 메시지이면 화면에 메시지 표시, 스크롤 이동X
                 newMessageReceivedCallback?.onReceived()
         }
+
+        if (positionStart == 0 && itemCount > 0)
+            onFirstDataListListener.onInsertedFirstDataList()
+
     }
 
     fun interface CheckMyMessage {
@@ -38,4 +42,7 @@ class ChatDataObserver(
         fun onReceived()
     }
 
+    fun interface OnFirstDataListListener {
+        fun onInsertedFirstDataList()
+    }
 }

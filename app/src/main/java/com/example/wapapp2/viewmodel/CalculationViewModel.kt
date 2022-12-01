@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
+import java.util.concurrent.atomic.AtomicInteger
 
 class CalculationViewModel : ViewModel(), IProductCheckBox {
     private val receiptRepository = ReceiptRepositoryImpl.INSTANCE
@@ -22,17 +23,24 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     private var onGoingReceiptIdsListener: ListenerRegistration? = null
     private val productsListenerMap = mutableMapOf<String, ListenerRegistration>()
+    private val receiptsListenerMap = mutableMapOf<String, ListenerRegistration>()
 
     //내 정산 금액
     val mySettlementAmount = MutableLiveData(0)
     val receiptMap = MutableLiveData(arrayMapOf<String, ReceiptDTO>())
-    val verifiedParticipantIds = mutableSetOf<String>()
     val calcRoomParticipantIds = mutableSetOf<String>()
 
     val finalTransferData = MutableLiveData<MutableList<FinalTransferDTO>>()
 
-    val onCompletedCalculation = MutableLiveData<Boolean>(false)
-    val onLoadedDataStatus = MutableLiveData<Boolean>(false)
+    val onVerifiedAllParticipants = MutableLiveData<Boolean>(false)
+    val verifiedParticipantIds = MutableLiveData(mutableSetOf<String>())
+    val onCompletedFirstReceiptsData = MutableLiveData<Boolean>(false)
+    val payersIds = MutableLiveData(mutableSetOf<String>())
+
+    val calculationCompletedPayerIds = MutableLiveData(mutableSetOf<String>())
+    val completedAllCalc = MutableLiveData(false)
+
+    val receiptCount = AtomicInteger(0)
 
     lateinit var myUid: String
     lateinit var myUserName: String
@@ -46,7 +54,11 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
         for (listener in productsListenerMap.values) {
             listener.remove()
         }
+        for (listener in receiptsListenerMap.values) {
+            listener.remove()
+        }
         productsListenerMap.clear()
+        receiptsListenerMap.clear()
     }
 
     override fun updateMyTransferMoney(): Int {
@@ -111,11 +123,20 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
 
     }
 
-    /**
-     * 내 최종 정산 금액 계산
-     **/
-    private fun updateMyFinalSettlementAmount() {
+    fun requestModifyCalculation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            for (receipt in receiptMap.value!!.values) {
+                receiptRepository.updateMyIdInCheckedParticipants(false, calcRoomId, receipt.id)
+            }
+        }
+    }
 
+    fun confirmMyCalculation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            for (receipt in receiptMap.value!!.values) {
+                receiptRepository.updateMyIdInCheckedParticipants(true, calcRoomId, receipt.id)
+            }
+        }
     }
 
     fun loadOngoingReceiptIds() {
@@ -128,9 +149,11 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
             CoroutineScope(Dispatchers.IO).launch {
                 //성공, 정산방 정보 가져옴
                 val calcRoomDTO = value.toObject<CalcRoomDTO>()!!
+                val modifiedMap = receiptMap.value!!
 
-                val lastOngoingReceiptIds = receiptMap.value!!.keys.toMutableSet()
+                val lastOngoingReceiptIds = modifiedMap.keys.toMutableSet()
                 val loadedOngoingReceiptIds = calcRoomDTO.ongoingReceiptIds.toMutableSet()
+                receiptCount.set(loadedOngoingReceiptIds.size)
 
                 //변화 확인
                 //추가된 영수증
@@ -138,136 +161,164 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                 //삭제된 영수증
                 val removedReceiptIds = lastOngoingReceiptIds.subtract(loadedOngoingReceiptIds)
 
-                if (removedReceiptIds.isNotEmpty()) {
-                    // 삭제된 영수증들을 영수증map에서 삭제
-                    val modifiedMap = receiptMap.value!!
-                    modifiedMap.removeAll(removedReceiptIds)
+                // 삭제된 영수증들을 영수증map에서 삭제
+                modifiedMap.removeAll(removedReceiptIds)
 
+                if (removedReceiptIds.isNotEmpty()) {
                     withContext(Main) {
                         receiptMap.value = modifiedMap
                     }
+                } else if (loadedOngoingReceiptIds.isEmpty()) {
+                    withContext(Main) {
+                        receiptMap.value = modifiedMap
+                        onCompletedFirstReceiptsData.value = true
+                    }
                 }
-                if (addedReceiptIds.isNotEmpty()) {
-                    //영수증 정보 로드
-                    loadReceipts(addedReceiptIds)
+
+                //영수증 정보 로드
+                loadReceipts(addedReceiptIds)
+
+                if (receiptCount.get() == 0) {
+                    withContext(Main) {
+                        completedAllCalc.value = true
+                    }
                 }
             }
 
         }
     }
 
-    private suspend fun loadReceipts(receiptIds: Set<String>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val receiptListResult = async { receiptRepository.getReceipts(calcRoomId, receiptIds.toList()) }
-            val receiptList = receiptListResult.await()
+    private fun loadReceipts(receiptIds: Set<String>) {
+        for (receiptId in receiptIds) {
+            val listenerRegistration = receiptRepository.snapshotReceipt(calcRoomId, receiptId) { value, error ->
+                value?.also { document ->
+                    val newReceiptDTO = document.toObject<ReceiptDTO>()!!
+                    newReceiptDTO.id = document.id
 
-            for (receipt in receiptList) {
-                val receiptId = receipt.id
-                if (productsListenerMap.containsKey(receiptId))
-                    continue
+                    if (receiptMap.value!!.containsKey(newReceiptDTO.id)) {
+                        val lastReceiptMap = receiptMap.value!!
+                        val lastReceiptDTO = lastReceiptMap[newReceiptDTO.id]!!
 
-                val productListener = receiptRepository.snapshotProducts(calcRoomId, receiptId) { value, error ->
-                    if (value == null)
-                        return@snapshotProducts
+                        lastReceiptDTO.name = newReceiptDTO.name
+                        lastReceiptDTO.checkedParticipantIds.clear()
+                        lastReceiptDTO.checkedParticipantIds.addAll(newReceiptDTO.checkedParticipantIds)
+                        lastReceiptDTO.totalMoney = newReceiptDTO.totalMoney
+                        lastReceiptDTO.status = newReceiptDTO.status
 
-                    //영수증 항목 로드, key = receiptId, value : map   key = productId
-                    val productMap = mutableMapOf<String, ReceiptProductDTO>()
-                    val modifiedReceiptMap = receiptMap.value!!
-                    val removedProductIds = mutableSetOf<String>()
-                    var firstLoadedData = true
-
-                    for (dc in value.documentChanges) {
-                        if (dc.type == DocumentChange.Type.ADDED || dc.type == DocumentChange.Type.MODIFIED) {
-                            val productDto = dc.document.toObject<ReceiptProductDTO>()
-                            productDto.numOfPeopleSelected = productDto.participants.size
-                            productDto.id = dc.document.id
-                            productDto.payersId = receipt.payersId
-                            productDto.receiptId = receipt.id
-
-                            productMap[productDto.id] = productDto
-
-                            if (dc.type == DocumentChange.Type.MODIFIED) {
-                                firstLoadedData = false
-                            }
-                        } else {
-                            val removedProductId = dc.document.id
-                            removedProductIds.add(removedProductId)
-                        }
-
+                        receiptMap.value = lastReceiptMap
+                    } else {
+                        loadProducts(newReceiptDTO)
                     }
 
-                    if (!modifiedReceiptMap.containsKey(receiptId))
-                        modifiedReceiptMap[receipt.id] = receipt
-
-                    modifiedReceiptMap[receiptId]!!.apply {
-                        if (removedProductIds.isNotEmpty())
-                            this.productMap.removeAll(removedProductIds)
-
-                        this.productMap.putAll(productMap.toMutableMap())
+                    if (newReceiptDTO.status) {
+                        val completedPayerIds = calculationCompletedPayerIds.value!!
+                        completedPayerIds.add(newReceiptDTO.payersId)
+                        calculationCompletedPayerIds.value = completedPayerIds
                     }
 
-
-                    receiptMap.value = modifiedReceiptMap
-                    if (firstLoadedData) {
-                        //모든 영수증이 로드된 직후
-                        val myMoney = updateMyTransferMoney()
-                        mySettlementAmount.value = myMoney
+                    if (isCompletedLoadReceipts()) {
+                        onVerifiedAllParticipants.value = checkVerifiedAllParticipants()
                     }
-
-                    checkVerifiedParticipants()
-                    onCompletedCalculation.value = endCalculation()
-
-                    if (!isLoadingReceiptData())
-                        onLoadedDataStatus.value = true
                 }
-
-                productsListenerMap[receiptId]?.apply {
-                    remove()
-                }
-                productsListenerMap[receiptId] = productListener
             }
 
+            receiptsListenerMap[receiptId] = listenerRegistration
         }
     }
 
-    private fun checkVerifiedParticipants() {
+
+    private fun loadProducts(receiptDTO: ReceiptDTO) {
+        val productListener = receiptRepository.snapshotProducts(calcRoomId, receiptDTO.id) { value, error ->
+            if (value == null)
+                return@snapshotProducts
+
+            //영수증 항목 로드, key = receiptId, value : map   key = productId
+            val productMap = mutableMapOf<String, ReceiptProductDTO>()
+            val modifiedReceiptMap = receiptMap.value!!
+            val removedProductIds = mutableSetOf<String>()
+
+            for (dc in value.documentChanges) {
+                if (dc.type == DocumentChange.Type.ADDED || dc.type == DocumentChange.Type.MODIFIED) {
+                    val productDto = dc.document.toObject<ReceiptProductDTO>()
+                    productDto.numOfPeopleSelected = productDto.participants.size
+                    productDto.id = dc.document.id
+                    productDto.payersId = receiptDTO.payersId
+                    productDto.receiptId = receiptDTO.id
+
+                    productMap[productDto.id] = productDto
+                } else {
+                    val removedProductId = dc.document.id
+                    removedProductIds.add(removedProductId)
+                }
+            }
+
+            if (!modifiedReceiptMap.containsKey(receiptDTO.id))
+                modifiedReceiptMap[receiptDTO.id] = receiptDTO
+
+            modifiedReceiptMap[receiptDTO.id]!!.apply {
+                this.productMap.removeAll(removedProductIds)
+                this.productMap.putAll(productMap.toMutableMap())
+            }
+
+            receiptMap.value = modifiedReceiptMap
+            val myMoney = updateMyTransferMoney()
+            mySettlementAmount.value = myMoney
+
+            if (isCompletedLoadProducts()) {
+                onCompletedFirstReceiptsData.value = true
+                onVerifiedAllParticipants.value = checkVerifiedAllParticipants()
+            }
+        }
+        productsListenerMap[receiptDTO.id] = productListener
+    }
+
+    private fun checkVerifiedAllParticipants(): Boolean {
         val receiptMap = receiptMap.value!!
-        verifiedParticipantIds.clear()
+        val verifiedParticipants = mutableSetOf<String>()
 
         for (receipt in receiptMap.values) {
-            for (product in receipt.productMap.values) {
-                verifiedParticipantIds.addAll(product.participants.keys)
-            }
+            verifiedParticipants.addAll(receipt.checkedParticipantIds.toSet())
+            verifiedParticipantIds.value = verifiedParticipants
+
+            if (receipt.checkedParticipantIds.toSet() != calcRoomParticipantIds.toSet())
+                return false
         }
+
+        return true
     }
 
-    fun isLoadingReceiptData(): Boolean {
+    private fun isCompletedLoadReceipts(): Boolean = receiptMap.value!!.size == receiptCount.get()
+
+
+    private fun isCompletedLoadProducts(): Boolean {
+        if (receiptMap.value!!.size != receiptCount.get())
+            return false
+
         for (receipt in receiptMap.value!!.values) {
             if (receipt.productMap.isEmpty)
-                return true
+                return false
         }
-        return false
+        return receiptMap.value!!.isNotEmpty()
     }
 
-    fun endCalculation(): Boolean = verifiedParticipantIds == calcRoomParticipantIds
 
     fun loadFinalTransferData() {
         //계좌 번호 로드
         CoroutineScope(Dispatchers.IO).launch {
             val receipts = receiptMap.value!!
-            val finalTransferDataList = mutableListOf<FinalTransferDTO>()
+            val finalCalculationMap = mutableMapOf<String, FinalTransferDTO>()
 
             for (receipt in receipts.values) {
                 val payersId = receipt.payersId
-                val payersIsMe = payersId == myUid
+                if (!finalCalculationMap.containsKey(payersId))
+                    finalCalculationMap[payersId] = FinalTransferDTO(payersId, receipt.payersName, 0, 0, mutableListOf())
 
-                val bankAccountsResult = async {
-                    bankAccountsRepository.getBankAccounts(payersId)
-                }
-                val bankAccounts = bankAccountsResult.await()
+                var mySettlementAmount = finalCalculationMap[payersId]!!.transferMoney
+                var totalMoney = finalCalculationMap[payersId]!!.totalMoney
+                totalMoney += receipt.totalMoney
 
-                var mySettlementAmount = 0
                 for (product in receipt.productMap.values) {
+
                     for (participantId in product.participants.keys) {
                         if (participantId == myUid) {
                             mySettlementAmount += product.price / product.participants.size
@@ -276,14 +327,52 @@ class CalculationViewModel : ViewModel(), IProductCheckBox {
                     }
                 }
 
-                if (payersIsMe)
+                if (payersId == myUid)
                     mySettlementAmount = -mySettlementAmount
-
-                finalTransferDataList.add(FinalTransferDTO(payersId = receipt.payersId, payersName = receipt.payersName,
-                        transferMoney = mySettlementAmount, accounts = bankAccounts))
+                finalCalculationMap[payersId]!!.transferMoney = mySettlementAmount
+                finalCalculationMap[payersId]!!.totalMoney = totalMoney
             }
+
+            for (receipt in finalCalculationMap.values) {
+                val payersId = receipt.payersId
+
+                val bankAccountsResult = async {
+                    bankAccountsRepository.getBankAccounts(payersId)
+                }
+                val bankAccounts = bankAccountsResult.await()
+                finalCalculationMap[payersId]!!.accounts.addAll(bankAccounts)
+            }
+
             withContext(Main) {
-                finalTransferData.value = finalTransferDataList
+                payersIds.value = finalCalculationMap.keys.toMutableSet()
+                finalTransferData.value = finalCalculationMap.values.toMutableList()
+            }
+        }
+    }
+
+    fun myCheckStatus() = verifiedParticipantIds.value!!.contains(myUid)
+
+    fun completeCalculation() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val myReceiptIds = mutableListOf<String>()
+            for (receipt in receiptMap.value!!.values) {
+                if (receipt.payersId == myUid) {
+                    myReceiptIds.add(receipt.id)
+                }
+            }
+
+            receiptRepository.modifyReceipts(mutableMapOf("status" to true), calcRoomId, myReceiptIds.toList())
+
+            val isCompletedAllCalcResult = async {
+                calcRoomRepository.isCompletedStatus(calcRoomId)
+            }
+
+            if (isCompletedAllCalcResult.await()) {
+                calcRoomRepository.updateCalculationStatus(calcRoomId, false, receiptMap.value!!.keys.toMutableList())
+                withContext(Main){
+                    completedAllCalc.value = true
+                    // 정산이 완료되면 calcmainfragment에서 프래그먼트 전환
+                }
             }
         }
     }

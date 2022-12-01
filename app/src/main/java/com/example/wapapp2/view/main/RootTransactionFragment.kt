@@ -46,7 +46,6 @@ class RootTransactionFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myAccountViewModel.init()
     }
 
     override fun onCreateView(

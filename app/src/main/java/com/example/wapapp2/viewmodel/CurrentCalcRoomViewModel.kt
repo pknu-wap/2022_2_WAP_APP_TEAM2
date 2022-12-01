@@ -9,7 +9,6 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.model.notifications.MultipleRecipientsPushNotificationDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
@@ -133,7 +132,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
         //방 나가기
         //calcRoom문서 내 participantIds에서 내 id삭제
         exitFromRoom = true
-        FcmRepositoryImpl.unSubscribeToCalcRoom(roomId)
+        FcmRepositoryImpl.unSubscribeToTopic(roomId)
 
         CoroutineScope(Dispatchers.IO).launch {
             //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
@@ -172,7 +171,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
      * 정산방 초대 알림
      */
     private suspend fun sendNewCalcRoomFcm(calcRoomId: String, recipientTokens: MutableList<String>) {
-        FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.NewCalcRoom, recipientTokens, SendFcmCalcRoomDTO(calcRoomId))
+        FcmRepositoryImpl.sendFcmToRecipients(NotificationType.NewCalcRoom, recipientTokens, SendFcmCalcRoomDTO(calcRoomId))
     }
 
 

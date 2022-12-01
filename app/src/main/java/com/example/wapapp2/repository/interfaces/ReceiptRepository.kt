@@ -11,14 +11,17 @@ interface ReceiptRepository {
     suspend fun addProducts(receiptId: String, productsList: MutableList<ReceiptProductDTO>, calcRoomId: String): Boolean
     suspend fun getLastDocumentId(calcRoomId: String): String?
     suspend fun modifyReceipt(map: MutableMap<String, Any?>, calcRoomId: String, receiptId: String): Boolean
+    suspend fun modifyReceipts(map: MutableMap<String, Any?>, calcRoomId: String, receiptIds: List<String>)
     suspend fun removeReceipt(calcRoomId: String, receiptId: String)
     suspend fun removeProducts(calcRoomId: String, receiptId: String, removeIds: MutableList<String>): Boolean
     suspend fun modifyProducts(productMap: MutableMap<String, ReceiptProductDTO>, calcRoomId: String, receiptId: String): Boolean
     suspend fun getReceipts(calcRoomId: String): MutableList<ReceiptDTO>
     suspend fun getReceipts(calcRoomId: String, receiptIds: List<String>): MutableList<ReceiptDTO>
     fun snapshotReceipts(calcRoomId: String, eventListener: EventListener<QuerySnapshot>): ListenerRegistration
+    fun snapshotReceipt(calcRoomId: String, receiptId: String, eventListener: EventListener<DocumentSnapshot>): ListenerRegistration
     suspend fun getProducts(receiptId: String, calcRoomId: String): MutableList<ReceiptProductDTO>
     suspend fun addOngoingReceipt(receiptId: String, calcRoomId: String): Boolean
+    suspend fun updateMyIdInCheckedParticipants(add: Boolean, calcRoomId: String, receiptId: String)
 
     suspend fun updateMyIdFromProductParticipantIds(
             add: Boolean, calcRoomId: String, receiptId: String, productId: String,

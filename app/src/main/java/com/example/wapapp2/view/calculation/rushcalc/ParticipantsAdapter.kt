@@ -2,6 +2,7 @@ package com.example.wapapp2.view.calculation.rushcalc
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.collection.arrayMapOf
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.MyCheckBoxListener
 import com.example.wapapp2.databinding.ParticipantItemViewBinding
@@ -11,7 +12,7 @@ import com.example.wapapp2.viewmodel.CalculationViewModel
 class ParticipantsAdapter(private val iCheckedRecipient: ICheckedRecipient<CalcRoomParticipantDTO>) :
         RecyclerView.Adapter<ParticipantsAdapter.ViewHolder>() {
 
-    val participants = mutableListOf<CalcRoomParticipantDTO>()
+    val participants = arrayMapOf<String, CalcRoomParticipantDTO>()
 
 
     class ViewHolder(
@@ -44,7 +45,7 @@ class ParticipantsAdapter(private val iCheckedRecipient: ICheckedRecipient<CalcR
             parent.context), parent, false), iCheckedRecipient)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(participants[position])
+        holder.bind(participants.valueAt(position))
     }
 
     override fun getItemCount(): Int = participants.size

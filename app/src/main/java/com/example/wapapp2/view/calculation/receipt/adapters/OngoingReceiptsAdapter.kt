@@ -1,5 +1,6 @@
 package com.example.wapapp2.view.calculation.receipt.adapters
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -23,11 +24,29 @@ class OngoingReceiptsAdapter(
 ) : RecyclerView.Adapter<OngoingReceiptsAdapter.ReceiptVM>() {
     val receiptMap = arrayMapOf<String, ReceiptDTO>()
 
+    init {
+        lockCheckBox = false
+    }
+
     companion object {
         var PARTICIPANT_COUNT = 0
         lateinit var MY_UID: String
+        var lockCheckBox = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun lockCheckBox(refresh: Boolean) {
+        lockCheckBox = true
+        if (refresh)
+            notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun unlockCheckBox(refresh: Boolean) {
+        lockCheckBox = false
+        if (refresh)
+            notifyDataSetChanged()
+    }
 
     class ReceiptVM(
             private val binding: ViewReceiptItemBinding,
@@ -35,10 +54,6 @@ class OngoingReceiptsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         private var productsAdapter: ProductsAdapter? = null
         private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd E a hh:mm", Locale.getDefault())
-
-        init {
-            binding.recentCalcItem.addItemDecoration(DividerItemDecoration(binding.root.context, DividerItemDecoration.VERTICAL))
-        }
 
         fun bind(receipt: ReceiptDTO) {
             val description = "${receipt.name} - ${receipt.payersName}"
@@ -102,6 +117,7 @@ class OngoingReceiptsAdapter(
 
                 showNumOfPeopleSelected(product)
                 binding.recentCalcCkbox.addOnCheckedStateChangedListener(delayCheckBoxListener!!)
+                binding.recentCalcCkbox.isClickable = !lockCheckBox
             }
 
             private fun calcMoney(product: ReceiptProductDTO): Int = if (product.numOfPeopleSelected == 0) 0

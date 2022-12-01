@@ -59,6 +59,8 @@ class LoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireActivity().viewModelStore.clear()
+
         auth = FirebaseAuth.getInstance()
     }
 
@@ -85,6 +87,7 @@ class LoginFragment : Fragment() {
 
     fun moveMainPage(user: FirebaseUser?) {
         if (user != null) {
+            myAccountViewModel.onSignIn()
             val rootTransactionFragment = RootTransactionFragment()
 
             parentFragmentManager

@@ -1,5 +1,6 @@
 package com.example.wapapp2.viewmodel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
@@ -15,15 +16,15 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 
 class ChatViewModel : ViewModel() {
     lateinit var roomId: String
     private val chatRepository: ChatRepository = ChatRepositorylmpl.getINSTANCE()
-    private var listenerRegistration: ListenerRegistration? = null
+    var listenerRegistration: ListenerRegistration? = null
+
+    val isEmptyChats = MutableLiveData<Boolean>()
 
     override fun onCleared() {
         super.onCleared()
@@ -51,11 +52,13 @@ class ChatViewModel : ViewModel() {
     }
 
     fun addSnapshot(roomId: String, listener: EventListener<QuerySnapshot>) {
+        listenerRegistration?.remove()
         listenerRegistration = Firebase.firestore
                 .collection(FireStoreNames.calc_rooms.name)
                 .document(roomId)
                 .collection(FireStoreNames.chats.name)
                 .orderBy("sendedTime", Query.Direction.DESCENDING)
+                .limit(20)
                 .addSnapshotListener(listener)
     }
 
@@ -68,6 +71,19 @@ class ChatViewModel : ViewModel() {
             val calcRoomId = calcRoomDTO.id!!
             val sendFcmChatDTO = SendFcmChatDTO(chatDTO, calcRoomDTO.name, calcRoomId)
             FcmRepositoryImpl.sendFcmToTopic(NotificationType.Chat, calcRoomId, sendFcmChatDTO)
+        }
+    }
+
+    fun isEmptyChatList() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val isEmpty = async {
+                chatRepository.isEmptyChatList(roomId)
+            }
+            isEmpty.await()
+
+            withContext(Main) {
+                isEmptyChats.value = isEmpty.await()
+            }
         }
     }
 

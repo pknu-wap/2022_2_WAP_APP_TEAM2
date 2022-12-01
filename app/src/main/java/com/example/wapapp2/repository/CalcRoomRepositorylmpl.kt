@@ -1,6 +1,5 @@
 package com.example.wapapp2.repository
 
-import android.provider.SyncStateContract.Helpers.update
 import com.example.wapapp2.firebase.FireStoreNames
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.FriendDTO
@@ -9,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.*
-import java.lang.reflect.Field
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -67,9 +65,20 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                 }
     }
 
-    override suspend fun updateCalculationStatus(calcRoomId: String, status: Boolean) = suspendCoroutine<Boolean> { continuation ->
+    override suspend fun updateCalculationStatus(
+            calcRoomId: String, status: Boolean,
+            receiptIds: MutableList<String>,
+    ) = suspendCoroutine<Boolean> { continuation ->
+        val map = mutableMapOf<String, Any>()
+        map["calculationStatus"] = status
+
+        if (!status) {
+            map["ongoingReceiptIds"] = mutableListOf<String>()
+            map["endReceiptIds"] = receiptIds
+        }
+
         val document = firestore.collection(FireStoreNames.calc_rooms.name)
-                .document(calcRoomId).update("calculationStatus", status)
+                .document(calcRoomId).update(map)
                 .addOnCompleteListener {
                     continuation.resume(it.isSuccessful)
                 }
@@ -167,5 +176,16 @@ class CalcRoomRepositorylmpl private constructor() : CalcRoomRepository {
                         else continuation.resume(false)
                     }
         }
+    }
+
+    override suspend fun isCompletedStatus(calcRoomId: String) = suspendCoroutine<Boolean> { continuation ->
+        firestore.collection(FireStoreNames.calc_rooms.name)
+                .document(calcRoomId).collection(FireStoreNames.receipts.name).whereEqualTo("status", false)
+                .limit(1).get().addOnCompleteListener {
+                    if (it.isSuccessful)
+                        continuation.resume(it.result.isEmpty)
+                    else
+                        continuation.resumeWithException(it.exception!!)
+                }
     }
 }
