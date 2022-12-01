@@ -115,7 +115,7 @@ class FriendProfileFragment : DialogFragment() {
         userViewModel.getUser(friendAliasViewModel.friendDTO!!.friendUserId)
 
         if (dstUserDTO.imgUri.isEmpty().not()) {
-            Glide.with(binding.root).load(dstUserDTO.imgUri).centerCrop().into(binding.profile)
+            Glide.with(binding.root).load(dstUserDTO.imgUri).circleCrop().into(binding.profile)
         }
     }
 
