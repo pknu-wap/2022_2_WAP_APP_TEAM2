@@ -94,7 +94,10 @@ class BankTransferDialogFragment : DialogFragment() {
         }
 
         binding.bankName.text = bankTransferViewModel.selectedBankAccount!!.bankDTO!!.bankName
-        binding.bankAccountNumber.text = bankTransferViewModel.selectedBankAccount!!.accountNumber
+        binding.icon.setImageResource(bankTransferViewModel.selectedBankAccount!!.bankDTO!!.iconId)
+        val account =
+                "${bankTransferViewModel.selectedBankAccount!!.accountNumber} ${bankTransferViewModel.selectedBankAccount!!.accountHolder}"
+        binding.bankAccountNumber.text = account
         bankTransferViewModel.loadInstalledBankApps(requireContext())
     }
 
