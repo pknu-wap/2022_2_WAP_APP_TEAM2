@@ -40,7 +40,7 @@ class ReceiptsAdapter(
 
         fun bind(receiptDTO: ReceiptDTO) {
             binding.receiptDate.text = simpleDateFormat.format(receiptDTO.createdTime!!)
-            binding.receiptTitle.text = receiptDTO.name
+            binding.receiptTitle.text = receiptDTO.name.ifEmpty { "제목 없음" }
             binding.totalMoney.text = DataTypeConverter.toKRW(receiptDTO.totalMoney)
 
             if (receiptDTO.imgUrl.isNullOrEmpty()) {
