@@ -139,14 +139,16 @@ class ReceiptInfoFragment : Fragment() {
                 }
             }
 
-            var amountText = ""
-            if (payersIsMe) {
-                amountText = "받은 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+            if (mySettlementAmount == 0) {
+                binding.mySettlementAmount.text = getString(R.string.not_settled_yet)
             } else {
-                amountText = "보낸 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+                val amountText = if (payersIsMe) {
+                    "받은 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+                } else {
+                    "보낸 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+                }
+                binding.mySettlementAmount.text = amountText
             }
-
-            binding.mySettlementAmount.text = amountText
         }
         receiptViewModel.getProducts(receiptViewModel.currentReceiptId!!, receiptViewModel.currentRoomId!!)
     }

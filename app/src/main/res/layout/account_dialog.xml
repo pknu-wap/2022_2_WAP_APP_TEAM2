@@ -22,7 +22,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:src="@drawable/common_google_signin_btn_icon_dark_focused" />
+            android:src="@drawable/common_google_signin_btn_icon_dark_focused"
+            />
 
         <TextView
             android:id="@+id/bank_name"
@@ -31,18 +32,18 @@
             android:layout_alignTop="@id/icon"
             android:layout_toRightOf="@id/icon"
             android:text="토스뱅크"
-            android:textSize="16sp"
+            android:textSize="17sp"
             />
 
         <TextView
             android:id="@+id/bank_account_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_alignBottom="@id/icon"
+            android:layout_marginTop="4dp"
             android:layout_toRightOf="@id/icon"
             android:text="123455677777"
-            android:textSize="15sp"
+            android:textSize="16sp"
             />
 
     </RelativeLayout>
