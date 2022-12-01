@@ -35,10 +35,7 @@
             android:id="@+id/go_to_today_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:background="?attr/selectableItemBackground"
             android:text="@string/go_to_today"
-            android:textColor="@color/white"
             />
 
         <Button
@@ -46,9 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:background="?attr/selectableItemBackground"
+            android:backgroundTint="@color/design_default_color_secondary"
             android:text="@string/go_to_first_selected_day"
-            android:textColor="@color/white"
             />
 
     </LinearLayout>

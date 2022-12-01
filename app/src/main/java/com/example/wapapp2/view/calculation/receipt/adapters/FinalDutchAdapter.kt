@@ -20,25 +20,25 @@ import com.example.wapapp2.model.FinalTransferDTO
 class FinalDutchAdapter(
         private val accountOnClickListener: ListOnClickListener<BankAccountDTO>,
         private val requestCalcOnClickListener: ItemOnClickListener<FinalTransferDTO>,
+        private val myUid: String,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val items = mutableListOf<FinalTransferDTO>()
 
     class FixedPayVH(
             private val binding: ViewDutchItemBinding, private val accountOnClickListener: ListOnClickListener<BankAccountDTO>,
             private val requestCalcOnClickListener: ItemOnClickListener<FinalTransferDTO>,
+            private val myUid: String,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: FinalTransferDTO) {
             binding.payersName.text = item.payersName
-            binding.money.text = if (item.transferMoney >= 0) DataTypeConverter.toKRW(item.transferMoney)
+            binding.money.text = if (item.payersId != myUid) DataTypeConverter.toKRW(item.transferMoney)
             else DataTypeConverter.toKRW(item.totalMoney + item.transferMoney)
 
-            binding.type.text = if (item.transferMoney >= 0) binding.root.context.getString(R.string.money_to_give)
+            binding.type.text = if (item.payersId != myUid) binding.root.context.getString(R.string.money_to_give)
             else binding.root.context.getString(R.string.money_to_be_received)
 
-
-
-            if (item.transferMoney >= 0) {
+            if (item.payersId != myUid) {
                 binding.accounts.adapter =
                         AccountsAdapter(item, item.accounts.toList(), accountOnClickListener, requestCalcOnClickListener)
             } else {
@@ -51,7 +51,7 @@ class FinalDutchAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             FixedPayVH(ViewDutchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false), accountOnClickListener,
-                    requestCalcOnClickListener)
+                    requestCalcOnClickListener, myUid)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as FixedPayVH).bind(items[position])

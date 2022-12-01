@@ -16,6 +16,12 @@
         <item>com.wooricard.smartapp</item>  <!--우리 WON 카드-->
         <item>com.hyundaicard.appcard</item>  <!--현대 앱카드-->
         <item>kr.co.citibank.citimobile</item>  <!--씨티카드-->
+        <item>com.kakaobank.channel</item>
+        <item>com.shinhan.sbanking</item>
+        <item>com.wooribank.smart.npib</item>
+        <item>nh.smart.nhcok</item>
+        <item>nh.smart.allonebank</item>
+        <item>com.kbankwith.smartbank</item>
 
         <!--간편결제-->
         <item>com.samsung.android.spay</item>  <!--삼성페이(삼성, 농협, KB)-->
