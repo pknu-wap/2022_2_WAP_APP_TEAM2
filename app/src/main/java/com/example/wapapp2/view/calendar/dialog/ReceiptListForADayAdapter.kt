@@ -15,7 +15,7 @@ class ReceiptListForADayAdapter(private val list: ArrayList<ReceiptDTO>, val rec
     inner class ViewHolder(private val binding: DialogCalculationItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             val dstReceipt = list[position]
-            binding.receiptName.text = dstReceipt.name
+            binding.receiptName.text = dstReceipt.name.ifEmpty { "제목 없음" }
             binding.payer.text = dstReceipt.payersName
             binding.time.text = DateTime.parse(dstReceipt.date.toString()).toString("aa hh:mm")
             binding.totalMoney.text = DataTypeConverter.toKRW(dstReceipt.totalMoney)

@@ -7,10 +7,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
-import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.commons.view.RecyclerViewItemDecoration
@@ -18,13 +15,10 @@ import com.example.wapapp2.databinding.GroupFragmentBinding
 import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.view.calculation.calcroom.NewCalcRoomFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.GroupAdapter
-import com.example.wapapp2.view.calculation.receipt.NewReceiptFragment
 import com.example.wapapp2.view.main.MainHostFragment
-import com.example.wapapp2.viewmodel.MyCalendarViewModel
 import com.example.wapapp2.viewmodel.FriendsViewModel
-import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.wapapp2.viewmodel.MyCalendarViewModel
 
 
 class GrouplistFragment : Fragment() {
@@ -111,8 +105,12 @@ class GrouplistFragment : Fragment() {
             }
             myCalendarViewModel.loadCalendarReceipts(it)
         }
-        myCalcRoomViewModel.loadMyCalcRoomIds()
         binding.addBtn.setOnClickListener(addOnClickedItemListener)
+        myCalcRoomViewModel.loadMyCalcRoomIds()
+
+        if (friendsViewModel.friendsMap.value!!.isEmpty()) {
+            friendsViewModel.loadMyFriends()
+        }
     }
 
     override fun onStart() {

@@ -128,7 +128,7 @@ class FriendsFragment : Fragment() {
         friendsViewModel.myFriendsMapUpdatedLiveData.observe(viewLifecycleOwner) {
             myFriendsAdapter?.stopListening()
             myFriendsAdapter = MyFriendsAdapter(friendOnClickListener,
-                    friendsViewModel.getMyFriendsOptions_new(), FriendsViewModel.MY_FRIEND_MAP.toMap())
+                    friendsViewModel.getMyFriendsOptions_new(), friendsViewModel.friendsMap.value!!.toMap())
             dataObserver = ListAdapterDataObserver(binding.myFriendsList, binding.myFriendsList.layoutManager as
                     LinearLayoutManager, myFriendsAdapter!!)
             dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_my_friends))

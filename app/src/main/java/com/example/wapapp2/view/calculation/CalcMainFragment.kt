@@ -29,6 +29,7 @@ import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.view.receipt.SideNavReceiptsFragment
 import com.example.wapapp2.viewmodel.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.checkerframework.checker.units.qual.s
 
 
 class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerListener {
@@ -44,6 +45,7 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
     private val chatViewModel by viewModels<ChatViewModel>()
     private val calculationViewModel by viewModels<CalculationViewModel>()
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     private var chatInputLayoutHeight = 0
 
@@ -53,15 +55,9 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
         arguments?.apply {
             roomId = getString("roomId")!!
-            currentCalcRoomViewModel.loadCalcRoomData(roomId!!)
             calculationViewModel.calcRoomId = roomId!!
         }
 
-        calculationViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
-        calculationViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
-        calculationViewModel.calcRoomId = currentCalcRoomViewModel.roomId!!
-
-        currentCalcRoomViewModel.myFriendMap.putAll(FriendsViewModel.MY_FRIEND_MAP.toMutableMap())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,7 +71,24 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSideMenu()
+
+        myAccountViewModel.myProfileData.observe(viewLifecycleOwner) { myProfile ->
+            calculationViewModel.myUserName = myProfile.name
+            calculationViewModel.myUid = myProfile.id
+            //내 친구 목록 데이터가 동기화되어있지 않으면 로드
+            if (friendsViewModel.friendsMap.value == null)
+                friendsViewModel.loadMyFriends()
+        }
+
+        friendsViewModel.friendsMap.observe(viewLifecycleOwner) {
+            currentCalcRoomViewModel.myFriendMap.putAll(it.toMutableMap())
+            //영수증 데이터 로드
+            init()
+        }
+
+        if (myAccountViewModel.myProfileData.value == null) {
+            myAccountViewModel.init()
+        }
 
         calculationViewModel.mySettlementAmount.observe(viewLifecycleOwner) { transferMoney ->
             updateMySettlementAmount(transferMoney)
@@ -94,7 +107,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
             calculationViewModel.loadOngoingReceiptIds()
         }
 
-
         calculationViewModel.receiptMap.observe(viewLifecycleOwner) {
             if (it.isEmpty) {
                 binding.calculationSimpleInfo.title.text = getString(R.string.empty_ongoing_receipts)
@@ -104,18 +116,6 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
                 binding.calculationSimpleInfo.summary.visibility = View.VISIBLE
             }
         }
-
-        val chatFragment = ChatFragment()
-        chatFragment.setViewHeightCallback { height ->
-            // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
-            chatInputLayoutHeight = height + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
-                    resources.displayMetrics).toInt()
-        }
-
-        childFragmentManager.beginTransaction()
-                .replace(binding.chat.id, chatFragment, ChatFragment.TAG).commit()
-
-        setOngoingFolderView()
 
         binding.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
@@ -150,6 +150,24 @@ class CalcMainFragment : Fragment(), ParticipantsInCalcRoomFragment.OnNavDrawerL
         super.onSaveInstanceState(outState)
         outState.putString("roomId", roomId)
     }
+
+    private fun init() {
+        currentCalcRoomViewModel.loadCalcRoomData(calculationViewModel.calcRoomId)
+
+        val chatFragment = ChatFragment()
+        chatFragment.setViewHeightCallback { height ->
+            // 최근 정산 카드뷰를 펼쳤을때 폴더블 뷰의 하단 마진을 채팅 입력 레이아웃 높이로 변경
+            chatInputLayoutHeight = height + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
+                    resources.displayMetrics).toInt()
+        }
+
+        childFragmentManager.beginTransaction()
+                .replace(binding.chat.id, chatFragment, ChatFragment.TAG).commit()
+
+        setOngoingFolderView()
+        setSideMenu()
+    }
+
 
     private fun updateMySettlementAmount(transferMoney: Int) {
         if (transferMoney >= 0) {

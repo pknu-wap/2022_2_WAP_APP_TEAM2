@@ -18,14 +18,20 @@ class BankListAdapter(
     private val unselectedBackgroundTint = ColorStateList.valueOf(Color.WHITE)
     private val selectedBackgroundTint = ColorStateList.valueOf(Color.LTGRAY)
 
+    init {
+        selectedBankId?.apply {
+            selectedPosition = toInt()
+        }
+    }
+
     inner class ViewHolder(private val viewBinding: BankItemViewBinding) : RecyclerView.ViewHolder(viewBinding.root) {
         fun bind() {
             val position = bindingAdapterPosition
 
             if (selectedBankId != null && selectedBankId == bankList[position].uid) {
-                viewBinding.root.backgroundTintList = selectedBackgroundTint
+                viewBinding.root.setBackgroundColor(Color.LTGRAY)
             } else {
-                viewBinding.root.backgroundTintList = unselectedBackgroundTint
+                viewBinding.root.setBackgroundColor(Color.WHITE)
             }
 
             viewBinding.icon.setImageResource(bankList[position].iconId)
@@ -33,7 +39,7 @@ class BankListAdapter(
 
             viewBinding.root.setOnClickListener {
                 selectedBankId?.apply { notifyItemChanged(selectedPosition) }
-                viewBinding.root.backgroundTintList = selectedBackgroundTint
+                viewBinding.root.setBackgroundColor(Color.LTGRAY)
 
                 selectedBankId = bankList[position].uid
                 selectedPosition = position

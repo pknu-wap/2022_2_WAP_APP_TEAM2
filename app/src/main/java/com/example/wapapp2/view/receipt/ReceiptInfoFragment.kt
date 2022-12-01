@@ -20,6 +20,7 @@ import com.example.wapapp2.model.ReceiptProductDTO
 import com.example.wapapp2.model.ReceiptProductParticipantDTO
 import com.example.wapapp2.view.editreceipt.ReceiptImgFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
+import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.ReceiptViewModel
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -33,6 +34,7 @@ class ReceiptInfoFragment : Fragment() {
     private val simpleDateFormat = SimpleDateFormat("yyyy/MM/dd E a hh:mm", Locale.getDefault())
     private val receiptViewModel by viewModels<ReceiptViewModel>()
     private val friendsViewModel by activityViewModels<FriendsViewModel>()
+    private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
 
     companion object {
         const val TAG = "ReceiptInfoFragment"
@@ -93,11 +95,12 @@ class ReceiptInfoFragment : Fragment() {
 
         receiptViewModel.currentReceiptDTO!!.apply {
             binding.totalMoney.text = DataTypeConverter.toKRW(totalMoney)
-            binding.title.text = name
+
+            binding.title.text = name.ifEmpty { "제목 없음" }
             binding.createdDateTime.text = simpleDateFormat.format(createdTime!!)
 
             //결제자가 내 친구 이면 별명으로 교체
-            binding.payer.text = FriendsViewModel.MY_FRIEND_MAP[payersId]?.alias ?: payersName
+            binding.payer.text = friendsViewModel.friendsMap.value!![payersId]?.alias ?: payersName
 
 
             if (imgUrl.isNullOrEmpty())
@@ -121,6 +124,29 @@ class ReceiptInfoFragment : Fragment() {
             adapter.modelList.addAll(it)
             adapter.notifyDataSetChanged()
             LoadingDialogView.clearDialogs()
+
+            //내 정산 금액 계산
+            var mySettlementAmount = 0
+            val myUid = myAccountViewModel.myProfileData.value!!.id
+            val payersIsMe = receiptViewModel.currentReceiptDTO!!.payersId == myUid
+
+            for (product in it) {
+                for (participantId in product.participants.keys) {
+                    if (participantId == myUid) {
+                        mySettlementAmount += product.price / product.participants.size
+                        break
+                    }
+                }
+            }
+
+            var amountText = ""
+            if (payersIsMe) {
+                amountText = "받은 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+            } else {
+                amountText = "보낸 금액 : ${DataTypeConverter.toKRW(mySettlementAmount)}"
+            }
+
+            binding.mySettlementAmount.text = amountText
         }
         receiptViewModel.getProducts(receiptViewModel.currentReceiptId!!, receiptViewModel.currentRoomId!!)
     }
