@@ -59,7 +59,7 @@ class FinalDutchFragment : Fragment() {
     }
 
 
-    private val finalDutchAdapter = FinalDutchAdapter(accountOnClickListener, requestCalcOnClickListener)
+    private lateinit var finalDutchAdapter: FinalDutchAdapter
 
     companion object {
         const val TAG = "FinalDutchFragment"
@@ -71,6 +71,8 @@ class FinalDutchFragment : Fragment() {
         rushCalcRoomViewModel.myUserName = myAccountViewModel.myProfileData.value!!.name
         rushCalcRoomViewModel.myUid = myAccountViewModel.myProfileData.value!!.id
         rushCalcRoomViewModel.calcRoomId = currentCalcRoomViewModel.roomId!!
+        finalDutchAdapter = FinalDutchAdapter(accountOnClickListener, requestCalcOnClickListener,
+                myAccountViewModel.myProfileData.value!!.id)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
