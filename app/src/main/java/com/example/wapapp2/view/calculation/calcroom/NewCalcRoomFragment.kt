@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
+import com.example.wapapp2.commons.classes.DelayTextWatcher
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
 import com.example.wapapp2.databinding.FragmentNewCalcRoomBinding
 import com.example.wapapp2.model.CalcRoomDTO
@@ -25,6 +26,7 @@ import com.example.wapapp2.view.main.MainHostFragment
 import com.example.wapapp2.viewmodel.FriendsViewModel
 import com.example.wapapp2.viewmodel.MyAccountViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
+import org.checkerframework.checker.units.qual.s
 
 
 class NewCalcRoomFragment : Fragment() {
@@ -36,7 +38,7 @@ class NewCalcRoomFragment : Fragment() {
 
     private val myAccountViewModel by activityViewModels<MyAccountViewModel>()
     private val myCalcRoomViewModel by activityViewModels<MyCalcRoomViewModel>()
-    private val friendsViewModel by viewModels<FriendsViewModel>()
+    private val friendsViewModel by activityViewModels<FriendsViewModel>()
 
     private val onCheckedFriendListener: OnCheckedFriendListener =
             OnCheckedFriendListener { isChecked, friendDTO -> friendsViewModel.checkedFriend(friendDTO, isChecked) }
@@ -64,31 +66,31 @@ class NewCalcRoomFragment : Fragment() {
             adapter = searchFriendsListAdapter
 
             listAdapterDataObserver = ListAdapterDataObserver(
-                this,
-                this.layoutManager as LinearLayoutManager,
-                this.adapter!!::getItemCount)
+                    this,
+                    this.layoutManager as LinearLayoutManager,
+                    this.adapter!!::getItemCount)
             listAdapterDataObserver!!.registerLoadingView(binding.inviteFriendsLayout.loadingView, getString(R.string.empty_friends_list))
             searchFriendsListAdapter!!.registerAdapterDataObserver(listAdapterDataObserver!!)
         }
 
         // 정산방 등록
         binding.inviteFriendsLayout.saveBtn.setOnClickListener {
-            if (myAccountViewModel.myProfileData == null){
-                Toast.makeText(context, "네트워크 연결을 확인하세요",Toast.LENGTH_SHORT).show()
+            if (myAccountViewModel.myProfileData == null) {
+                Toast.makeText(context, "네트워크 연결을 확인하세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (binding.roomNameEdit.text!!.isEmpty()){
+            if (binding.roomNameEdit.text!!.isEmpty()) {
                 Toast.makeText(context, "채팅방 제목을 입력해주세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (checkedFriendsListAdapter.itemCount <= 0){
+            if (checkedFriendsListAdapter.itemCount <= 0) {
                 Toast.makeText(context, "친구를 초대해주세요", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val newCalcRoomDTO : CalcRoomDTO = CalcRoomDTO()
+            val newCalcRoomDTO: CalcRoomDTO = CalcRoomDTO()
             newCalcRoomDTO.name = binding.roomNameEdit.text.toString()
             newCalcRoomDTO.creatorUserId = myAccountViewModel.myProfileData!!.value!!.id
             newCalcRoomDTO.participantIds = checkedFriendsListAdapter.getParticipantIDs(newCalcRoomDTO.creatorUserId)
@@ -106,9 +108,9 @@ class NewCalcRoomFragment : Fragment() {
 
                 fragmentManager.popBackStack()
                 fragmentManager.beginTransaction()
-                    .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
-                    .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
-                    .addToBackStack(CalcMainFragment.TAG).commitAllowingStateLoss()
+                        .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)
+                        .add(R.id.fragment_container_view, fragment, CalcMainFragment.TAG)
+                        .addToBackStack(CalcMainFragment.TAG).commitAllowingStateLoss()
 
             }
         }
@@ -132,17 +134,9 @@ class NewCalcRoomFragment : Fragment() {
             searchFriendsListAdapter.setList(it)
         }
 
-        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                s?.apply { friendsViewModel.findFriend(toString()) }
+        binding.inviteFriendsLayout.searchBar.addTextChangedListener(object : DelayTextWatcher() {
+            override fun onFinalText(text: String) {
+                friendsViewModel.findFriend(text)
             }
         })
         friendsViewModel.findFriend("")

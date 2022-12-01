@@ -28,14 +28,11 @@ class FriendsViewModel : ViewModel() {
     val searchResultFriendsLiveData = MutableLiveData<MutableList<FriendDTO>>()
     val participantsInCalcRoom = mutableListOf<CalcRoomParticipantDTO>()
 
+    val friendsMap = MutableLiveData(mutableMapOf<String, FriendDTO>())
+
     val myFriendsMapUpdatedLiveData = MutableLiveData<Boolean>(true)
 
     private var friendsListener: ListenerRegistration? = null
-
-    /** ID : friendDTO **/
-    companion object {
-        val MY_FRIEND_MAP = mutableMapOf<String, FriendDTO>()
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -70,7 +67,7 @@ class FriendsViewModel : ViewModel() {
 
     fun findFriend(word: String) {
         viewModelScope.launch {
-            val friends = MY_FRIEND_MAP.values.toMutableList()
+            val friends = friendsMap.value!!.values.toMutableList()
             val result = mutableListOf<FriendDTO>()
 
             if (word.isEmpty()) {
@@ -97,10 +94,16 @@ class FriendsViewModel : ViewModel() {
                         FriendDTO(userDTO.id, userDTO.name, userDTO.email)
                 )
             }
+            result.await()
+            friendsLocalRepository.insert(FriendDTO(userDTO.id, userDTO.name, userDTO.email))
+
             withContext(Main) {
-                result.await()?.apply {
-                    if (this)
-                        MY_FRIEND_MAP[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
+                result.await().apply {
+                    val friends = friendsMap.value!!
+                    if (this) {
+                        friends[userDTO.id] = FriendDTO(userDTO.id, userDTO.name, userDTO.email)
+                        friendsMap.value = friends
+                    }
                     myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
                 }
             }
@@ -110,8 +113,12 @@ class FriendsViewModel : ViewModel() {
     fun removeMyFriend(friendId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             //myFriendsIdSet에서 삭제
-            MY_FRIEND_MAP.remove(friendId)
-            myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
+            val friends = friendsMap.value!!
+            friends.remove(friendId)
+            withContext(Main) {
+                myFriendsMapUpdatedLiveData.value = myFriendsMapUpdatedLiveData.value!!.not()
+                friendsMap.value = friends
+            }
             val result = async {
                 friendsRepositoryImpl.removeMyFriend(friendId)
             }
@@ -123,8 +130,8 @@ class FriendsViewModel : ViewModel() {
     fun getMyFriendsOptions_new(): FirestoreRecyclerOptions<UserDTO> {
         val query =
                 fireStore.collection(FireStoreNames.users.name)
-                        .whereIn(FieldPath.documentId(), if (MY_FRIEND_MAP.isEmpty())
-                            mutableListOf("1") else MY_FRIEND_MAP.keys.toMutableList())
+                        .whereIn(FieldPath.documentId(), if (friendsMap.value!!.isEmpty())
+                            mutableListOf("1") else friendsMap.value!!.keys.toMutableList())
 
         //snapshot listener 달아줘야함 별명 거기다가 snapshot -> ob
         val option = FirestoreRecyclerOptions.Builder<UserDTO>()
@@ -147,7 +154,9 @@ class FriendsViewModel : ViewModel() {
         val option = FirestoreRecyclerOptions.Builder<FriendDTO>()
                 .setQuery(query, MetadataChanges.INCLUDE) {
                     val dto = it.toObject<FriendDTO>()!!
-                    MY_FRIEND_MAP[dto.friendUserId] = dto
+                    val friends = friendsMap.value!!
+                    friends[dto.friendUserId] = dto
+                    friendsMap.value = friends
                     dto
                 }
                 .build()
@@ -175,8 +184,12 @@ class FriendsViewModel : ViewModel() {
                     //로컬에 있으면 서버에서 가져오지 않음
                     val list = friendsLocalRepository.getAll()
                     list.collect { friends ->
+                        val map = friendsMap.value!!
                         for (friend in friends) {
-                            MY_FRIEND_MAP[friend.friendUserId] = friend
+                            map[friend.friendUserId] = friend
+                        }
+                        withContext(Main) {
+                            friendsMap.value = map
                         }
                     }
                 } else {
@@ -184,10 +197,15 @@ class FriendsViewModel : ViewModel() {
                     val myFriends = async {
                         friendsRepositoryImpl.loadMyFriends()
                     }
+                    val map = friendsMap.value!!
 
                     for (friend in myFriends.await()) {
-                        MY_FRIEND_MAP[friend.friendUserId] = friend
+                        map[friend.friendUserId] = friend
                         friendsLocalRepository.insert(FriendDTO(friend.friendUserId, friend.alias, friend.email))
+                    }
+
+                    withContext(Main) {
+                        friendsMap.value = map
                     }
                 }
             }

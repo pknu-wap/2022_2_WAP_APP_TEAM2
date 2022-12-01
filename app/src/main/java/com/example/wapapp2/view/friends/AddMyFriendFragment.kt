@@ -47,7 +47,7 @@ class AddMyFriendFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userViewModel.myFriendsIdSet.addAll(FriendsViewModel.MY_FRIEND_MAP.keys)
+        userViewModel.myFriendsIdSet.addAll(friendsViewModel.friendsMap.value!!.keys)
     }
 
     override fun onCreateView(
