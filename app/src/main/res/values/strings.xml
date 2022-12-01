@@ -144,5 +144,6 @@
     <string name="impossible_to_invite_friends_because_of_calculation">정산이 완료되지 않아 친구 초대가 불가합니다!</string>
     <string name="complete_calculation">정산 확정</string>
     <string name="msg_complete_calculation">정산을 완료하시겠습니까?</string>
+    <string name="not_settled_yet">아직 정산되지 않았습니다</string>
 
 </resources>
