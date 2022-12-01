@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
@@ -17,11 +18,7 @@ import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -35,8 +32,6 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     var auth: FirebaseAuth? = null
-    var googleSignInClient: GoogleSignInClient? = null
-    val GOOGLE_LOGIN_CODE = 9001
 
 
     companion object {
@@ -65,13 +60,6 @@ class LoginFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()
-
-        var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(requireContext(), gso)
     }
 
     fun emailLogin() {
@@ -119,7 +107,14 @@ class LoginFragment : Fragment() {
     }
 
     fun moveEditPassword() {
+        val editPasswordFragment = EditPasswordFragment()
 
+        parentFragmentManager
+            .beginTransaction()
+            .hide(this@LoginFragment)
+            .add(R.id.fragment_container_view, editPasswordFragment, tag)
+            .addToBackStack(tag)
+            .commitAllowingStateLoss()
     }
 
     fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
@@ -132,23 +127,6 @@ class LoginFragment : Fragment() {
             }
     }
 
-    fun googleLogin() {
-        var signInIntent = googleSignInClient?.signInIntent
-        startActivityForResult(signInIntent, GOOGLE_LOGIN_CODE)
-    }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == GOOGLE_LOGIN_CODE && resultCode == Activity.RESULT_OK) {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if (result!!.isSuccess) {
-                val account = result!!.signInAccount
-                firebaseAuthWithGoogle(account!!)
-            }
-        }
-    }
-
-
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -158,8 +136,7 @@ class LoginFragment : Fragment() {
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
-        binding.btnGoogleLogin.setOnClickListener { googleLogin() }
-        binding.btnEditPassword.setOnClickListener {  }
+        binding.btnEditPassword.setOnClickListener { moveEditPassword() }
 
         return binding.root
     }
