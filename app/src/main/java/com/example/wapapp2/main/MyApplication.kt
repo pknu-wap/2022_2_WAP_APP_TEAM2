@@ -7,6 +7,11 @@ import com.example.wapapp2.R
 import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.model.BankDTO
 import com.example.wapapp2.repository.*
+
+import com.example.wapapp2.repository.interfaces.BankAccountRepository
+
+import com.example.wapapp2.repository.interfaces.UserImgRepository
+
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -24,7 +29,7 @@ class MyApplication : Application() {
         FirebaseApp.initializeApp(applicationContext)
 
         val settings = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
+                .setPersistenceEnabled(false)
                 .build()
         FirebaseFirestore.getInstance().firestoreSettings = settings
         JodaTimeAndroid.init(applicationContext)
@@ -38,8 +43,10 @@ class MyApplication : Application() {
         FriendsRepositoryImpl.initialize()
         ChatRepositorylmpl.initialize()
         UserRepositoryImpl.initialize()
+        UserImgRepositoryImpl.initialize()
         MyBankAccountRepositoryImpl.initialize()
         CalcRoomRepositorylmpl.initialize()
+        BankAccountRepositoryImpl.initialize()
     }
 
     private fun initBanks() {

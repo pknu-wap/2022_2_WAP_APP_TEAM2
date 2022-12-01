@@ -1,46 +1,55 @@
 package com.example.wapapp2.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.repository.CalendarRepositoryImpl
 import com.example.wapapp2.repository.interfaces.CalendarRepository
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import org.joda.time.DateTime
+import java.sql.Date
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class MyCalendarViewModel : ViewModel() {
     private val myCalendarRepository: CalendarRepository = CalendarRepositoryImpl.getINSTANCE()
-    private var myCalcRoomReceiptListeners: ArrayList<ListenerRegistration>? = null
+    private val myCalcRoomReceiptListeners: ArrayList<ListenerRegistration> = arrayListOf()
 
-    /** Hashmap of my ReceiptDTOs <DateString ISO8610, ReceiptDTO> **/
-    var myReceiptMap = MutableLiveData<HashMap<String, ArrayList<ReceiptDTO>>>()
+    /** Hashmap of my ReceiptDTOs <DateString yyyyMMdd, ReceiptDTO> **/
+    var myReceiptMapLivedata = MutableLiveData<HashMap<String, ArrayList<ReceiptDTO>>>(hashMapOf())
+    val myReceiptMap get() = myReceiptMapLivedata.value
+
+    /** Update될떄마다 값이 바뀜 **/
+    var updatedBooleanLiveData = MutableLiveData<Boolean>(true)
+
+    /** 방마다 hashmap 값을 저장 **/
+    var myReceiptCalendarMaps = HashMap<String, HashMap<String, ArrayList<ReceiptDTO>>>(hashMapOf())
 
     fun loadCalendarReceipts(myCalcRoomIDs: MutableSet<String>) {
         for (myCalcRoomID in myCalcRoomIDs) {
-            viewModelScope.launch {
-                val pairOf_map_rl = async {
-                    myCalendarRepository.getMyReceipts_with_addSnapshot(myCalcRoomID, EventListener { value, error ->
-                        value?.documentChanges?.apply {
-                            for (dc in this) {
-                                if (dc.type == DocumentChange.Type.ADDED) {
-                                    receiptAdded(dc.document.toObject(ReceiptDTO::class.java))
-                                } else {
-                                    receiptRemoved(dc.document.toObject(ReceiptDTO::class.java))
-                                }
+            myCalcRoomReceiptListeners.add(
+                myCalendarRepository.addSnapShotListner(
+                    myCalcRoomID,
+                    EventListener { value, error ->
+                        val hashMap = hashMapOf<String, ArrayList<ReceiptDTO>>()
+                        if (value != null) {
+                            for (dc in value) {
+                                val newReceiptDTO = dc.toObject(ReceiptDTO::class.java)
+                                newReceiptDTO.roomID = myCalcRoomID
+                                if (hashMap[SimpleDateFormat("yyyyMMdd").format(newReceiptDTO.createdTime)] == null)
+                                    hashMap[SimpleDateFormat("yyyyMMdd").format(newReceiptDTO.createdTime)] = arrayListOf(newReceiptDTO)
+                                else
+                                    hashMap[SimpleDateFormat("yyyyMMdd").format(newReceiptDTO.createdTime)]!!.add(newReceiptDTO)
                             }
+                            myReceiptCalendarMaps[myCalcRoomID] = hashMap
+                            updatedBooleanLiveData.value = updatedBooleanLiveData.value!!.not()
                         }
-                    })
-                }
-                pairOf_map_rl.await()?.let {
-                    myReceiptMap.value = it.first ?: HashMap()
-                    myCalcRoomReceiptListeners = it.second
-                }
-            }
+                    }
+                )
+            )
         }
     }
 
@@ -50,32 +59,18 @@ class MyCalendarViewModel : ViewModel() {
     }
 
     fun listenerRemove(){
-        if (myCalcRoomReceiptListeners != null) {
-            for (register in myCalcRoomReceiptListeners!!) {
+        if (myCalcRoomReceiptListeners.isEmpty().not()) {
+            for (register in myCalcRoomReceiptListeners) {
                 register.remove()
             }
         }
     }
 
-    fun receiptAdded(newReceiptDTO: ReceiptDTO) {
-        val keyDateString = DateTime.parse(newReceiptDTO.date.toString()).toString("yyyyMMdd")
-
-        var tmplist = myReceiptMap.value ?: hashMapOf()
-        if (tmplist.containsKey(keyDateString)) {
-            tmplist[keyDateString]!!.add(newReceiptDTO)
-        } else {
-            tmplist[keyDateString] = arrayListOf(newReceiptDTO)
-        }
-        myReceiptMap.value = tmplist
+    fun getTotalHashMap() : HashMap<String, ArrayList<ReceiptDTO>>{
+        val result = hashMapOf<String, ArrayList<ReceiptDTO>>()
+        for ( mapForOneCalcRoom in myReceiptCalendarMaps.values)
+            result.putAll(mapForOneCalcRoom)
+        return result
     }
 
-    fun receiptRemoved(removedReceiptDTO: ReceiptDTO) {
-        val keyDateString = DateTime.parse(removedReceiptDTO.date.toString()).toString("yyyyMMdd")
-
-        var tmplist = myReceiptMap.value ?: hashMapOf()
-        tmplist[keyDateString]?.let {
-            it.remove(removedReceiptDTO)
-        }
-        myReceiptMap.value = tmplist
-    }
 }

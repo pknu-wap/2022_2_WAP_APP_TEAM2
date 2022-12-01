@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.example.wapapp2.R
@@ -15,6 +16,7 @@ import com.example.wapapp2.model.UserDTO
 import com.example.wapapp2.view.calculation.CalcMainFragment
 import com.example.wapapp2.view.calculation.calcroom.adapters.ParticipantsInCalcRoomAdapter
 import com.example.wapapp2.view.friends.InviteFriendsFragment
+import com.example.wapapp2.viewmodel.CalculationViewModel
 import com.example.wapapp2.viewmodel.CurrentCalcRoomViewModel
 import com.example.wapapp2.viewmodel.MyCalcRoomViewModel
 
@@ -23,6 +25,10 @@ class ParticipantsInCalcRoomFragment : Fragment() {
     private var _binding: FragmentParticipantsInCalcRoomBinding? = null
     private val binding get() = _binding!!
     private val calcRoomViewModel by viewModels<CurrentCalcRoomViewModel>({ requireParentFragment() })
+    private val calculationViewModel by viewModels<CalculationViewModel>({
+        parentFragmentManager.findFragmentByTag(CalcMainFragment.TAG)!!
+    })
+
     private val participantOnClickListener = ListOnClickListener<CalcRoomParticipantDTO> { item, pos ->
 
     }
@@ -53,11 +59,16 @@ class ParticipantsInCalcRoomFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        calcRoomViewModel.participants.observe(viewLifecycleOwner) {
-            adapter.participants = it
+        calcRoomViewModel.participantMap.observe(viewLifecycleOwner) {
+            adapter.participants = it.values.toMutableList()
         }
 
         binding.addFriend.root.setOnClickListener {
+            if (calcRoomViewModel.calcRoom.value!!.calculationStatus) {
+                Toast.makeText(requireContext(), R.string.impossible_to_invite_friends_because_of_calculation, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             onNavDrawerListener?.closeDrawer()
             val inviteFriendsFragment = InviteFriendsFragment()
             val fragmentManager = requireParentFragment().parentFragmentManager

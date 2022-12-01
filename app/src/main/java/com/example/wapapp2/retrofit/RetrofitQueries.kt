@@ -1,6 +1,6 @@
 package com.example.wapapp2.retrofit
 
-import com.example.wapapp2.model.notifications.MultipleRecipientsPushNotificationDTO
+import com.example.wapapp2.model.notifications.TokenPushNotificationDTO
 import com.example.wapapp2.model.notifications.TopicPushNotificationDTO
 import com.google.gson.JsonElement
 import retrofit2.Response
@@ -21,5 +21,5 @@ interface RetrofitQueries {
             "Authorization: key=${RetrofitClient.FCM_SERVER_KEY}"
     )
     @POST("fcm/send")
-    suspend fun sendFcmToMultipleRecipients(@Body jsonObject: MultipleRecipientsPushNotificationDTO): Response<JsonElement>
+    suspend fun sendFcmToRecipient(@Body jsonObject: TokenPushNotificationDTO): Response<JsonElement>
 }

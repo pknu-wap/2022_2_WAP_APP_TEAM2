@@ -7,52 +7,56 @@
     android:layout_height="match_parent"
     app:contentPadding="16dp"
     >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
 
-
         <!-- Upper Frame -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="나의 정산액"
-            android:textStyle="bold"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            >
 
-        <TextView
-            android:id="@+id/summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:text="12,000원"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/title"
-            app:layout_constraintRight_toLeftOf="@id/expand_btn" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/my_settlement_amount"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
-        <ImageButton
-            android:id="@+id/expand_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:src="@drawable/ic_baseline_expand_less_24"
-            app:layout_constraintBottom_toBottomOf="@id/title"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/title" />
+            <TextView
+                android:id="@+id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="12,000원"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/title"
+                app:layout_constraintRight_toLeftOf="@id/expand_btn"
+                />
+
+            <ImageButton
+                android:id="@+id/expand_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_baseline_expand_less_24"
+                app:layout_constraintBottom_toBottomOf="@id/title"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/title"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Lower Frame -->
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_container_view"
+            android:id="@+id/calculation_fragment_container_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />

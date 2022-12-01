@@ -56,7 +56,6 @@ class NewCalcRoomFragment : Fragment() {
         binding = FragmentNewCalcRoomBinding.inflate(inflater)
 
         binding.topAppBar.setNavigationOnClickListener {
-            friendsViewModel.reset()
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
@@ -105,7 +104,6 @@ class NewCalcRoomFragment : Fragment() {
                     putString("roomId", it.id)
                 }
 
-                friendsViewModel.reset()
                 fragmentManager.popBackStack()
                 fragmentManager.beginTransaction()
                     .hide(fragmentManager.findFragmentByTag(MainHostFragment.TAG) as Fragment)

@@ -61,20 +61,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
-    /**
-     * 알림 클릭 시 동작
-     */
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        intent?.apply {
-            try {
-                onIntentFromNotification(extras!!)
-            } catch (e: Exception) {
-                nonClickedNotification()
-            }
-        }
-    }
 
     private fun onIntentFromNotification(arguments: Bundle) {
         arguments.apply {
@@ -82,6 +68,8 @@ class MainActivity : AppCompatActivity() {
                 nonClickedNotification()
                 return
             }
+
+            myAccountViewModel.onSignIn()
 
             when (getParcelable<NotificationType>("notificationType")) {
                 NotificationType.Chat -> {

@@ -1,31 +1,44 @@
 package com.example.wapapp2.view.friends.adapter
 
+import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.wapapp2.R
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.databinding.MyFriendItemViewBinding
 import com.example.wapapp2.model.FriendDTO
+import com.example.wapapp2.model.UserDTO
 import com.firebase.ui.common.ChangeEventType
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.firebase.ui.firestore.paging.FirestorePagingAdapter
-import com.firebase.ui.firestore.paging.FirestorePagingOptions
 import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MyFriendsAdapter(
-        private val onClickListener: ListOnClickListener<FriendDTO>,
-        options: FirestoreRecyclerOptions<FriendDTO>,
+        private val onClickListener: ListOnClickListener<UserDTO>,
+        options: FirestoreRecyclerOptions<UserDTO>,
+        val friendMap: Map<String, FriendDTO>
 ) :
-        FirestoreRecyclerAdapter<FriendDTO, MyFriendsAdapter.CustomViewHolder>(options), IAdapterItemCount {
+        FirestoreRecyclerAdapter<UserDTO, MyFriendsAdapter.CustomViewHolder>(options), IAdapterItemCount {
+
+    lateinit var defaultImgMan : Drawable
+    lateinit var defaultImgGirl : Drawable
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+        defaultImgMan = ContextCompat.getDrawable(parent.context, R.drawable.man)!!
+        defaultImgGirl = ContextCompat.getDrawable(parent.context, R.drawable.girl)!!
         return CustomViewHolder(MyFriendItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false), onClickListener)
     }
 
-    override fun onBindViewHolder(holder: CustomViewHolder, position: Int, model: FriendDTO) {
+    override fun onBindViewHolder(holder: CustomViewHolder, position: Int, model: UserDTO) {
         holder.bind(model)
     }
 
@@ -37,20 +50,31 @@ class MyFriendsAdapter(
         super.onChildChanged(type, snapshot, newIndex, oldIndex)
     }
 
-    class CustomViewHolder(
+    inner class CustomViewHolder(
             private val binding: MyFriendItemViewBinding,
-            private val onClickListener: ListOnClickListener<FriendDTO>,
+            private val onClickListener: ListOnClickListener<UserDTO>,
     ) :
             RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(friendDTO: FriendDTO) {
-            binding.myAccountId.text = "email"
-            binding.myProfileName.text = friendDTO.alias
+        fun bind(userDTO : UserDTO) {
+            binding.myAccountId.text = userDTO.email
+            binding.myProfileName.text = userDTO.name
 
-            binding.root.setOnClickListener {
-                onClickListener.onClicked(friendDTO, bindingAdapterPosition)
+            friendMap[userDTO.id]?.apply {
+                binding.myProfileName.text = this.alias
+                binding.root.setOnClickListener {
+                    onClickListener.onClicked(userDTO, bindingAdapterPosition)
+                }
             }
+            CoroutineScope(Dispatchers.Main).launch {
+                if(userDTO.imgUri.isEmpty().not()) Glide.with(binding.root).load(userDTO.imgUri).circleCrop().into(binding.myProfileImg)
+                else if (userDTO.gender == "man") binding.myProfileImg.setImageDrawable(defaultImgMan)
+                else binding.myProfileImg.setImageDrawable(defaultImgGirl)
+            }
+
         }
+
+
 
     }
 

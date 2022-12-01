@@ -1,11 +1,14 @@
 package com.example.wapapp2.view.login
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
@@ -15,8 +18,10 @@ import com.example.wapapp2.datastore.MyDataStore
 import com.example.wapapp2.repository.*
 import com.example.wapapp2.view.main.RootTransactionFragment
 import com.example.wapapp2.viewmodel.MyAccountViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +32,7 @@ class LoginFragment : Fragment() {
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     var auth: FirebaseAuth? = null
+
 
     companion object {
         const val TAG = "LoginFragment"
@@ -47,11 +53,14 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
         //moveMainPage(auth?.currentUser)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireActivity().viewModelStore.clear()
+
         auth = FirebaseAuth.getInstance()
     }
 
@@ -78,6 +87,7 @@ class LoginFragment : Fragment() {
 
     fun moveMainPage(user: FirebaseUser?) {
         if (user != null) {
+            myAccountViewModel.onSignIn()
             val rootTransactionFragment = RootTransactionFragment()
 
             parentFragmentManager
@@ -99,6 +109,28 @@ class LoginFragment : Fragment() {
                 .commitAllowingStateLoss()
     }
 
+    fun moveEditPassword() {
+        val editPasswordFragment = EditPasswordFragment()
+
+        parentFragmentManager
+            .beginTransaction()
+            .hide(this@LoginFragment)
+            .add(R.id.fragment_container_view, editPasswordFragment, tag)
+            .addToBackStack(tag)
+            .commitAllowingStateLoss()
+    }
+
+    fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        auth?.signInWithCredential(credential)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    moveMainPage(auth?.currentUser)
+                }
+            }
+    }
+
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?,
@@ -107,6 +139,7 @@ class LoginFragment : Fragment() {
 
         binding.btnLogin.setOnClickListener { emailLogin() }
         binding.btnSignup.setOnClickListener { moveSignup() }
+        binding.btnEditPassword.setOnClickListener { moveEditPassword() }
 
         return binding.root
     }

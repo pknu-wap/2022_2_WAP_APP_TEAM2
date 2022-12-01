@@ -9,7 +9,6 @@ import com.example.wapapp2.model.CalcRoomDTO
 import com.example.wapapp2.model.CalcRoomParticipantDTO
 import com.example.wapapp2.model.FriendDTO
 import com.example.wapapp2.model.ReceiptDTO
-import com.example.wapapp2.model.notifications.MultipleRecipientsPushNotificationDTO
 import com.example.wapapp2.model.notifications.NotificationType
 import com.example.wapapp2.model.notifications.send.SendFcmCalcRoomDTO
 import com.example.wapapp2.repository.CalcRoomRepositorylmpl
@@ -31,9 +30,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
 
     var roomId: String? = null
     val myFriendMap = mutableMapOf<String, FriendDTO>()
-    val participants = MutableLiveData<MutableList<CalcRoomParticipantDTO>>()
-    val participantMap = mutableMapOf<String, CalcRoomParticipantDTO>()
-    val participantIds = mutableSetOf<String>()
+    val participantMap = MutableLiveData(mutableMapOf<String, CalcRoomParticipantDTO>())
     val receipts = MutableLiveData<ArrayMap<String, ReceiptDTO>>(arrayMapOf())
     val calcRoom = MutableLiveData<CalcRoomDTO>()
 
@@ -58,11 +55,11 @@ class CurrentCalcRoomViewModel : ViewModel() {
         addSnapshotReceipts()
     }
 
-    private fun onChangedParticipants() {
+    private fun onChangedParticipants(participantIds: MutableList<String>) {
         // 정산방 참여자 목록 가져오기
         viewModelScope.launch {
             val downloadedParticipantList = async {
-                userRepository.getUsers(participantIds.toMutableList())
+                userRepository.getUsers(participantIds)
             }
             // 받아온 유저 목록에서 친구 추가 여부 확인
             val participantList = mutableListOf<CalcRoomParticipantDTO>()
@@ -70,18 +67,20 @@ class CurrentCalcRoomViewModel : ViewModel() {
             var isMyFriend = false
             var dto: CalcRoomParticipantDTO? = null
 
+            val _participantMap = participantMap.value!!
+            _participantMap.clear()
+
             for (v in downloadedParticipantList.await()) {
                 //내 친구인지 확인
                 isMyFriend = myFriendMap.containsKey(v.id)
                 name = if (isMyFriend) myFriendMap[v.id]!!.alias else v.name
 
                 dto = CalcRoomParticipantDTO(v.id, name, isMyFriend, v.email, v.fcmToken)
-                participantList.add(dto)
-                participantMap[v.id] = dto
+                _participantMap[v.id] = dto
             }
 
             withContext(Main) {
-                participants.value = participantList
+                participantMap.value = _participantMap
             }
         }
     }
@@ -119,11 +118,10 @@ class CurrentCalcRoomViewModel : ViewModel() {
             calcRoomDTO.id = value.id
 
             //참여자 변화 확인
-            if (calcRoomDTO.participantIds.toMutableSet() != participantIds) {
+            if (calcRoomDTO.participantIds.toMutableSet() != participantMap.value!!.keys) {
                 //참여자 변화 생김
-                participantIds.clear()
-                participantIds.addAll(calcRoomDTO.participantIds.toMutableSet())
-                onChangedParticipants()
+                val participantIds = calcRoomDTO.participantIds.toMutableList()
+                onChangedParticipants(participantIds)
             }
 
             calcRoom.value = calcRoomDTO
@@ -134,7 +132,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
         //방 나가기
         //calcRoom문서 내 participantIds에서 내 id삭제
         exitFromRoom = true
-        FcmRepositoryImpl.unSubscribeToCalcRoom(roomId)
+        FcmRepositoryImpl.unSubscribeToTopic(roomId)
 
         CoroutineScope(Dispatchers.IO).launch {
             //users문서 내 myCalcRoomIds에서 나가려는 정산방 id 삭제
@@ -173,7 +171,7 @@ class CurrentCalcRoomViewModel : ViewModel() {
      * 정산방 초대 알림
      */
     private suspend fun sendNewCalcRoomFcm(calcRoomId: String, recipientTokens: MutableList<String>) {
-        FcmRepositoryImpl.sendFcmToMultipleDevices(NotificationType.NewCalcRoom, recipientTokens, SendFcmCalcRoomDTO(calcRoomId))
+        FcmRepositoryImpl.sendFcmToRecipients(NotificationType.NewCalcRoom, recipientTokens, SendFcmCalcRoomDTO(calcRoomId))
     }
 
 

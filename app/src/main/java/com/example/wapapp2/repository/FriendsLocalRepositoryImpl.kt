@@ -41,6 +41,12 @@ class FriendsLocalRepositoryImpl private constructor(context: Context) : Friends
         dao.delete(friendDTO)
     }
 
+    @WorkerThread
+    suspend fun clear(){
+        dao.deleteAll()
+    }
+
+
     override fun get(friendId: String): Flow<FriendDTO?> = dao.get(friendId)
 
     override fun get(friendIds: List<String>): Flow<List<FriendDTO>> = dao.get(friendIds)

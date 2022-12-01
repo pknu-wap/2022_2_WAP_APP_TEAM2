@@ -22,7 +22,7 @@ class NewLoadingView : FrameLayout, DefaultLifecycleObserver {
     private var succeed = false
     val isSuccess get() = succeed
     private var btnEnabled = false
-    private var emptyListMsg: String? = null
+    var emptyListMsg: String? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -41,9 +41,10 @@ class NewLoadingView : FrameLayout, DefaultLifecycleObserver {
      * contentView : 표시여부를 변경할 views,
      * 함수 호출과 함께 contentView들을 숨기고, 로딩바 표시
      */
-    fun setContentView(vararg contentView: View) {
+    fun setContentView(emptyMsg: String, vararg contentView: View) {
         this.contentViews.addAll(contentView.toMutableList())
-        onStarted()
+        emptyListMsg = emptyMsg
+        onFailed(emptyMsg)
     }
 
     /**
@@ -102,5 +103,7 @@ class NewLoadingView : FrameLayout, DefaultLifecycleObserver {
 
         contentViews.clear()
     }
+
+
 
 }

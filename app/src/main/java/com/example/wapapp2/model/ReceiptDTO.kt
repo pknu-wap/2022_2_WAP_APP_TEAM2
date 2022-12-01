@@ -3,6 +3,7 @@ package com.example.wapapp2.model
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
+import androidx.collection.arrayMapOf
 import com.google.firebase.firestore.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.parcelize.Parcelize
@@ -35,11 +36,14 @@ data class ReceiptDTO(
         var payersName: String,
 
         @field:JvmField
-        @PropertyName("status")
+        @PropertyName("status") // true -> 정산 완료, else -> 진행 중
         var status: Boolean,
 
         @PropertyName("totalMoney")
         var totalMoney: Int = 0,
+
+        @PropertyName("checkedParticipantIds")
+        val checkedParticipantIds: MutableList<String>,
 
         @get:Exclude
         private val productList: ArrayList<ReceiptProductDTO>,
@@ -50,7 +54,7 @@ data class ReceiptDTO(
         @get:Exclude
         public val date: DateTime = DateTime.now(),
 ) : Parcelable {
-    constructor() : this("", null, "", null, "", "", "", false, 0, arrayListOf(), 0, DateTime.now())
+    constructor() : this("", null, "", null, "", "", "", false, 0, mutableListOf(), arrayListOf(), 0, DateTime.now())
 
     fun addProduct(receiptProductDTO: ReceiptProductDTO) {
         productList.add(receiptProductDTO)
@@ -63,6 +67,8 @@ data class ReceiptDTO(
     @Exclude
     fun getProducts(): ArrayList<ReceiptProductDTO> = productList
 
+    @get:Exclude
+    val productMap = arrayMapOf<String, ReceiptProductDTO>()
 
     fun removeProduct(receiptProductDTO: ReceiptProductDTO): Int {
         for ((index, value) in productList.withIndex()) {

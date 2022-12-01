@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wapapp2.R
 import com.example.wapapp2.commons.classes.ListAdapterDataObserver
+import com.example.wapapp2.commons.classes.WrapContentLinearLayoutManager
 import com.example.wapapp2.commons.interfaces.ListOnClickListener
 import com.example.wapapp2.commons.view.RecyclerViewItemDecoration
 import com.example.wapapp2.databinding.GroupFragmentBinding
@@ -75,7 +76,7 @@ class GrouplistFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = GroupFragmentBinding.inflate(layoutInflater, container, false)
-        binding.loadingView.setContentView(binding.groupRV)
+        binding.loadingView.setContentView(getString(R.string.empty_calc_rooms), binding.groupRV)
         return binding.root
     }
 
@@ -95,13 +96,12 @@ class GrouplistFragment : Fragment() {
 
         myCalcRoomViewModel.myCalcRoomIds.observe(viewLifecycleOwner) {
             adapter?.stopListening()
-
             if (it.isNotEmpty()) {
                 if (adapter == null) {
                     adapter = GroupAdapter(myCalcRoomViewModel.getMyCalcRoomsOptions(), onGroupItemOnClickListener)
                     binding.groupRV.adapter = adapter
                     dataObserver = CalcRoomDataObserver(binding.groupRV, binding.groupRV.layoutManager as
-                            LinearLayoutManager, adapter!!)
+                            WrapContentLinearLayoutManager, adapter!!)
                     dataObserver!!.registerLoadingView(binding.loadingView, getString(R.string.empty_calc_rooms))
                     adapter!!.registerAdapterDataObserver(dataObserver!!)
                 } else {

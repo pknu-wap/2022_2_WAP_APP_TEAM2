@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wapapp2.commons.classes.DateConverter
 import com.example.wapapp2.commons.interfaces.IAdapterItemCount
+import com.example.wapapp2.databinding.ChatMsgItemNoticeBinding
 import com.example.wapapp2.databinding.ChatMsgItemReceivedBinding
 import com.example.wapapp2.databinding.ChatMsgItemSendedBinding
 import com.example.wapapp2.model.ChatDTO
@@ -21,13 +22,19 @@ import org.joda.time.format.ISODateTimeFormat
 
 class ChatPagingAdapter(
         private val myId: String,
-        private val option: FirestorePagingOptions<ChatDTO>,
+        option: FirestorePagingOptions<ChatDTO>,
 ) : FirestorePagingAdapter<ChatDTO, RecyclerView.ViewHolder>(option), IAdapterItemCount, ChatDataObserver.CheckMyMessage {
     private val timeFormat = DateTimeFormat.forPattern("a hh:mm")
     private val dateTimeParser = ISODateTimeFormat.dateTimeParser()
 
     private enum class ItemViewType {
-        SENDED, RECEVEIED
+        SENDED, RECEVEIED, NOTICE
+    }
+
+    inner class NoticeHolder(val binding: ChatMsgItemNoticeBinding) : RecyclerView.ViewHolder(binding.root), ChatHolder {
+        override fun bind(position: Int, model: ChatDTO) {
+            binding.notice.text = "${model.userName}님이 방을 나갔습니다."
+        }
     }
 
 
@@ -54,27 +61,47 @@ class ChatPagingAdapter(
 
         private fun setUserName(position: Int, model: ChatDTO) {
             if (model.senderId == myId || equalsTopUserId(model.senderId, position)) {
-                binding.userName.visibility = View.GONE
-                return
-            }
-            binding.userName.visibility = View.VISIBLE
+                if (topIsNotice(model.senderId, position))
+                    binding.userName.visibility = View.VISIBLE
+                else {
+                    binding.userName.visibility = View.GONE
+                    return
+                }
+            } else
+                binding.userName.visibility = View.VISIBLE
+
             binding.userName.text = model.userName
         }
 
         // for reverse
         private fun equalsTopUserId(userId: String, currentPosition: Int): Boolean {
-            return if (currentPosition >= itemCount) false else getItem(currentPosition + 1)?.get("senderId") == userId
+            return if (currentPosition + 1 >= itemCount) false
+            else getItem(currentPosition + 1)?.getString("senderId") == userId
+        }
+
+        private fun topIsNotice(userId: String, currentPosition: Int): Boolean {
+            return if (currentPosition + 1 >= itemCount) false
+            else getItem(currentPosition + 1)?.getBoolean("notice")!!
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == ItemViewType.RECEVEIED.ordinal) ChatHolder_received(ChatMsgItemReceivedBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder else
-            ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        if (viewType == ItemViewType.RECEVEIED.ordinal)
+            return ChatHolder_received(ChatMsgItemReceivedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        else if (viewType == ItemViewType.SENDED.ordinal)
+            return ChatHolder_sended(ChatMsgItemSendedBinding.inflate(LayoutInflater.from(parent.context), parent, false)) as RecyclerView.ViewHolder
+        else
+            return NoticeHolder(ChatMsgItemNoticeBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun getItemViewType(position: Int): Int =
-            if (getItem(position)?.get("senderId").toString() == myId) ItemViewType.SENDED.ordinal else ItemViewType.RECEVEIED.ordinal
+    override fun getItemViewType(position: Int): Int {
+        return if (getItem(position)?.getBoolean("notice")!!)
+            ItemViewType.NOTICE.ordinal
+        else if (getItem(position)?.getString("senderId") == myId)
+            ItemViewType.SENDED.ordinal
+        else
+            ItemViewType.RECEVEIED.ordinal
+    }
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, model: ChatDTO) {
@@ -93,5 +120,6 @@ class ChatPagingAdapter(
     fun getLastChatDTO(): ChatDTO {
         return getItem(0)!!.toObject(ChatDTO::class.java)!!
     }
+
 
 }

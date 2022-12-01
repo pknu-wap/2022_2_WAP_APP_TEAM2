@@ -96,75 +96,20 @@
             android:layout_marginTop="8dp" />
 
         <TextView
+            android:id="@+id/btn_editPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="비밀번호를 잊으셨나요?"
+            android:clickable="true"
             android:textColor="@color/purple_700"/>
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/View"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="or"
-                android:textAlignment="center"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@color/white"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/View"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginRight="16dp"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:background="@color/white"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/View"
-                android:layout_marginLeft="16dp"/>
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginRight="12dp"
-            android:backgroundTint="#2DC1C0C0"
-            android:drawableLeft="@drawable/_993685_brand_brands_google_logo_logos_icon"
-            android:padding="12dp"
-            android:paddingLeft="36dp"
-            android:text="Log in with Google"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:strokeColor="#00FFFFFF"
-            />
-    </LinearLayout>
+        />
 
 </LinearLayout>

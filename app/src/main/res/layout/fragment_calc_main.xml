@@ -102,15 +102,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:drawableRight="@drawable/ic_baseline_arrow_right_24"
                 android:text="영수증 목록"
                 android:textSize="15sp"
                 />
 
-
-            <com.google.android.material.divider.MaterialDivider
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/receipts_fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
                 />
 
             <TextView

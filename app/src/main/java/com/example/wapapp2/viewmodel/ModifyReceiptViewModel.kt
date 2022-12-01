@@ -3,6 +3,7 @@ package com.example.wapapp2.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.wapapp2.model.ReceiptDTO
 import com.example.wapapp2.model.ReceiptProductDTO
+import com.example.wapapp2.repository.CalcRoomRepositorylmpl
 import com.example.wapapp2.repository.ReceiptImgRepositoryImpl
 import com.example.wapapp2.repository.ReceiptRepositoryImpl
 import kotlinx.coroutines.*
@@ -10,6 +11,7 @@ import kotlinx.coroutines.*
 class ModifyReceiptViewModel : ViewModel() {
     private val receiptRepositoryImpl = ReceiptRepositoryImpl.INSTANCE
     private val receiptImgRepositoryImpl = ReceiptImgRepositoryImpl.INSTANCE
+    private val calcRoomReceiptRepositoryImpl = CalcRoomRepositorylmpl.getINSTANCE()
 
     lateinit var originalReceiptDTO: ReceiptDTO
     lateinit var modifiedReceiptDTO: ReceiptDTO
@@ -44,6 +46,7 @@ class ModifyReceiptViewModel : ViewModel() {
             if (originalReceiptDTO.totalMoney != modifiedReceiptDTO.totalMoney)
                 map["totalMoney"] = modifiedReceiptDTO.totalMoney
 
+            map["participants"] = emptyMap<String, Any?>()
 
             //사진이 변경된 경우
             if (receiptImgChanged) {
@@ -103,15 +106,24 @@ class ModifyReceiptViewModel : ViewModel() {
                 if (!originalProductMap[id]!!.equalsSimple(modifiedProductMap[id]!!)) {
                     //수정 됨
                     modifiedMap[id] = modifiedProductMap[id]!!
+                    modifiedMap[id]!!.participants.clear()
                 }
             }
 
             // 추가된 항목 분석
             for (id in addedSet) {
+                modifiedProductMap[id]!!.participants.clear()
                 addedList.add(modifiedProductMap[id]!!)
             }
 
+            // 수정되지 않은 항목
+            val unModifiedSet = originalProductMap.keys.toMutableSet().subtract(modifiedMap.keys.toMutableSet())
+                    .subtract(removedSet)
+
             val receiptId = originalReceiptDTO.id
+
+            if (unModifiedSet.isNotEmpty())
+                receiptRepositoryImpl.clearParticipants(currentRoomId!!, receiptId, unModifiedSet.toMutableList())
 
             if (modifiedMap.isNotEmpty())
                 receiptRepositoryImpl.modifyProducts(modifiedMap, currentRoomId!!, receiptId)
@@ -126,6 +138,15 @@ class ModifyReceiptViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             //영수증 삭제
             receiptRepositoryImpl.removeReceipt(calcRoomId, receiptDTO.id)
+
+            //진행중인 영수증 개수 가져오기
+            val onGoingReceiptCountsResult = async {
+                calcRoomReceiptRepositoryImpl.getOngoingReceiptCounts(calcRoomId)
+            }
+            val onGoingReceiptCounts = onGoingReceiptCountsResult.await()
+            //정산 상태 변경, 진행중인 정산이 없으면 false로, 그 외 -> true
+            calcRoomReceiptRepositoryImpl.updateCalculationStatus(calcRoomId, onGoingReceiptCounts != 0, mutableListOf<String>())
+
             //영수증 사진 삭제
             if (receiptDTO.imgUrl.isNotEmpty()) {
                 receiptImgRepositoryImpl.deleteReceiptImg(receiptDTO.imgUrl!!)

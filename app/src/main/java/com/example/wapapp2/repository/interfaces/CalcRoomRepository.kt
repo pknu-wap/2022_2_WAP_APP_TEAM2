@@ -7,9 +7,13 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.ListenerRegistration
 
 interface CalcRoomRepository {
-    suspend fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO) : Boolean
+    suspend fun addNewCalcRoom(calcRoomDTO: CalcRoomDTO): Boolean
     suspend fun getCalcRoom(roomId: String): CalcRoomDTO
     suspend fun inviteFriends(list: MutableList<FriendDTO>, roomId: String)
+    suspend fun updateCalculationStatus(calcRoomId: String, status: Boolean, receiptIds: MutableList<String>): Boolean
+    suspend fun getOngoingReceiptCounts(calcRoomId: String): Int
+    suspend fun isCompletedStatus(calcRoomId: String): Boolean
+
     fun getMyCalcRoomIds(listener: EventListener<DocumentSnapshot>): ListenerRegistration
     suspend fun exitFromCalcRoom(roomId: String): Boolean
     fun snapshotCalcRoom(roomId: String, listener: EventListener<DocumentSnapshot>): ListenerRegistration
