@@ -69,7 +69,7 @@ class CalendarAdapter(val firstDate_inDstMonth : DateTime, val hashMapOfReceipts
 
         inner class DayMarkingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
             fun bind(pos : Int){
-                inner_item_binding.marking.text = markingItems!![pos].name
+                inner_item_binding.marking.text = markingItems!![pos].name.ifEmpty { "제목 없음" }
                 inner_item_binding.marking.setBackgroundColor(
                     if (markingItems!![pos].status)
                         ContextCompat.getColor(itemView.context ,R.color.dutch_done)
