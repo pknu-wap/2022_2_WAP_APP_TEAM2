@@ -43,10 +43,10 @@ class FriendProfileFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         arguments?.apply {
             dstUserDTO = getParcelable("userDTO")!!
-            friendAliasViewModel.friendDTO = FriendsViewModel.MY_FRIEND_MAP[dstUserDTO.id]
+            friendAliasViewModel.friendDTO = friendsViewModel.friendsMap.value!![dstUserDTO.id]
         }
     }
 

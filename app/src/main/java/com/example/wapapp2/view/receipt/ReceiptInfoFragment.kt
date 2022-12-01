@@ -97,7 +97,7 @@ class ReceiptInfoFragment : Fragment() {
             binding.createdDateTime.text = simpleDateFormat.format(createdTime!!)
 
             //결제자가 내 친구 이면 별명으로 교체
-            binding.payer.text = FriendsViewModel.MY_FRIEND_MAP[payersId]?.alias ?: payersName
+            binding.payer.text = friendsViewModel.friendsMap.value!![payersId]?.alias ?: payersName
 
 
             if (imgUrl.isNullOrEmpty())

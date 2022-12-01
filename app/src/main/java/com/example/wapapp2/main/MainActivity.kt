@@ -69,7 +69,13 @@ class MainActivity : AppCompatActivity() {
                 return
             }
 
-            myAccountViewModel.onSignIn()
+            if(!myAccountViewModel.onSignIn()){
+                //로그인 상태가 아니면 로그인 페이지로 이동
+                val loginFragment = LoginFragment()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_container_view, loginFragment,
+                        LoginFragment.TAG).commit()
+                return
+            }
 
             when (getParcelable<NotificationType>("notificationType")) {
                 NotificationType.Chat -> {

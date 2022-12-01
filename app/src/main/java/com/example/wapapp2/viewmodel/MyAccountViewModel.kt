@@ -30,7 +30,7 @@ class MyAccountViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     val myProfileData = MutableLiveData<UserDTO>()
 
-    fun initMyProfile() {
+    private fun initMyProfile() {
         CoroutineScope(Dispatchers.IO).launch {
             val result = async {
                 userRepository.getUser(auth.currentUser!!.uid)
